@@ -1,0 +1,23 @@
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+charset = utf-8
+trim_trailing_whitespace = true
+# lf, cr, crlf
+end_of_line = crlf
+insert_final_newline = true
+
+# Tab indentation (no size specified)
+[Makefile]
+indent_style = tab
+
+[*.{c,h,cpp,hpp,frag,geom,vert,comp}]
+indent_style = space
+indent_size = 2
+tab_width = 2
+
+[*.py]
+indent_style = space
+indent_size = 2
