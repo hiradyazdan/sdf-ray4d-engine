@@ -1,8 +1,9 @@
 {
-  "name": "4d-ray-engine",
+  "name": "ray4d-engine",
   "version": "1.0.0",
   "dependencies": [
     { "name": "glm" }
   ],
-  "builtin-baseline":""
+  "builtin-baseline":"",
+  "overrides": []
 }

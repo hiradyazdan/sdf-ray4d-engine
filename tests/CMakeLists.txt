@@ -4,14 +4,16 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{CMAKE_TOOLCHAIN_FILE})
     set(CMAKE_TOOLCHAIN_FILE $ENV{CMAKE_TOOLCHAIN_FILE})
 endif()
 
+set(TESTS_TARGET_NAME ${TARGET_NAME}Tests)
+
 find_package(Catch2 CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 
 enable_testing()
-add_executable(${TARGET_NAME}_TESTS)
+add_executable(${TESTS_TARGET_NAME})
 
 file(
-    GLOB_RECURSE ${TARGET_NAME}_TESTS_SOURCES
+    GLOB_RECURSE ${TESTS_TARGET_NAME}_SOURCES
 
     ${PROJECT_SOURCE_DIR}/include/*.hpp
     ${PROJECT_SOURCE_DIR}/src/*.cpp
@@ -20,9 +22,9 @@ file(
     ${PROJECT_SOURCE_DIR}/tests/src/*.cpp
 )
 
-list(REMOVE_ITEM ${TARGET_NAME}_TESTS_SOURCES ${PROJECT_SOURCE_DIR}/src/main.cpp)
+list(REMOVE_ITEM ${TESTS_TARGET_NAME}_SOURCES ${PROJECT_SOURCE_DIR}/src/main.cpp)
 
-target_sources(${TARGET_NAME}_TESTS PRIVATE ${${TARGET_NAME}_TESTS_SOURCES})
+target_sources(${TESTS_TARGET_NAME} PRIVATE ${${TESTS_TARGET_NAME}_SOURCES})
 
-target_link_libraries(${TARGET_NAME}_TESTS PRIVATE glfw)
-target_link_libraries(${TARGET_NAME}_TESTS PRIVATE Catch2::Catch2)
+target_link_libraries(${TESTS_TARGET_NAME} PRIVATE glfw)
+target_link_libraries(${TESTS_TARGET_NAME} PRIVATE Catch2::Catch2)

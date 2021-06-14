@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{CMAKE_TOOLCHAIN_FILE})
+    set(CMAKE_TOOLCHAIN_FILE $ENV{CMAKE_TOOLCHAIN_FILE})
+endif()
+
+set(PLUGIN_TARGET_NAME Ray4DPlugin)
+
+project(
+    ${PLUGIN_TARGET_NAME}_build
+    VERSION 1.0.0
+    DESCRIPTION "Ray4D Plugin: 4D Raymarching Unity Plugin"
+    HOMEPAGE_URL ""
+    LANGUAGES CXX
+)
+
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+file(
+    GLOB_RECURSE ${PLUGIN_TARGET_NAME}_SOURCE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+)
+
+add_library(${PLUGIN_TARGET_NAME} SHARED ${TARGET_NAME}_SOURCE)
