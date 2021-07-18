@@ -6,7 +6,7 @@
 //
 //#include <glslang/Public/ShaderLang.h>
 //
-//namespace ray4d
+//namespace sdfRay4d
 //{
 //  /// Helper class to generate SPIRV code from GLSL source
 //  /// A very simple version of the glslValidator application

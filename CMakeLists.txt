@@ -7,14 +7,22 @@ endif()
 # if vcpkg versions feature flag is not enabled by default
 #set(VCPKG_FEATURE_FLAGS "versions")
 
-set(TARGET_NAME Ray4D)
+set(TARGET_NAME SDFRay4D)
 project(
     ${TARGET_NAME}_build
     VERSION 1.0.0
-    DESCRIPTION "Ray4D Engine: 4D Raymarching Engine"
-    HOMEPAGE_URL ""
+    DESCRIPTION "SDF Ray4D Engine: 4D SDF Raymarching Engine"
+    HOMEPAGE_URL "https://github.com/hiradyazdan/masters-project"
     LANGUAGES CXX
 )
+
+if(${CMAKE_VERSION} VERSION_LESS "3.16.0")
+    message("For faster builds switch to CMake 3.16+")
+else()
+    # If UNITY BUILD causes compile or runtime issues turn this off.
+    # TODO: setting this messes up my IDE syntax error detections intermittently
+#    set(CMAKE_UNITY_BUILD ON)
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,8 +30,9 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 set(CMAKE_AUTOMOC ON) # Qt's extensions handler - Meta Object Compiler (moc)
 set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON) # UIC tools
-set(CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/ui)
+# uncomment below if ui layout created with Qt creator
+#set(CMAKE_AUTOUIC ON) # UIC tools
+#set(CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/ui)
 
 include_directories(include)
 include_directories(externals)
@@ -36,23 +45,29 @@ include_directories(externals)
 find_package(Vulkan REQUIRED)
 find_package(glm REQUIRED)
 find_package(Qt5 COMPONENTS Widgets OpenGL)
+#find_package(Boost REQUIRED)
 
 #qt5_add_resources(RESOURCES ${PROJECT_SOURCE_DIR}/externals/nodeeditor/resources/resources.qrc)
 
 add_executable(${TARGET_NAME} ${RESOURCES})
 
+#add_compile_definitions(NODE_EDITOR_SHARED NODE_EDITOR_EXPORTS)
+target_compile_definitions(${TARGET_NAME} PRIVATE NODE_EDITOR_SHARED NODE_EDITOR_EXPORTS)
+
 file(
     GLOB_RECURSE ${TARGET_NAME}_SOURCE
+
     ${PROJECT_SOURCE_DIR}/include/*.hpp
     ${PROJECT_SOURCE_DIR}/src/*.cpp
 
 #    ${PROJECT_SOURCE_DIR}/externals/glslang/*
 
+    ${PROJECT_SOURCE_DIR}/externals/nodeEditor_old/*.hpp
+    ${PROJECT_SOURCE_DIR}/externals/nodeEditor_old/*.cpp
+
 #    ${PROJECT_SOURCE_DIR}/externals/nodeeditor/include/*
 #    ${PROJECT_SOURCE_DIR}/externals/nodeeditor/src/*
 )
-
-#target_compile_definitions(${TARGET_NAME} PRIVATE NODE_EDITOR_SHARED NODE_EDITOR_EXPORTS)
 
 target_sources(${TARGET_NAME} PRIVATE ${${TARGET_NAME}_SOURCE})
 
@@ -67,12 +82,14 @@ file(
     GLOB_RECURSE ${TARGET_NAME}_SHADERS_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/*.vert
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/*.frag
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/*.comp
     ${CMAKE_CURRENT_SOURCE_DIR}/spirv_compile.sh
 )
 set(
     ${TARGET_NAME}_SHADERS_BIN
     ${CMAKE_CURRENT_BINARY_DIR}/assets/*.vert
     ${CMAKE_CURRENT_BINARY_DIR}/assets/*.frag
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/*.comp
 )
 set(
     ${TARGET_NAME}_SHADERS_SPV
@@ -93,7 +110,7 @@ add_custom_command(
     DEPENDS ${${TARGET_NAME}_SHADERS_BIN}
 )
 add_custom_target(
-    ${TARGET_NAME}CopyAssets ALL
+    ${TARGET_NAME}SPVCompile ALL
     DEPENDS ${${TARGET_NAME}_SHADERS_SPV}
 )
 

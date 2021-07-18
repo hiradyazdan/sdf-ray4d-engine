@@ -1,5 +1,5 @@
 {
-  "name": "ray4d-engine",
+  "name": "sdf-ray4d-engine",
   "version": "1.0.0",
   "dependencies": [
     { "name": "glm" }

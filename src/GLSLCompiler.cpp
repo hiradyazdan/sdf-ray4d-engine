@@ -5,7 +5,7 @@
 //
 //#include "GLSLCompiler.hpp"
 //
-//using namespace ray4d;
+//using namespace sdfRay4d;
 //
 //EShLanguage FindShaderLanguage(VkShaderStageFlagBits _stage)
 //{

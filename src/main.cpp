@@ -1,8 +1,8 @@
 #include <QtWidgets/QStyleFactory>
 
-#include "MainWindow.hpp"
+#include "Window/MainWindow.hpp"
 
-using MainWindow = ray4d::MainWindow;
+using MainWindow = sdfRay4d::MainWindow;
 
 int main(int argc, char *argv[])
 {
@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
   MainWindow mainWindow;
 
-  mainWindow.resize(1024, 768);
+//  mainWindow.resize(1024, 768);
   mainWindow.showMaximized();
 
   return QApplication::exec();

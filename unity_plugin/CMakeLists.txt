@@ -9,7 +9,7 @@ set(PLUGIN_TARGET_NAME Ray4DPlugin)
 project(
     ${PLUGIN_TARGET_NAME}_build
     VERSION 1.0.0
-    DESCRIPTION "Ray4D Plugin: 4D Raymarching Unity Plugin"
+    DESCRIPTION "SDF Ray4D Plugin: 4D SDF Raymarching Unity Plugin"
     HOMEPAGE_URL ""
     LANGUAGES CXX
 )

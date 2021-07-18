@@ -2,15 +2,9 @@
 
 ## Requirements
 
-- cmake v3.12+ (tested with 3.19)
+- cmake v3.12+ (tested with 3.19 - for faster build use v3.16+)
 - Qt v5.10+ (tested with 5.15)
 - Vulkan SDK v1.2.x (tested with v1.2.176.1)
-
-## Design
-
-### High Level Architecture
-
-![Qt Vulkan App Design (High-level)](./docs/design/high-level-architecture.png)
 
 ## Build
 
@@ -19,9 +13,33 @@ cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_PATH} -DVCPKG_TARGET_TRIPLET=x64-windows ..
 cmake --build .
 ```
 
-## Qt Vulkan
+#### CMake Compilation Performance
 
-### Design
+Compiling source class implementations when split into multiple source files (i.e., Partial Class), to allow for
+readability/maintainability, may increase compilation time.
+
+It essentially creates extra multiple `obj` files for each split source file and therefore increases the size of
+compilation unit. There are a few ways to alleviate this and increase compilation performance which need to be reviewed, as below:
+
+- UNITY_BUILD (cmake 3.16+)
+- Pre-compiled Headers/PCH (cmake 3.16+)
+- Module Header Units (C++ 20 Modules)
+
+## Design
+
+### Vulkan vs. DirectX vs. OpenGL
+
+***Vulkan Advantages***
+
+- Multi-threading & Multi-GPU
+- Reducing driver overhead & CPU Load
+  - preprocess/bake batches of calls in advance to submit to command queues per frame
+
+### Qt Vulkan
+
+#### High Level Architecture
+
+![Qt Vulkan App Design (High-level)](./docs/design/high-level-architecture.png)
 
 ***Support for Vulkan rendering was added to the Qt framework since v5.10***
 
@@ -51,11 +69,11 @@ cmake --build .
     - CmdSetScissor
     - CmdDraw
 
-In contrast to using `GLFW`, above Vulkan implementations are already abstracted and handled via `QtVulkanDeviceFunctions` where there's no need to create extra classes and functionality for them.
+In contrast to using `GLFW`, above Vulkan implementations are already abstracted and handled via `QVulkanDeviceFunctions` where there's no need to create extra classes and functionality for them.
 
-This means, `VkDevice` and its functions can be extracted from `QtVulkanWindow` instance. The same applies to all other `vk` prefixed functions which are invoked by `QtVulkanDeviceFunctions` instance.
+This means, `VkDevice` and its functions can be extracted from `QtVulkanWindow` instance. The same applies to all other `vk` prefixed functions which are invoked by `QVulkanDeviceFunctions` instance.
 
-### Design Restrictions
+#### Design Restrictions
 
 - **VulkanWindow Inheritance**
   Currently, couldn't find a way to use one single class consuming and inheriting both `QVulkanWindow` and `QMainWindow` even with `protected` specifiers as they have same public methods signature and therefore cause ambiguous method name lookup.
@@ -89,6 +107,14 @@ pulling `glslang` and `shaderc` with git submodule also requires a lot of config
 
 ***Current Solution***
 For the time being, we skip `SPIR-V` runtime shader compilation using above libraries and instead pre-compile shaders to `SPIR-V` bytecodes using a shell script and cmake command.
+
+However, the problem with this solution is that it doesn't work for dynamic shader code loading, as node-based SDF graph editor allows for adding runtime shader instructions.
+
+***SPIRV Notes***
+
+- They do not validate `glsl` version `410` and below (because of second point as it lacks `binding` value, and they need uniform buffers binding).
+- They do not validate uniforms without blocks (they need to be wrapped into ubo)
+- `in` and `out` variables need to be specified with their locations
 
 ## Unity Native Plugin
 
