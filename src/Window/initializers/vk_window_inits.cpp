@@ -3,24 +3,36 @@
  * Members: Constructor Vulkan Window init helpers (Private)
  *****************************************************/
 
+#include <QLoggingCategory>
+
 #include "Window/MainWindow.hpp"
 
 using namespace sdfRay4d;
 
-void MainWindow::initVkInstance()
+void MainWindow::initVkLayers()
 {
-  m_vkInstance = new QVulkanInstance();
+  QLoggingCategory::setFilterRules(QStringLiteral("qt.vulkan=true"));
 
   /**
    * TODO:
    * Validation layers in Qt seem to be skipped
-   * when using Debug mode on CLion
+   * when using Debugger on CLion
    */
-  const QByteArrayList &validationLayers = {
+  const QByteArrayList &layers = {
+#ifndef Q_OS_ANDROID
     "VK_LAYER_KHRONOS_validation"
+#else
+    "VK_LAYER_GOOGLE_threading",
+    "VK_LAYER_LUNARG_parameter_validation",
+    "VK_LAYER_LUNARG_object_tracker",
+    "VK_LAYER_LUNARG_core_validation",
+    "VK_LAYER_LUNARG_image",
+    "VK_LAYER_LUNARG_swapchain",
+    "VK_LAYER_GOOGLE_unique_objects"
+#endif
   };
 
-  for(const auto &layer : validationLayers)
+  for(const auto &layer : layers)
   {
     if (!m_vkInstance->supportedLayers().contains(layer))
     {
@@ -30,7 +42,14 @@ void MainWindow::initVkInstance()
 
   // Enable validation layer,
   // if supported. Messages go to qDebug by default.
-  m_vkInstance->setLayers(validationLayers);
+  m_vkInstance->setLayers(layers);
+}
+
+void MainWindow::initVkInstance()
+{
+  m_vkInstance = new QVulkanInstance();
+
+  initVkLayers();
 
   if (!m_vkInstance->create())
   {
@@ -42,6 +61,6 @@ void MainWindow::initVkWindow()
 {
   initVkInstance();
 
-  m_vkWindow = new VulkanWindow();
+  m_vkWindow = new VulkanWindow(true);
   m_vkWindow->setVulkanInstance(m_vkInstance);
 }

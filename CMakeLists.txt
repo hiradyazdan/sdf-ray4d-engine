@@ -43,13 +43,14 @@ include_directories(externals)
 #find_package(PkgConfig REQUIRED)
 #find_package(glslang CONFIG REQUIRED) # uses vcpkg cmake config, but pulls in the Vulkan SDK's ports
 find_package(Vulkan REQUIRED)
+#find_package(unofficial-vulkan-memory-allocator REQUIRED)
 find_package(glm REQUIRED)
-find_package(Qt5 COMPONENTS Widgets OpenGL)
+find_package(Qt5 COMPONENTS Widgets OpenGL Concurrent)
 #find_package(Boost REQUIRED)
 
 #qt5_add_resources(RESOURCES ${PROJECT_SOURCE_DIR}/externals/nodeeditor/resources/resources.qrc)
 
-add_executable(${TARGET_NAME} ${RESOURCES})
+add_executable(${TARGET_NAME})
 
 #add_compile_definitions(NODE_EDITOR_SHARED NODE_EDITOR_EXPORTS)
 target_compile_definitions(${TARGET_NAME} PRIVATE NODE_EDITOR_SHARED NODE_EDITOR_EXPORTS)
@@ -72,9 +73,13 @@ file(
 target_sources(${TARGET_NAME} PRIVATE ${${TARGET_NAME}_SOURCE})
 
 #target_link_libraries(${TARGET_NAME} PRIVATE glslang::HLSL glslang::SPIRV glslang::glslang glslang::OGLCompiler)
-target_link_libraries(${TARGET_NAME} PRIVATE Vulkan::Vulkan)
+target_link_libraries(
+    ${TARGET_NAME} PRIVATE
+    Vulkan::Vulkan
+#    unofficial::vulkan-memory-allocator::vulkan-memory-allocator
+)
 target_link_libraries(${TARGET_NAME} PRIVATE glm::glm)
-target_link_libraries(${TARGET_NAME} PRIVATE Qt5::Widgets Qt5::OpenGL)
+target_link_libraries(${TARGET_NAME} PRIVATE Qt5::Widgets Qt5::OpenGL Qt5::Concurrent)
 
 # Temporary precompile shaders to SPV files till figuring out how to
 # integrate with glslang/shaderc apis
@@ -126,5 +131,5 @@ add_custom_target(
 
 # TODO: fix nodeeditor cmake to work with vcpkg
 #add_subdirectory(${PROJECT_SOURCE_DIR}/externals/nodeeditor)
-#add_subdirectory(${PROJECT_SOURCE_DIR}/externals/glslang)
+#add_subdirectory(${PROJECT_SOURCE_DIR}/externals)
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests)

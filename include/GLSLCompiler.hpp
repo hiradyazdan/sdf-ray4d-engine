@@ -39,7 +39,8 @@
 //       */
 //      bool compile_to_spirv(
 //        VkShaderStageFlagBits stage,
-//        const std::vector<uint8_t> &glsl_source,
+//        const QByteArray &glsl_source,
+////        const std::vector<uint8_t> &glsl_source,
 //        const std::string &entry_point,
 //        std::vector<std::uint32_t> &spirv,
 //        std::string &info_log

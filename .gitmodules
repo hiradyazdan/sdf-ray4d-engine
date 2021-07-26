@@ -1,3 +1,6 @@
 [submodule "externals/nodeeditor"]
 	path = externals/nodeeditor
 	url = https://github.com/paceholder/nodeeditor.git
+[submodule "externals/glslang"]
+	path = externals/glslang
+	url = https://github.com/KhronosGroup/glslang.git

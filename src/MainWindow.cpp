@@ -1,35 +1,31 @@
 #include <fstream>
 
-#include <QLoggingCategory>
 #include <QPointer>
 #include <QLibraryInfo>
 
 #include "Window/MainWindow.hpp"
-#include "Renderer.hpp"
 
 using namespace sdfRay4d;
 
-Q_LOGGING_CATEGORY(lcVk, "qt.vulkan")
+//Q_LOGGING_CATEGORY(lcVk, "qt.vulkan")
 
-static QPointer<QPlainTextEdit> messageLogWidget;
-static QtMessageHandler oldMessageHandler = nullptr;
-
-static void messageHandler(QtMsgType _msgType, const QMessageLogContext &_logContext, const QString &_text)
-{
-  if (!messageLogWidget.isNull()) messageLogWidget->appendPlainText(_text);
-  if (oldMessageHandler) oldMessageHandler(_msgType, _logContext, _text);
-}
+//static QPointer<QPlainTextEdit> messageLogWidget;
+//static QtMessageHandler oldMessageHandler = nullptr;
+//
+//static void messageHandler(QtMsgType _msgType, const QMessageLogContext &_logContext, const QString &_text)
+//{
+//  if (!messageLogWidget.isNull()) messageLogWidget->appendPlainText(_text);
+//  if (oldMessageHandler) oldMessageHandler(_msgType, _logContext, _text);
+//}
 
 MainWindow::MainWindow() :
 m_shaderMan(ShaderManager::instance()),
 m_outputNode(nullptr)
 {
-  messageLogWidget = new QPlainTextEdit(QLatin1String(QLibraryInfo::build()) + QLatin1Char('\n'));
-  messageLogWidget->setReadOnly(true);
-
-  oldMessageHandler = qInstallMessageHandler(messageHandler);
-
-  QLoggingCategory::setFilterRules(QStringLiteral("qt.vulkan=true"));
+//  messageLogWidget = new QPlainTextEdit(QLatin1String(QLibraryInfo::build()) + QLatin1Char('\n'));
+//  messageLogWidget->setReadOnly(true);
+//
+//  oldMessageHandler = qInstallMessageHandler(messageHandler);
 
   initVkWindow();
   initSDFGraph();
@@ -82,9 +78,4 @@ QPalette MainWindow::setPalette()
   palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
 
   return palette;
-}
-
-QVulkanWindowRenderer *VulkanWindow::createRenderer()
-{
-  return new Renderer(this);
 }

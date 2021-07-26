@@ -7,10 +7,35 @@
 
 using namespace sdfRay4d;
 
+void MainWindow::mousePressEvent(QMouseEvent *_event)
+{
+  m_pressed = true;
+  m_lastPos = _event->pos();
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *_event)
+{
+  m_pressed = false;
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *_event)
+{
+  if (!m_pressed) return;
+
+  int dx = _event->pos().x() - m_lastPos.x();
+  int dy = _event->pos().y() - m_lastPos.y();
+
+//  if (dy)
+//    m_vkWindow->getRenderer()->pitch(dy / 10.0f);
+
+//  if (dx)
+//    m_renderer->yaw(dx / 10.0f);
+
+  m_lastPos = _event->pos();
+}
+
 void MainWindow::keyPressEvent(QKeyEvent *_event)
 {
-  // this method is called every time the main window receives a key event.
-  // we then switch on the key value and set the camera in the GLWindow
   switch(_event->key())
   {
     // escape key to quite

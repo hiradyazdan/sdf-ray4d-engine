@@ -1,8 +1,8 @@
-# masters-project
+# SDF Ray4D Engine (masters-project)
 
 ## Requirements
 
-- cmake v3.12+ (tested with 3.19 - for faster build use v3.16+)
+- cmake v3.12+ (tested with 3.19 - for faster builds use v3.16+)
 - Qt v5.10+ (tested with 5.15)
 - Vulkan SDK v1.2.x (tested with v1.2.176.1)
 
@@ -15,15 +15,21 @@ cmake --build .
 
 #### CMake Compilation Performance
 
+***source file => compilation/translation unit => obj file => linker => executable***
+
 Compiling source class implementations when split into multiple source files (i.e., Partial Class), to allow for
-readability/maintainability, may increase compilation time.
+readability/maintainability, may increase the compilation time.
 
-It essentially creates extra multiple `obj` files for each split source file and therefore increases the size of
-compilation unit. There are a few ways to alleviate this and increase compilation performance which need to be reviewed, as below:
+It essentially creates extra multiple `obj` files for each split source file which is the result of increase
+in the number of compilation/translation units and therefore increase in the compilation time. There are a few ways
+to alleviate this reducing number of compilation units and saving compilation time, as below:
 
-- UNITY_BUILD (cmake 3.16+)
-- Pre-compiled Headers/PCH (cmake 3.16+)
-- Module Header Units (C++ 20 Modules)
+- `UNITY_BUILD` (cmake 3.16+)
+- `Pre-compiled Headers`/`PCH` (cmake 3.16+)
+- `Module` Header Units (C++20 `Modules`)
+
+Currently, `UNITY_BUILD` is used here, as `PCH` need more configuration and also
+there's no `Module Header units` support for C++17 which is used in this project.
 
 ## Design
 
@@ -34,6 +40,10 @@ compilation unit. There are a few ways to alleviate this and increase compilatio
 - Multi-threading & Multi-GPU
 - Reducing driver overhead & CPU Load
   - preprocess/bake batches of calls in advance to submit to command queues per frame
+
+### Vulkan Execution Model
+
+![Vulkan Execution Model](./docs/design/vulkan-execution-model.png)
 
 ### Qt Vulkan
 
@@ -69,9 +79,17 @@ compilation unit. There are a few ways to alleviate this and increase compilatio
     - CmdSetScissor
     - CmdDraw
 
-In contrast to using `GLFW`, above Vulkan implementations are already abstracted and handled via `QVulkanDeviceFunctions` where there's no need to create extra classes and functionality for them.
+In contrast to using `GLFW`, `SDL` or Native API, above Vulkan implementations
+are already abstracted and handled via `QVulkanWindow` and `QVulkanDeviceFunctions` where there's
+no need to create extra classes and functionality for them.
 
-This means, `VkDevice` and its functions can be extracted from `QtVulkanWindow` instance. The same applies to all other `vk` prefixed functions which are invoked by `QVulkanDeviceFunctions` instance.
+This means, `VkDevice` and its functions can be taken from `QVulkanWindow` instance.
+The same applies to all other `vk` prefixed functions which are invoked
+by `QVulkanDeviceFunctions`instance.
+
+`QVulkanWindowPrivate` acts as an internal class and, its instance is injected into `QVulkanWindow` which
+manages all complex device related functionality including GPU-CPU Synchronization/Multithreading
+and is hidden from the user.
 
 #### Design Restrictions
 
@@ -83,6 +101,32 @@ This means, `VkDevice` and its functions can be extracted from `QtVulkanWindow` 
   Note that, we could inherit `QWindow` to our `VulkanWindow` class and use `QVulkanFunctions` and `QVulkanInstance`, but the limitation would be that `QWidget` functionality is limited and can't have predefined places for Qt widgets.
 
   So, the only way is to inject (***Dependency Injection - DI***) or instantiate `VulkanWindow` in the `MainWindow` constructor, which may be better in terms of design and testability but with extra distinguished classes.
+
+#### Performance & Memory Usage
+
+###### GUI Overhead (Qt)
+
+Although using a Native API could be the most performant way for a GUI application,
+Qt as a wrapper around the native API has some features helping to lower the performance
+bottleneck:
+
+- Qt `Signal`-`Slot` fast mechanism (statically typed and MOC slot method calls)
+- Qt Multithreading (QtConcurrent & QFuture) - equivalent for `std::async` & `std::future`
+
+This performance however, may come as a cost of higher amount of memory usage.
+
+
+
+
+`VMA` (Vulkan Memory Allocator) is a vulkan Memory Allocation Library,
+which simplifies the creation and allocation of resources.
+
+Using this library does not cause any less overhead than if memory allocation
+was done through `QVulkanDeviceFucntions`.
+
+###### Graphics API Overhead (Vulkan)
+
+TBC
 
 ## Node Editor
 

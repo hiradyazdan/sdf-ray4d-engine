@@ -8,15 +8,7 @@
 #include <QtWidgets/QMessageBox>
 
 #include "Types.hpp"
-
-#include "nodeEditor_old/FlowScene.hpp"
-#include "nodeEditor_old/FlowView.hpp"
-#include "nodeEditor_old/Node.hpp"
-
-#include "SDFGraph/DistanceFieldData.hpp"
-
 #include "VulkanWindow.hpp"
-
 #include "ShaderManager.hpp"
 
 namespace sdfRay4d
@@ -34,8 +26,6 @@ namespace sdfRay4d
       static QPalette setPalette();
 
     public:
-      void keyPressEvent(QKeyEvent *_event) override;
-
       NodePtrSet getNodes() { return m_sdfGraphScene->getNodes(); }
 
     public slots:
@@ -46,7 +36,14 @@ namespace sdfRay4d
       virtual void onNodeChanged(const sdfRay4d::NodePtrSet &_nodes);
 
     private:
+      void mousePressEvent(QMouseEvent *_event) override;
+      void mouseReleaseEvent(QMouseEvent *_event) override;
+      void mouseMoveEvent(QMouseEvent *_event) override;
+      void keyPressEvent(QKeyEvent *_event) override;
+
+    private:
       void initVkInstance();
+      void initVkLayers();
       void initVkWindow();
 
       void registerModels();
@@ -72,6 +69,7 @@ namespace sdfRay4d
        * Vulkan
        */
       QVulkanInstance *m_vkInstance;
+      VulkanWindow *m_vkWindow;
 
       /**
        * SDF Graph
@@ -93,8 +91,6 @@ namespace sdfRay4d
 
       QDockWidget *m_dockWidget;
 
-      VulkanWindow *m_vkWindow;
-
       QVBoxLayout *m_mainLayout;
 
       QTabWidget *m_infoTab;
@@ -102,5 +98,8 @@ namespace sdfRay4d
 
       QPushButton *m_grabBtn;
       QPushButton *m_quitBtn;
+
+      bool m_pressed = false;
+      QPoint m_lastPos;
   };
 }

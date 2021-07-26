@@ -7,68 +7,69 @@
 
 using namespace sdfRay4d;
 
+void Renderer::preInitResources()
+{
+  if(m_isMSAA)
+  {
+    const auto sampleCounts = m_vkWindow->supportedSampleCounts();
+    qDebug() << "Supported sample counts:" << sampleCounts;
+
+    for (int s = 16; s >= 4; s /= 2)
+    {
+      if (sampleCounts.contains(s))
+      {
+        qDebug("Requesting sample count %d", s);
+        m_vkWindow->setSampleCount(s);
+
+        break;
+      }
+    }
+  }
+}
+
 void Renderer::initResources()
 {
   qDebug("initResources");
 
-  m_device = m_vkWindow->device();
-  auto *vkInstance = m_vkWindow->vulkanInstance();
-  m_deviceFuncs = vkInstance->deviceFunctions(m_device);
+  m_isFramePending = false;
 
-  const int concurrentFrameCount = m_vkWindow->concurrentFrameCount();
+  m_vkInstance  = m_vkWindow->vulkanInstance();
+  m_device      = m_vkWindow->device();
+  m_deviceFuncs = m_vkInstance->deviceFunctions(m_device);
 
-  createUploadBuffer(concurrentFrameCount);
-  setupDescriptorSets(concurrentFrameCount);
-  createPipelineCache();
-  createPipelineLayout();
-  createGraphicsPipeline();
+//  vma::AllocatorInfo allocatorInfo;
+//  allocatorInfo.vulkanApiVersion  = VK_API_VERSION_1_2;
+//  allocatorInfo.physicalDevice    = m_vkWindow->physicalDevice();
+//  allocatorInfo.device            = m_device;
+//  allocatorInfo.instance          = m_vkInstance->vkInstance();
+//
+//  vmaCreateAllocator(&allocatorInfo, &m_allocator);
 
-  QString info;
-  info += QString::asprintf("Number of physical devices: %d\n", int(m_vkWindow->availablePhysicalDevices().count()));
-
-  QVulkanFunctions *f = vkInstance->functions();
-  VkPhysicalDeviceProperties props;
-  f->vkGetPhysicalDeviceProperties(m_vkWindow->physicalDevice(), &props);
-  info += QString::asprintf(
-    "Active physical device name: '%s' version %d.%d.%d\nAPI version %d.%d.%d\n",
-    props.deviceName,
-    VK_VERSION_MAJOR(props.driverVersion), VK_VERSION_MINOR(props.driverVersion),
-    VK_VERSION_PATCH(props.driverVersion),
-    VK_VERSION_MAJOR(props.apiVersion), VK_VERSION_MINOR(props.apiVersion),
-    VK_VERSION_PATCH(props.apiVersion)
+  // Shaders
+  m_objMaterial.vertexShader.load(
+    m_device,
+    m_deviceFuncs,
+    VK_SHADER_STAGE_VERTEX_BIT,
+    QStringLiteral("assets/shaders/fullscreentri.vert.spv")
+  );
+  m_objMaterial.fragmentShader.load(
+    m_device,
+    m_deviceFuncs,
+    VK_SHADER_STAGE_FRAGMENT_BIT,
+    QStringLiteral("assets/shaders/rtprimitives.frag.spv")
   );
 
-  info += QStringLiteral("Supported instance layers:\n");
-  for (const QVulkanLayer &layer : vkInstance->supportedLayers())
-    info += QString::asprintf("    %s v%u\n", layer.name.constData(), layer.version);
-  info += QStringLiteral("Enabled instance layers:\n");
-  for (const QByteArray &layer : vkInstance->layers())
-    info += QString::asprintf("    %s\n", layer.constData());
-
-  info += QStringLiteral("Supported instance extensions:\n");
-  for (const QVulkanExtension &ext : vkInstance->supportedExtensions())
-    info += QString::asprintf("    %s v%u\n", ext.name.constData(), ext.version);
-  info += QStringLiteral("Enabled instance extensions:\n");
-  for (const QByteArray &ext : vkInstance->extensions())
-    info += QString::asprintf("    %s\n", ext.constData());
-
-  info += QString::asprintf("Color format: %u\nDepth-stencil format: %u\n",
-                            m_vkWindow->colorFormat(), m_vkWindow->depthStencilFormat());
-
-  info += QStringLiteral("Supported sample counts:");
-  const QVector<int> sampleCounts = m_vkWindow->supportedSampleCounts();
-  for (int count : sampleCounts)
-    info += QLatin1Char(' ') + QString::number(count);
-  info += QLatin1Char('\n');
-
-  emit dynamic_cast<VulkanWindow *>(m_vkWindow)->vulkanInfoReceived(info);
+  m_pipelinesFuture = QtConcurrent::run(this, &Renderer::createPipelines);
 }
 
 void Renderer::releaseResources()
 {
   qDebug("releaseResources");
 
-  destroyPipeline();
+  m_pipelinesFuture.waitForFinished();
+
   destroyDescriptorSets();
+  destroyPipeline();
   destroyBuffers();
+  destroyShaderModules();
 }

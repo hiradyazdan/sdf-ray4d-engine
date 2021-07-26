@@ -1,5 +1,7 @@
 #pragma once
 
+//#define VMA_IMPLEMENTATION
+//#include "vk_mem_alloc.h"
 #include <QVulkanFunctions>
 
 namespace sdfRay4d::vk
@@ -8,16 +10,36 @@ namespace sdfRay4d::vk
   using Buffer = VkBuffer;
   using BufferInfo = VkBufferCreateInfo;
   using Result = VkResult;
-  using MemReq = VkMemoryRequirements;
-  using MemAlloc = VkMemoryAllocateInfo;
 
-  using ShaderModule      = VkShaderModule;
-  using ShaderStageFlags = VkShaderStageFlagBits;
   using VertexBindingDesc = VkVertexInputBindingDescription;
   using VertexAttrDesc    = VkVertexInputAttributeDescription;
   using DynamicState      = VkDynamicState;
   using Device = VkDevice;
   using Pipeline = VkPipeline;
+
+  using CmdBuffer = VkCommandBuffer;
+  using ClearColor = VkClearColorValue;
+  using ClearDepthStencil = VkClearDepthStencilValue;
+  using Clear = VkClearValue;
+  using RenderPassBeginInfo = VkRenderPassBeginInfo;
+  using Viewport = VkViewport;
+  using Rect2D = VkRect2D;
+  using PushConstantRange = VkPushConstantRange;
+
+//  namespace vma
+//  {
+//    using AllocatorInfo = VmaAllocatorCreateInfo;
+//    using Allocator = VmaAllocator;
+//
+//    using AllocInfo = VmaAllocationCreateInfo;
+//    using Alloc = VmaAllocation;
+//  }
+
+  namespace memory
+  {
+    using Reqs = VkMemoryRequirements;
+    using AllocInfo = VkMemoryAllocateInfo;
+  }
 
   namespace device
   {
@@ -42,22 +64,51 @@ namespace sdfRay4d::vk
     using Write = VkWriteDescriptorSet;
   }
 
+  namespace shader
+  {
+    using Module      = VkShaderModule;
+    using Info        = VkShaderModuleCreateInfo;
+    using StageFlags  = VkShaderStageFlagBits;
+  }
+
   namespace pipeline
   {
     using Cache = VkPipelineCache;
     using CacheInfo                 = VkPipelineCacheCreateInfo;
     using Layout = VkPipelineLayout;
+
     using LayoutInfo                = VkPipelineLayoutCreateInfo;
-    using ShaderStage           = VkPipelineShaderStageCreateInfo;
-    using VertexInputState      = VkPipelineVertexInputStateCreateInfo;
-    using GraphicsPipeline      = VkGraphicsPipelineCreateInfo;
-    using InputAssembly         = VkPipelineInputAssemblyStateCreateInfo;
-    using Viewport              = VkPipelineViewportStateCreateInfo;
-    using Rasterization         = VkPipelineRasterizationStateCreateInfo;
-    using Multisample           = VkPipelineMultisampleStateCreateInfo;
-    using DepthStencil          = VkPipelineDepthStencilStateCreateInfo;
-    using ColorBlend            = VkPipelineColorBlendStateCreateInfo;
+    using ShaderStageInfo           = VkPipelineShaderStageCreateInfo;
+    using VertexInputInfo      = VkPipelineVertexInputStateCreateInfo;
+    using GraphicsPipelineInfo      = VkGraphicsPipelineCreateInfo;
+    using InputAssemblyInfo         = VkPipelineInputAssemblyStateCreateInfo;
+    using ViewportInfo          = VkPipelineViewportStateCreateInfo;
+    using RasterizationInfo         = VkPipelineRasterizationStateCreateInfo;
+    using MultisampleInfo           = VkPipelineMultisampleStateCreateInfo;
+    using DepthStencilInfo          = VkPipelineDepthStencilStateCreateInfo;
+    using ColorBlendInfo            = VkPipelineColorBlendStateCreateInfo;
+    using DynamicInfo          = VkPipelineDynamicStateCreateInfo;
+
     using ColorBlendAttachment  = VkPipelineColorBlendAttachmentState;
-    using Dynamic               = VkPipelineDynamicStateCreateInfo;
   }
+
+  enum class StructureType
+  {
+    // Pipeline States Infos
+
+    PIPELINE_SHADER_STAGE_INFO = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+    PIPELINE_LAYOUT_INFO = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+    PIPELINE_VERTEX_INPUT_INFO = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+    PIPELINE_INPUT_ASSEMBLY_INFO = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+    PIPELINE_RASTERIZATION_INFO = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+    PIPELINE_VIEWPORT_INFO = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+    PIPELINE_MULTISAMPLE_INFO = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+    PIPELINE_DEPTH_STENCIL_INFO = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+    PIPELINE_COLOR_BLEND_INFO = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+    PIPELINE_DYNAMIC_INFO = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+
+    GRAPHICS_PIPELINE_INFO = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+
+    BUFFER_INFO = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+  };
 }
