@@ -94,6 +94,7 @@ and is hidden from the user.
 #### Design Restrictions
 
 - **VulkanWindow Inheritance**
+
   Currently, couldn't find a way to use one single class consuming and inheriting both `QVulkanWindow` and `QMainWindow` even with `protected` specifiers as they have same public methods signature and therefore cause ambiguous method name lookup.
 
   Also, instantiating the `QMainWindow` in `VulkanWindow` constructor to, instead, use the `resize` and `show`/`showMaximized` methods of `QVulkanWindow`, does not load an actual window and therefore cannot be used as a workaround.
@@ -114,9 +115,6 @@ bottleneck:
 - Qt Multithreading (QtConcurrent & QFuture) - equivalent for `std::async` & `std::future`
 
 This performance however, may come as a cost of higher amount of memory usage.
-
-
-
 
 `VMA` (Vulkan Memory Allocator) is a vulkan Memory Allocation Library,
 which simplifies the creation and allocation of resources.
@@ -147,12 +145,19 @@ Vulkan SDK's `glslang` and `shaderc` are not available via cmake. However, `vcpk
 
 https://github.com/KhronosGroup/glslang/issues/2570
 
-pulling `glslang` and `shaderc` with git submodule also requires a lot of configurations with cmake, which is a huge rabbit hole I don't have time to get into right now! But in any case, `vcpkg` needs to be excluded if we pull in the git repository as otherwise, it will cause conflicts.
+pulling `glslang` ~~or shaderc~~ with git submodule resolves the linking problem using cmake config from `vulkan samples` repo. `vcpkg` needs to be excluded if we pull in the git repository as otherwise, it will cause conflicts.
+
+***GLSL Compiler Multithreading Issue***:
+
+GLSL Compiler (`glslang`) cannot initialize and run synchronously in multiple threads, but can only run and compile exactly once per process, not per thread. Therefore, initial compiling & loading of multiple static shaders cannot be done async and in a separate thread each.
+
+Also, because `pipelines initialization` directly depend on the result of the loaded shaders, running shader compilation and load in parallel with pipeline creation doesn't make sense as it either way has to wait for the result of the loaded shaders to be able to initialize a pipeline.
 
 ***Current Solution***
-For the time being, we skip `SPIR-V` runtime shader compilation using above libraries and instead pre-compile shaders to `SPIR-V` bytecodes using a shell script and cmake command.
 
-However, the problem with this solution is that it doesn't work for dynamic shader code loading, as node-based SDF graph editor allows for adding runtime shader instructions.
+The best solution currently is to only pre-compile static shaders to `.spv` files at build-time, in order to have them load async. Then when SDF Graph dynamic shaders are to be compiled by the user at runtime, they queue up on separate threads to load into the scene without stalling/freezing the frames or any other real-time interaction.
+
+This requires a specific algorithm to identify which shaders need to be picked up at compile time and which at runtime.
 
 ***SPIRV Notes***
 

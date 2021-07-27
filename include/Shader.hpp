@@ -22,12 +22,15 @@ namespace sdfRay4d
       void load(
         Device _device,
         QVulkanDeviceFunctions *_deviceFuncs,
-        shader::StageFlags _stage,
         const QString &_filePath
       );
       ShaderData *getData();
       bool isValid() { return m_data.isValid(); }
       void reset();
+
+    private:
+      static QByteArray readShaderBinary(const QString &_filePath);
+      static shader::StageFlags getShaderStage(const std::string &_fileExtension);
 
     private:
       bool m_maybeRunning = false;

@@ -43,6 +43,8 @@ namespace sdfRay4d
       pipeline::VertexInputInfo createVertexInputState();
       pipeline::ShaderStageInfo *createShaderStages();
 
+      void loadShaders();
+
       /**
        * Create Pipeline Helpers
        *

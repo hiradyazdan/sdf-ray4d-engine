@@ -16,8 +16,8 @@ project(
     LANGUAGES CXX
 )
 
-if(${CMAKE_VERSION} VERSION_LESS "3.16.0")
-    message("For faster builds switch to CMake 3.16+")
+if(${CMAKE_VERSION} VERSION_LESS "3.16")
+    message("Your CMake version is ${CMAKE_VERSION}. Update to at least 3.16 to enable unity_build to speed up incremental builds")
 else()
     # If UNITY BUILD causes compile or runtime issues turn this off.
     # TODO: setting this messes up my IDE syntax error detections intermittently
@@ -41,7 +41,7 @@ include_directories(externals)
 #include_directories(./externals/nodeeditor/include/nodes/internal)
 
 #find_package(PkgConfig REQUIRED)
-#find_package(glslang CONFIG REQUIRED) # uses vcpkg cmake config, but pulls in the Vulkan SDK's ports
+find_package(glslang CONFIG REQUIRED) # uses vcpkg cmake config, but pulls in the Vulkan SDK's ports
 find_package(Vulkan REQUIRED)
 #find_package(unofficial-vulkan-memory-allocator REQUIRED)
 find_package(glm REQUIRED)
@@ -61,8 +61,6 @@ file(
     ${PROJECT_SOURCE_DIR}/include/*.hpp
     ${PROJECT_SOURCE_DIR}/src/*.cpp
 
-#    ${PROJECT_SOURCE_DIR}/externals/glslang/*
-
     ${PROJECT_SOURCE_DIR}/externals/nodeEditor_old/*.hpp
     ${PROJECT_SOURCE_DIR}/externals/nodeEditor_old/*.cpp
 
@@ -73,6 +71,8 @@ file(
 target_sources(${TARGET_NAME} PRIVATE ${${TARGET_NAME}_SOURCE})
 
 #target_link_libraries(${TARGET_NAME} PRIVATE glslang::HLSL glslang::SPIRV glslang::glslang glslang::OGLCompiler)
+target_link_libraries(${TARGET_NAME} PRIVATE glslang glslang-default-resource-limits SPIRV)
+#target_link_libraries(${TARGET_NAME} PRIVATE shaderc)
 target_link_libraries(
     ${TARGET_NAME} PRIVATE
     Vulkan::Vulkan
@@ -81,55 +81,22 @@ target_link_libraries(
 target_link_libraries(${TARGET_NAME} PRIVATE glm::glm)
 target_link_libraries(${TARGET_NAME} PRIVATE Qt5::Widgets Qt5::OpenGL Qt5::Concurrent)
 
-# Temporary precompile shaders to SPV files till figuring out how to
-# integrate with glslang/shaderc apis
-file(
-    GLOB_RECURSE ${TARGET_NAME}_SHADERS_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/assets/*.vert
-    ${CMAKE_CURRENT_SOURCE_DIR}/assets/*.frag
-    ${CMAKE_CURRENT_SOURCE_DIR}/assets/*.comp
-    ${CMAKE_CURRENT_SOURCE_DIR}/spirv_compile.sh
-)
-set(
-    ${TARGET_NAME}_SHADERS_BIN
-    ${CMAKE_CURRENT_BINARY_DIR}/assets/*.vert
-    ${CMAKE_CURRENT_BINARY_DIR}/assets/*.frag
-    ${CMAKE_CURRENT_SOURCE_DIR}/assets/*.comp
-)
-set(
-    ${TARGET_NAME}_SHADERS_SPV
-    ${CMAKE_CURRENT_BINARY_DIR}/assets/*.spv
-)
-add_custom_command(
-    OUTPUT ${${TARGET_NAME}_SHADERS_BIN}
-    COMMAND ${CMAKE_COMMAND} -E copy
-    ${${TARGET_NAME}_SHADERS_SRC} .
-
-    COMMENT "Copying across shader source files."
-    DEPENDS ${${TARGET_NAME}_SHADERS_SRC}
-)
-add_custom_command(
-    OUTPUT ${${TARGET_NAME}_SHADERS_SPV}
-    COMMAND ./spirv_compile.sh
-    COMMENT "Compiling shader files and removing redundant files."
-    DEPENDS ${${TARGET_NAME}_SHADERS_BIN}
-)
+# ONLY use for static shaders to speed up the scene's initial load time.
 add_custom_target(
-    ${TARGET_NAME}SPVCompile ALL
-    DEPENDS ${${TARGET_NAME}_SHADERS_SPV}
+    ${TARGET_NAME}_ASSET_PIPELINE ALL
+
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_CURRENT_SOURCE_DIR}/spirv_static_compile.sh
+    $<TARGET_FILE_DIR:${TARGET_NAME}>
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets
+    $<TARGET_FILE_DIR:${TARGET_NAME}>/assets
+
+    COMMAND ./spirv_static_compile.sh
+
+    COMMENT "Copying Assets, Compiling Shaders & Removing Redundant files."
 )
 
-#add_custom_target(
-#    ${TARGET_NAME}CopyAssets ALL
-#
-#    COMMAND ${CMAKE_COMMAND} -E copy_directory
-#    ${CMAKE_CURRENT_SOURCE_DIR}/assets
-#    $<TARGET_FILE_DIR:${TARGET_NAME}>/assets
-#
-#    COMMENT "Copying assets to build directory"
-#)
-
-# TODO: fix nodeeditor cmake to work with vcpkg
-#add_subdirectory(${PROJECT_SOURCE_DIR}/externals/nodeeditor)
-#add_subdirectory(${PROJECT_SOURCE_DIR}/externals)
+add_subdirectory(${PROJECT_SOURCE_DIR}/externals)
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests)

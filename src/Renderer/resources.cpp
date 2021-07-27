@@ -45,21 +45,30 @@ void Renderer::initResources()
 //
 //  vmaCreateAllocator(&allocatorInfo, &m_allocator);
 
-  // Shaders
-  m_objMaterial.vertexShader.load(
-    m_device,
-    m_deviceFuncs,
-    VK_SHADER_STAGE_VERTEX_BIT,
-    QStringLiteral("assets/shaders/fullscreentri.vert.spv")
-  );
-  m_objMaterial.fragmentShader.load(
-    m_device,
-    m_deviceFuncs,
-    VK_SHADER_STAGE_FRAGMENT_BIT,
-    QStringLiteral("assets/shaders/rtprimitives.frag.spv")
-  );
-
+  loadShaders();
   m_pipelinesFuture = QtConcurrent::run(this, &Renderer::createPipelines);
+}
+
+void Renderer::loadShaders()
+{
+  // Shaders
+  if (!m_objMaterial.vertexShader.isValid())
+  {
+    m_objMaterial.vertexShader.load(
+      m_device,
+      m_deviceFuncs,
+      "assets/shaders/SDF/static/fullscreentri.vert.spv"
+    );
+  }
+
+  if (!m_objMaterial.fragmentShader.isValid())
+  {
+    m_objMaterial.fragmentShader.load(
+      m_device,
+      m_deviceFuncs,
+      "assets/shaders/SDF/static/rtprimitives.frag.spv"
+    );
+  }
 }
 
 void Renderer::releaseResources()
