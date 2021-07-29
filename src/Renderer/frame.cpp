@@ -21,7 +21,7 @@ void Renderer::startNextFrame()
 
 void Renderer::buildFrame()
 {
-  QMutexLocker locker(&m_guiMutex);
+//  QMutexLocker locker(&m_guiMutex);
 
 //  const int concurrentFrameCount = m_vkWindow->concurrentFrameCount();
 //

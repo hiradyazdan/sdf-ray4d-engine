@@ -96,7 +96,7 @@ using namespace sdfRay4d;
 /**
  * per Material Pipeline
  */
-void Renderer::setShaderStages()
+pipeline::ShaderStageInfo &Renderer::setShaderStages()
 {
   pipeline::ShaderStageInfo shaderStages[2] = {
     {
@@ -119,44 +119,50 @@ void Renderer::setShaderStages()
     }
   };
 
-  memcpy(&m_shaderStages, &shaderStages, sizeof(shaderStages));
+  return (pipeline::ShaderStageInfo &) shaderStages;
+
+//  memcpy(&m_shaderStages, &shaderStages, sizeof(shaderStages));
 }
 
 /**
  * per Material Pipeline
  */
-void Renderer::setVertexLayout()
+pipeline::VertexInputInfo *Renderer::setVertexLayout()
 {
-  VertexBindingDesc vertexBindingDesc = {
-    0, // binding
-    3 * sizeof(float), // sizeof(VertexP2C)
-    VK_VERTEX_INPUT_RATE_VERTEX
+  VertexBindingDesc vertexBindingDesc[] = {
+    {
+      0, // binding
+      3 * sizeof(float),
+      VK_VERTEX_INPUT_RATE_VERTEX
+    }
   };
   VertexAttrDesc vertexAttrDesc[] = {
     { // position
       0, // location
       0, // binding
-      VK_FORMAT_R32G32_SFLOAT,
-      0 // offsetof(VertexP2C, x)
+      VK_FORMAT_R32G32B32_SFLOAT,
+      0
     },
-    { // color
+    { // normal
       1,
       0,
       VK_FORMAT_R32G32B32_SFLOAT, // VK_FORMAT_R8G8B8A8_UNORM
-      2 * sizeof(float) // offsetof(VertexP2C, rgba)
+      5 * sizeof(float)
     }
   };
 
   pipeline::VertexInputInfo vertexInputInfo;
   vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-  vertexInputInfo.vertexBindingDescriptionCount = sizeof(vertexBindingDesc);
-  vertexInputInfo.pVertexBindingDescriptions = &vertexBindingDesc;
+  vertexInputInfo.vertexBindingDescriptionCount = sizeof(vertexBindingDesc) / sizeof(vertexBindingDesc[0]);
+  vertexInputInfo.pVertexBindingDescriptions = vertexBindingDesc;
   vertexInputInfo.vertexAttributeDescriptionCount = sizeof(vertexAttrDesc) / sizeof(vertexAttrDesc[0]);
   vertexInputInfo.pVertexAttributeDescriptions = vertexAttrDesc;
   vertexInputInfo.pNext = nullptr;
   vertexInputInfo.flags = 0;
 
-  memcpy(&m_vertexInputInfo, &vertexInputInfo, sizeof(vertexInputInfo));
+  return &vertexInputInfo;
+
+//  memcpy(&m_vertexInputInfo, &vertexInputInfo, sizeof(vertexInputInfo));
 }
 
 /**

@@ -31,7 +31,7 @@ void MainWindow::initWidgets()
 
   m_vpWidget = new QWidget();
 
-  m_dockWidget = new QDockWidget(tr("SDF Modelling Graph Editor"), this);
+  m_dockWidget = new QDockWidget(tr("SDF Graph Editor"), this);
   m_dockWidget->setAllowedAreas(
     Qt::TopDockWidgetArea |
     Qt::BottomDockWidgetArea |

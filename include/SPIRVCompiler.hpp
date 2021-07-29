@@ -8,11 +8,19 @@
 
 #include "Types.hpp"
 
+//namespace sdfRay4d::spvc
+//{
+//  using TargetLang = glslang::EShTargetLanguage;
+//  using TargetLangVersion = glslang::EShTargetLanguageVersion;
+//}
+
 namespace sdfRay4d
 {
+  using namespace vk;
+
   /// Helper class to generate SPIRV code from GLSL source
   /// A very simple version of the glslValidator application
-  class GLSLCompiler
+  class SPIRVCompiler
   {
     public:
       /**
@@ -20,15 +28,15 @@ namespace sdfRay4d
        * @param target_language The language to translate to
        * @param target_language_version The version of the language to translate to
        */
-      static void set_target_environment(
-        glslang::EShTargetLanguage target_language,
-        glslang::EShTargetLanguageVersion target_language_version
-      );
+//      static void set_target_environment(
+//        spvc::TargetLang target_language,
+//        spvc::TargetLangVersion target_language_version
+//      );
 
       /**
        * @brief Reset the glslang target environment to the default values
        */
-      static void reset_target_environment();
+//      static void reset_target_environment();
 
       /**
        * @brief Compiles GLSL to SPIRV code
@@ -39,17 +47,19 @@ namespace sdfRay4d
        * @param[out] spirv The generated SPIRV code
        * @param[out] info_log Stores any log messages during the compilation process
        */
-      bool compile_to_spirv(
-        VkShaderStageFlagBits stage,
-        const QByteArray &glsl_source,
-//        const std::vector<uint8_t> &glsl_source,
-        const std::string &entry_point,
-        std::vector<std::uint32_t> &spirv,
-        std::string &info_log
+      static bool compile(
+        shader::StageFlags _stage,
+        const QByteArray &_glslSource,
+        const std::string &_entryPoint,
+        std::vector<std::uint32_t> &_spvBytecode,
+        std::string &_log
       );
 
     private:
-      static glslang::EShTargetLanguage        env_target_language;
-      static glslang::EShTargetLanguageVersion env_target_language_version;
+      static EShLanguage getShaderLang(shader::StageFlags _stage);
+
+//    private:
+//      static spvc::TargetLang        env_target_language;
+//      static spvc::TargetLangVersion env_target_language_version;
   };
 }

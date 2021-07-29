@@ -9,22 +9,23 @@ namespace sdfRay4d
 {
   using namespace vk;
 
-  struct ShaderData
-  {
-    shader::Module shaderModule = VK_NULL_HANDLE;
-
-    bool isValid() const { return shaderModule != VK_NULL_HANDLE; }
-  };
-
   class Shader
   {
     public:
+      struct Data
+      {
+        shader::Module shaderModule = VK_NULL_HANDLE;
+
+        bool isValid() const { return shaderModule != VK_NULL_HANDLE; }
+      };
+
+    public:
       void load(
-        Device _device,
+        Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs,
         const QString &_filePath
       );
-      ShaderData *getData();
+      Data *getData();
       bool isValid() { return m_data.isValid(); }
       void reset();
 
@@ -33,9 +34,19 @@ namespace sdfRay4d
       static shader::StageFlags getShaderStage(const std::string &_fileExtension);
 
     private:
-      bool m_maybeRunning = false;
-      ShaderData m_data;
+      Data load(
+        std::vector<uint32_t> &_spv,
+        const QByteArray &_buffer,
+        bool _isPrecompiled = false
+      );
 
-      QFuture<ShaderData> m_future;
+    private:
+      bool m_maybeRunning = false;
+
+      Device m_device = VK_NULL_HANDLE;
+      QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
+      Data m_data;
+
+      QFuture<Data> m_future;
   };
 }

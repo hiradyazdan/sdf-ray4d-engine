@@ -51,7 +51,6 @@ void Renderer::initResources()
 
 void Renderer::loadShaders()
 {
-  // Shaders
   if (!m_objMaterial.vertexShader.isValid())
   {
     m_objMaterial.vertexShader.load(

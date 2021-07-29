@@ -19,7 +19,7 @@ project(
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
     message("Your CMake version is ${CMAKE_VERSION}. Update to at least 3.16 to enable unity_build to speed up incremental builds")
 else()
-    # If UNITY BUILD causes compile or runtime issues turn this off.
+    # If UNITY BUILD causes compile or runtime issues (e.g. ODRs) turn this off.
     # TODO: setting this messes up my IDE syntax error detections intermittently
 #    set(CMAKE_UNITY_BUILD ON)
 endif()
@@ -41,7 +41,7 @@ include_directories(externals)
 #include_directories(./externals/nodeeditor/include/nodes/internal)
 
 #find_package(PkgConfig REQUIRED)
-find_package(glslang CONFIG REQUIRED) # uses vcpkg cmake config, but pulls in the Vulkan SDK's ports
+#find_package(glslang CONFIG REQUIRED) # vcpkg port is broken
 find_package(Vulkan REQUIRED)
 #find_package(unofficial-vulkan-memory-allocator REQUIRED)
 find_package(glm REQUIRED)
@@ -70,9 +70,18 @@ file(
 
 target_sources(${TARGET_NAME} PRIVATE ${${TARGET_NAME}_SOURCE})
 
-#target_link_libraries(${TARGET_NAME} PRIVATE glslang::HLSL glslang::SPIRV glslang::glslang glslang::OGLCompiler)
+# NOTE:
+#
+# Currently vcpkg port of glslang does not link
+# default-resource-limits.lib correctly as there is a linker error
+# So had to use git-submodule to pull in the glslang repo and configure,
+# build and link it as a third party library.
+#
+# This PR (https://github.com/microsoft/vcpkg/pull/15624) tried to address this lib
+# But seems to be broken and regressed by another PR (https://github.com/microsoft/vcpkg/pull/15719)
+#
+#target_link_libraries(${TARGET_NAME} PRIVATE glslang::glslang glslang::SPIRV glslang::HLSL glslang::OGLCompiler)
 target_link_libraries(${TARGET_NAME} PRIVATE glslang glslang-default-resource-limits SPIRV)
-#target_link_libraries(${TARGET_NAME} PRIVATE shaderc)
 target_link_libraries(
     ${TARGET_NAME} PRIVATE
     Vulkan::Vulkan
@@ -93,10 +102,10 @@ add_custom_target(
     ${CMAKE_CURRENT_SOURCE_DIR}/assets
     $<TARGET_FILE_DIR:${TARGET_NAME}>/assets
 
-    COMMAND ./spirv_static_compile.sh
+#    COMMAND ./spirv_static_compile.sh
 
     COMMENT "Copying Assets, Compiling Shaders & Removing Redundant files."
 )
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/externals)
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests)
+add_subdirectory(${PROJECT_SOURCE_DIR}/externals)

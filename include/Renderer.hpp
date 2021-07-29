@@ -61,8 +61,8 @@ namespace sdfRay4d
 
       void createObjPipeline();
 
-      void setShaderStages();
-      void setVertexLayout();
+      pipeline::ShaderStageInfo &setShaderStages();
+      pipeline::VertexInputInfo *setVertexLayout();
       void setupDescriptorSets();
       void createPipelineLayout();
       void createGraphicsPipeline();
@@ -107,7 +107,8 @@ namespace sdfRay4d
       }
 
     private:
-      struct {
+      struct
+      {
         device::Size        vertUniSize;
         device::Size        fragUniSize;
         device::Size        uniMemStartOffset;
@@ -163,8 +164,8 @@ namespace sdfRay4d
        * Vulkan Members - Pipeline
        */
       pipeline::Cache m_pipelineCache = VK_NULL_HANDLE;
-      pipeline::ShaderStageInfo m_shaderStages[2];
-      pipeline::VertexInputInfo m_vertexInputInfo;
+//      pipeline::ShaderStageInfo m_shaderStages[2];
+//      pipeline::VertexInputInfo m_vertexInputInfo;
 
       float m_rotation = 0.0f;
 
