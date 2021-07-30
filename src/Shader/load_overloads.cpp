@@ -1,3 +1,8 @@
+/*****************************************************
+ * Partial Class: Shader
+ * Members: Load Function Overloads (Public/Private)
+ *****************************************************/
+
 #include <QtConcurrentRun>
 
 #include "Shader.hpp"

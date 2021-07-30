@@ -8,6 +8,7 @@
 //#include "Window/MainWindow.hpp"
 #include "Window/VulkanWindow.hpp"
 
+#include "PSO.hpp"
 #include "Shader.hpp"
 
 namespace sdfRay4d
@@ -18,6 +19,8 @@ namespace sdfRay4d
 
   class Renderer : public QVulkanWindowRenderer
   {
+    using ShaderStageInfoList = std::vector<pipeline::ShaderStageInfo>;
+
     public:
       explicit Renderer(VulkanWindow *_vkWindow, bool _isMSAA = false);
 
@@ -40,9 +43,6 @@ namespace sdfRay4d
       void startNextFrame() override;
 
     private:
-      pipeline::VertexInputInfo createVertexInputState();
-      pipeline::ShaderStageInfo *createShaderStages();
-
       void loadShaders();
 
       /**
@@ -50,10 +50,10 @@ namespace sdfRay4d
        *
        * Pipeline Cache: Once
        *
-       * Shader Stages: per Pipeline/Material
-       * Vertex Layout: per Pipeline/Material
-       * Descriptor Sets/Layouts: per Pipeline/Material
-       * Pipeline Layout: per Pipeline/Material
+       * Shader Stages: per Material Pipeline
+       * Vertex Layout: per Material Pipeline
+       * Descriptor Sets/Layouts: per Material Pipeline
+       * Pipeline Layout: per Material Pipeline
        */
       void createPipelines();
 
@@ -61,8 +61,19 @@ namespace sdfRay4d
 
       void createObjPipeline();
 
-      pipeline::ShaderStageInfo &setShaderStages();
-      pipeline::VertexInputInfo *setVertexLayout();
+      void initShaderStages();
+
+      void initPSOs();
+
+      void setDynamicState();
+      void setVertexInputState();
+      void setInputAssemblyState();
+      void setRasterizationState();
+      void setColorBlendState();
+      void setViewportState();
+      void setDepthStencilState();
+      void setMultisampleState();
+
       void setupDescriptorSets();
       void createPipelineLayout();
       void createGraphicsPipeline();
@@ -93,14 +104,6 @@ namespace sdfRay4d
       void destroyShaderModules();
 
     private:
-      pipeline::InputAssemblyInfo setInputAssemblyInfo();
-      pipeline::RasterizationInfo setRasterizationInfo();
-      pipeline::ViewportInfo setViewportInfo();
-      pipeline::MultisampleInfo setMultisampleInfo();
-      pipeline::DepthStencilInfo setDepthStencilInfo();
-      pipeline::ColorBlendInfo setColorBlendInfo();
-
-    private:
       static device::Size aligned(device::Size v, device::Size byteAlign)
       {
         return (v + byteAlign - 1) & ~(byteAlign - 1);
@@ -121,6 +124,9 @@ namespace sdfRay4d
         descriptor::Set     descSet;
 
         pipeline::Layout    pipelineLayout = VK_NULL_HANDLE;
+        PSO                 pso;
+        ShaderStageInfoList shaderStages;
+
         Pipeline            pipeline = VK_NULL_HANDLE;
       } m_objMaterial;
 

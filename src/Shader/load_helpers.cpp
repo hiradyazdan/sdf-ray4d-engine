@@ -1,3 +1,8 @@
+/*****************************************************
+ * Partial Class: Shader
+ * Members: Load Function Helpers (Private)
+ *****************************************************/
+
 #include <QFile>
 
 #include "Shader.hpp"
