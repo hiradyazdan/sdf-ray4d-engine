@@ -116,15 +116,12 @@ bottleneck:
 
 This performance however, may come as a cost of higher amount of memory usage.
 
-`VMA` (Vulkan Memory Allocator) is a vulkan Memory Allocation Library,
-which simplifies the creation and allocation of resources.
-
-Using this library does not cause any less overhead than if memory allocation
-was done through `QVulkanDeviceFucntions`.
-
 ###### Graphics API Overhead (Vulkan)
 
-TBC
+Memory Allocation is managed via`QVulkanDeviceFucntions` which has no
+more overhead than if it was managed through `VMA` (Vulkan Memory Allocator),
+which is a vulkan Memory Allocation Library, to simplify the creation and
+allocation of resources, while giving access to Vulkan functions.
 
 ## Node Editor
 

@@ -1,10 +1,15 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <vector>
+
 #include <QVulkanWindow>
 
 #include <glslang/Public/ShaderLang.h>
+#include <glslang/SPIRV/GlslangToSpv.h>
+#include <glslang/StandAlone/ResourceLimits.h>
+#include <glslang/Include/ShHandle.h>
 
 #include "Types.hpp"
 
@@ -38,15 +43,6 @@ namespace sdfRay4d
        */
 //      static void reset_target_environment();
 
-      /**
-       * @brief Compiles GLSL to SPIRV code
-       * @param stage The Vulkan shader stage flag
-       * @param glsl_source The GLSL source code to be compiled
-       * @param entry_point The entrypoint function name of the shader stage
-       * @param shader_variant The shader variant
-       * @param[out] spirv The generated SPIRV code
-       * @param[out] info_log Stores any log messages during the compilation process
-       */
       static bool compile(
         shader::StageFlags _stage,
         const QByteArray &_glslSource,
@@ -61,5 +57,8 @@ namespace sdfRay4d
 //    private:
 //      static spvc::TargetLang        env_target_language;
 //      static spvc::TargetLangVersion env_target_language_version;
+
+    private:
+
   };
 }

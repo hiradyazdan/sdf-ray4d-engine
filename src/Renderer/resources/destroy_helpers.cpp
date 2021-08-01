@@ -22,7 +22,7 @@ void Renderer::destroyDescriptorSets()
   }
 }
 
-void Renderer::destroyPipeline()
+void Renderer::destroyPipelines()
 {
   if (m_objMaterial.pipeline)
   {
@@ -45,9 +45,6 @@ void Renderer::destroyPipeline()
 
 void Renderer::destroyBuffers()
 {
-//  vmaDestroyBuffer(m_allocator, buffer, allocation);
-//  vmaDestroyAllocator(m_allocator);
-
   if (m_uniformBuffer)
   {
     m_deviceFuncs->vkDestroyBuffer(m_device, m_uniformBuffer, nullptr);

@@ -10,35 +10,9 @@
  * directory named as the class name
  *****************************************************/
 
-#include <iostream>
-
 #include "SPIRVCompiler.hpp"
 
-#include <glslang/SPIRV/GlslangToSpv.h>
-#include <glslang/StandAlone/ResourceLimits.h>
-#include <glslang/Include/ShHandle.h>
-
 using namespace sdfRay4d;
-
-EShLanguage SPIRVCompiler::getShaderLang(shader::StageFlags _stage)
-{
-  switch (_stage)
-  {
-    case VK_SHADER_STAGE_VERTEX_BIT:                  return EShLangVertex;
-    case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:    return EShLangTessControl;
-    case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT: return EShLangTessEvaluation;
-    case VK_SHADER_STAGE_GEOMETRY_BIT:                return EShLangGeometry;
-    case VK_SHADER_STAGE_FRAGMENT_BIT:                return EShLangFragment;
-    case VK_SHADER_STAGE_COMPUTE_BIT:                 return EShLangCompute;
-    case VK_SHADER_STAGE_RAYGEN_BIT_KHR:              return EShLangRayGen;
-    case VK_SHADER_STAGE_ANY_HIT_BIT_KHR:             return EShLangAnyHit;
-    case VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR:         return EShLangClosestHit;
-    case VK_SHADER_STAGE_MISS_BIT_KHR:                return EShLangMiss;
-    case VK_SHADER_STAGE_INTERSECTION_BIT_KHR:        return EShLangIntersect;
-    case VK_SHADER_STAGE_CALLABLE_BIT_KHR:            return EShLangCallable;
-    default:                                          return EShLangVertex;
-  }
-}
 
 //spvc::TargetLang        SPIRVCompiler::env_target_language         = spvc::TargetLang::EShTargetNone;
 //spvc::TargetLangVersion SPIRVCompiler::env_target_language_version = (spvc::TargetLangVersion) 0; // SPIR-V 1.0
@@ -58,6 +32,15 @@ EShLanguage SPIRVCompiler::getShaderLang(shader::StageFlags _stage)
 //  SPIRVCompiler::env_target_language_version = (spvc::TargetLangVersion) 0;
 //}
 
+/**
+ * @brief Compiles GLSL to SPIRV bytecode
+ * @param _stage The Vulkan shader stage flag
+ * @param _glslSource The GLSL source code to be compiled
+ * @param _entryPoint The entrypoint function name of the shader stage
+ * @param[out] _spvBytecode The generated SPIRV code
+ * @param[out] _log Stores any log messages during the compilation process
+ * @return
+ */
 bool SPIRVCompiler::compile(
   shader::StageFlags _stage,
   const QByteArray &_glslSource,
@@ -68,69 +51,77 @@ bool SPIRVCompiler::compile(
 {
   glslang::InitializeProcess();
 
-  auto messages = static_cast<EShMessages>(EShMsgDefault | EShMsgVulkanRules | EShMsgSpvRules);
-  auto language = getShaderLang(_stage);
-  auto source = std::string(_glslSource.begin(), _glslSource.end());
+    auto messages = (EShMessages) (
+      EShMsgDefault |
+      EShMsgVulkanRules |
+      EShMsgSpvRules
+    );
+    auto language = getShaderLang(_stage);
+    auto source = std::string(_glslSource.begin(), _glslSource.end());
+    const char *fileNames[1]  = { "" };
+    const char *shaderSrc     = source.data();
 
-  const char *file_name_list[1] = { "" };
-  const char *shader_source     = reinterpret_cast<const char *>(source.data());
+    glslang::TShader shader(language);
 
-  glslang::TShader shader(language);
+    shader.setStringsWithLengthsAndNames(&shaderSrc, nullptr, fileNames, 1);
+    shader.setEntryPoint(_entryPoint.c_str());
+    shader.setSourceEntryPoint(_entryPoint.c_str());
 
-  shader.setStringsWithLengthsAndNames(&shader_source, nullptr, file_name_list, 1);
-  shader.setEntryPoint(_entryPoint.c_str());
-  shader.setSourceEntryPoint(_entryPoint.c_str());
+  //  if (SPIRVCompiler::env_target_language != spvc::TargetLang::EShTargetNone)
+  //  {
+  //    shader.setEnvTarget(SPIRVCompiler::env_target_language, SPIRVCompiler::env_target_language_version);
+  //  }
 
-//  if (SPIRVCompiler::env_target_language != spvc::TargetLang::EShTargetNone)
-//  {
-//    shader.setEnvTarget(SPIRVCompiler::env_target_language, SPIRVCompiler::env_target_language_version);
-//  }
+    if (!shader.parse(
+      &glslang::DefaultTBuiltInResource,
+      100,
+      false,
+      messages)
+    )
+    {
+      _log = std::string(shader.getInfoLog()) + "\n" + std::string(shader.getInfoDebugLog());
 
-	if (!shader.parse(&glslang::DefaultTBuiltInResource, 100, false, messages))
-	{
-		_log = std::string(shader.getInfoLog()) + "\n" + std::string(shader.getInfoDebugLog());
+      return false;
+    }
 
-		return false;
-	}
+    // Add shader to new program object.
+    glslang::TProgram program;
+    program.addShader(&shader);
 
-  // Add shader to new program object.
-  glslang::TProgram program;
-  program.addShader(&shader);
+    // Link program.
+    if (!program.link(messages))
+    {
+      _log = std::string(program.getInfoLog()) + "\n" + std::string(program.getInfoDebugLog());
 
-  // Link program.
-  if (!program.link(messages))
-  {
-    _log = std::string(program.getInfoLog()) + "\n" + std::string(program.getInfoDebugLog());
+      return false;
+    }
 
-    return false;
-  }
+    // Save any log that was generated.
+    if (shader.getInfoLog())
+    {
+      _log += std::string(shader.getInfoLog()) + "\n" + std::string(shader.getInfoDebugLog()) + "\n";
+    }
 
-  // Save any info log that was generated.
-  if (shader.getInfoLog())
-  {
-    _log += std::string(shader.getInfoLog()) + "\n" + std::string(shader.getInfoDebugLog()) + "\n";
-  }
+    if (program.getInfoLog())
+    {
+      _log += std::string(program.getInfoLog()) + "\n" + std::string(program.getInfoDebugLog());
+    }
 
-  if (program.getInfoLog())
-  {
-    _log += std::string(program.getInfoLog()) + "\n" + std::string(program.getInfoDebugLog());
-  }
+    glslang::TIntermediate *intermediate = program.getIntermediate(language);
 
-  glslang::TIntermediate *intermediate = program.getIntermediate(language);
+    // Translate to SPIRV.
+    if (!intermediate)
+    {
+      _log += "Failed to get shared intermediate code.\n";
 
-  // Translate to SPIRV.
-  if (!intermediate)
-  {
-    _log += "Failed to get shared intermediate code.\n";
+      return false;
+    }
 
-    return false;
-  }
+    spv::SpvBuildLogger logger;
 
-  spv::SpvBuildLogger logger;
+    glslang::GlslangToSpv(*intermediate, _spvBytecode, &logger);
 
-  glslang::GlslangToSpv(*intermediate, _spvBytecode, &logger);
-
-  _log += logger.getAllMessages() + "\n";
+    _log += logger.getAllMessages() + "\n";
 
   // Shutdown glslang library.
   glslang::FinalizeProcess();

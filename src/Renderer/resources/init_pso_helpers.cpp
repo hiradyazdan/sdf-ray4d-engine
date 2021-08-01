@@ -1,3 +1,8 @@
+/*****************************************************
+ * Partial Class: Renderer
+ * Members: Init PSO (Pipeline State Objects) Helpers (Private)
+ *****************************************************/
+
 #include "PSO.hpp"
 #include "Renderer.hpp"
 
@@ -18,7 +23,7 @@ void Renderer::initPSOs()
 void Renderer::setDynamicState()
 {
   auto &pso = m_objMaterial.pso;
-  auto &dynamicState = pso.dynamicState = {};
+  auto &dynamicState = pso.dynamicState = {}; // memset
   auto &states = pso.dynamicStates = {
     VK_DYNAMIC_STATE_VIEWPORT,
     VK_DYNAMIC_STATE_SCISSOR
@@ -32,7 +37,7 @@ void Renderer::setDynamicState()
 void Renderer::setVertexInputState()
 {
   auto &pso = m_objMaterial.pso;
-  auto &vertexInputState = pso.vertexInputState = {};
+  auto &vertexInputState = pso.vertexInputState = {}; // memset
   auto &vertexBindingDesc = pso.vertexBindingDesc = {
     {
       0, // binding
@@ -67,7 +72,7 @@ void Renderer::setVertexInputState()
 void Renderer::setInputAssemblyState()
 {
   auto &pso = m_objMaterial.pso;
-  auto &inputAssemblyState = pso.inputAssemblyState = {};
+  auto &inputAssemblyState = pso.inputAssemblyState = {}; // memset
 
   inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
   inputAssemblyState.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -77,7 +82,7 @@ void Renderer::setInputAssemblyState()
 void Renderer::setRasterizationState()
 {
   auto &pso = m_objMaterial.pso;
-  auto &rasterizationState = pso.rasterizationState = {};
+  auto &rasterizationState = pso.rasterizationState = {}; // memset
 
   rasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
   rasterizationState.depthClampEnable = VK_FALSE;
@@ -95,14 +100,14 @@ void Renderer::setRasterizationState()
 void Renderer::setColorBlendState()
 {
   auto &pso = m_objMaterial.pso;
-  auto &colorBlendState = pso.colorBlendState = {};
+  auto &colorBlendState = pso.colorBlendState = {}; // memset
 
   colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
   colorBlendState.logicOpEnable = VK_FALSE;
   colorBlendState.attachmentCount = 1;
 
   // no blend, write out all of rgba
-  auto &att = pso.colorBlendAttachment = {};
+  auto &att = pso.colorBlendAttachment = {}; // memset
 
   att.blendEnable = VK_FALSE;
   att.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
@@ -123,7 +128,7 @@ void Renderer::setColorBlendState()
 void Renderer::setViewportState()
 {
   auto &pso = m_objMaterial.pso;
-  auto &viewportState = pso.viewportState = {};
+  auto &viewportState = pso.viewportState = {}; // memset
 
   viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
   viewportState.viewportCount = 1;
@@ -135,7 +140,7 @@ void Renderer::setViewportState()
 void Renderer::setDepthStencilState()
 {
   auto &pso = m_objMaterial.pso;
-  auto &depthStencilState = pso.depthStencilState = {};
+  auto &depthStencilState = pso.depthStencilState = {}; // memset
 
   depthStencilState.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
   depthStencilState.depthTestEnable = VK_TRUE;
@@ -146,7 +151,7 @@ void Renderer::setDepthStencilState()
 void Renderer::setMultisampleState()
 {
   auto &pso = m_objMaterial.pso;
-  auto &multisampleState = pso.multisampleState = {};
+  auto &multisampleState = pso.multisampleState = {}; // memset
 
   multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
   multisampleState.rasterizationSamples = m_isMSAA ? m_vkWindow->sampleCountFlagBits() : VK_SAMPLE_COUNT_1_BIT;

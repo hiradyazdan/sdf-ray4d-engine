@@ -28,6 +28,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
+# TODO: Use Sanitizers for dynamic (RTC) analysis
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g -OX")
+
 set(CMAKE_AUTOMOC ON) # Qt's extensions handler - Meta Object Compiler (moc)
 set(CMAKE_AUTORCC ON)
 # uncomment below if ui layout created with Qt creator
@@ -43,7 +46,6 @@ include_directories(externals)
 #find_package(PkgConfig REQUIRED)
 #find_package(glslang CONFIG REQUIRED) # vcpkg port is broken
 find_package(Vulkan REQUIRED)
-#find_package(unofficial-vulkan-memory-allocator REQUIRED)
 find_package(glm REQUIRED)
 find_package(Qt5 COMPONENTS Widgets OpenGL Concurrent)
 #find_package(Boost REQUIRED)
@@ -85,7 +87,6 @@ target_link_libraries(${TARGET_NAME} PRIVATE glslang glslang-default-resource-li
 target_link_libraries(
     ${TARGET_NAME} PRIVATE
     Vulkan::Vulkan
-#    unofficial::vulkan-memory-allocator::vulkan-memory-allocator
 )
 target_link_libraries(${TARGET_NAME} PRIVATE glm::glm)
 target_link_libraries(${TARGET_NAME} PRIVATE Qt5::Widgets Qt5::OpenGL Qt5::Concurrent)

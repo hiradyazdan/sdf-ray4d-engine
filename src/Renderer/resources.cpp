@@ -33,41 +33,10 @@ void Renderer::initResources()
 
   m_isFramePending = false;
 
-  m_vkInstance  = m_vkWindow->vulkanInstance();
-  m_device      = m_vkWindow->device();
-  m_deviceFuncs = m_vkInstance->deviceFunctions(m_device);
+  initVkFunctions();
+  initShaders();
 
-//  vma::AllocatorInfo allocatorInfo;
-//  allocatorInfo.vulkanApiVersion  = VK_API_VERSION_1_2;
-//  allocatorInfo.physicalDevice    = m_vkWindow->physicalDevice();
-//  allocatorInfo.device            = m_device;
-//  allocatorInfo.instance          = m_vkInstance->vkInstance();
-//
-//  vmaCreateAllocator(&allocatorInfo, &m_allocator);
-
-  loadShaders();
   m_pipelinesFuture = QtConcurrent::run(this, &Renderer::createPipelines);
-}
-
-void Renderer::loadShaders()
-{
-  if (!m_objMaterial.vertexShader.isValid())
-  {
-    m_objMaterial.vertexShader.load(
-      m_device,
-      m_deviceFuncs,
-      "assets/shaders/SDF/static/fullscreentri.vert.spv"
-    );
-  }
-
-  if (!m_objMaterial.fragmentShader.isValid())
-  {
-    m_objMaterial.fragmentShader.load(
-      m_device,
-      m_deviceFuncs,
-      "assets/shaders/SDF/static/rtprimitives.frag.spv"
-    );
-  }
 }
 
 void Renderer::releaseResources()
@@ -77,7 +46,7 @@ void Renderer::releaseResources()
   m_pipelinesFuture.waitForFinished();
 
   destroyDescriptorSets();
-  destroyPipeline();
+  destroyPipelines();
   destroyBuffers();
   destroyShaderModules();
 }

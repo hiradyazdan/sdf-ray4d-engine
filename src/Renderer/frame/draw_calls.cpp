@@ -1,6 +1,6 @@
 /*****************************************************
  * Partial Class: Renderer
- * Members: Frame Draw Calls (Private)
+ * Members: Frame - Draw Calls (Private)
  *****************************************************/
 
 #include "Renderer.hpp"
@@ -63,22 +63,26 @@ using namespace sdfRay4d;
 //  m_deviceFuncs->vkCmdDraw(cb, (m_useLogo ? m_logoMesh.data() : m_blockMesh.data())->vertexCount, m_instCount, 0, 0);
 //}
 
-void Renderer::buildDrawCallsForFloor()
+void Renderer::buildDrawCalls(CmdBuffer &_cmdBuffer, QSize &_swapChainImgSize)
 {
-  CmdBuffer cmdBuffer = m_vkWindow->currentCommandBuffer();
+  m_deviceFuncs->vkCmdBindPipeline(
+    _cmdBuffer,
+    VK_PIPELINE_BIND_POINT_GRAPHICS,
+    m_objMaterial.pipeline
+  );
 
-  m_deviceFuncs->vkCmdBindPipeline(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_objMaterial.pipeline);
-
-  VkDeviceSize vbOffset = 0;
-  m_deviceFuncs->vkCmdBindVertexBuffers(cmdBuffer, 0, 1, &m_uniformBuffer, &vbOffset);
+  device::Size vbOffset = 0;
+  m_deviceFuncs->vkCmdBindVertexBuffers(
+    _cmdBuffer,
+    0,1,
+    &m_uniformBuffer, &vbOffset
+  );
 
 //  QMatrix4x4 mvp = m_proj; //* m_cam.viewMatrix() * m_floorModel;
 
-  auto sz = m_vkWindow->swapChainImageSize();
-
   float fragmentConstants[4] = {
-    (float)sz.width(),
-    (float)sz.height(),
+    (float)_swapChainImgSize.width(),
+    (float)_swapChainImgSize.height(),
 //    (float)1,
 //    (float)1,
 //      SDL_GetTicks() / 1000.0f
@@ -93,13 +97,16 @@ void Renderer::buildDrawCallsForFloor()
 //  qDebug("sizeof(mvp): %u ", sizeof(mvp));
 
   m_deviceFuncs->vkCmdPushConstants(
-    cmdBuffer,
+    _cmdBuffer,
     m_objMaterial.pipelineLayout,
     VK_SHADER_STAGE_FRAGMENT_BIT,
     0/*sizeof(mvp) - 4*/,
-    sizeof(fragmentConstants),
-    fragmentConstants//mvp.constData()
+    sizeof(fragmentConstants), fragmentConstants//mvp.constData()
   );
 
-  m_deviceFuncs->vkCmdDraw(cmdBuffer, 3, 1, 0, 0);
+  m_deviceFuncs->vkCmdDraw(
+    _cmdBuffer,
+    3,1,
+    0,0
+  );
 }

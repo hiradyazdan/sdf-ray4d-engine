@@ -1,11 +1,8 @@
 #pragma once
 
-//#include <shaderc/shaderc.hpp>
-
 #include <QFutureWatcher>
 #include <QtConcurrentRun>
 
-//#include "Window/MainWindow.hpp"
 #include "Window/VulkanWindow.hpp"
 
 #include "PSO.hpp"
@@ -17,24 +14,31 @@ namespace sdfRay4d
 
   class VulkanWindow;
 
-  class Renderer : public QVulkanWindowRenderer
+  class Renderer : public QVulkanWindowRenderer, public QObject
   {
     using ShaderStageInfoList = std::vector<pipeline::ShaderStageInfo>;
 
     public:
       explicit Renderer(VulkanWindow *_vkWindow, bool _isMSAA = false);
 
-      /**
-       * Resource Initializers
-       */
+    public slots:
+      void updateFrame();
+
+    /**
+     * Resource Initializers/Destructors
+     * -------------------------------------------------
+     */
+    public:
       void preInitResources() override;
       void initResources() override;
-      void initSwapChainResources() override;
-
-      /**
-       * Resource Destructors
-       */
       void releaseResources() override;
+
+    /**
+     * SwapChain Resource Initializers/Destructors
+     * -------------------------------------------------
+     */
+    public:
+      void initSwapChainResources() override;
       void releaseSwapChainResources() override;
 
       /**
@@ -42,27 +46,42 @@ namespace sdfRay4d
        */
       void startNextFrame() override;
 
+    /**
+     * Resources: Init Helpers (General)
+     * -------------------------------------------------
+     *
+     */
     private:
-      void loadShaders();
+      void initVkFunctions();
+      void initShaders();
 
-      /**
-       * Create Pipeline Helpers
-       *
-       * Pipeline Cache: Once
-       *
-       * Shader Stages: per Material Pipeline
-       * Vertex Layout: per Material Pipeline
-       * Descriptor Sets/Layouts: per Material Pipeline
-       * Pipeline Layout: per Material Pipeline
-       */
+    /**
+     * Resources: Create Pipeline Helpers (on Worker Thread)
+     * -------------------------------------------------
+     *
+     * Pipeline Cache: Once
+     *
+     * Shader Stages: per Material Pipeline
+     * Vertex Layout: per Material Pipeline
+     * Descriptor Sets/Layouts: per Material Pipeline
+     * Pipeline Layout: per Material Pipeline
+     */
+    private:
       void createPipelines();
-
       void createPipelineCache();
-
       void createObjPipeline();
+      void createPipelineLayout();
+      void createGraphicsPipeline();
 
       void initShaderStages();
+      void setupDescriptorSets();
 
+    /**
+     * Resources: Init PSO (Pipeline State Objects) Helpers (on Worker Thread)
+     * -------------------------------------------------
+     *
+     */
+    private:
       void initPSOs();
 
       void setDynamicState();
@@ -74,34 +93,34 @@ namespace sdfRay4d
       void setDepthStencilState();
       void setMultisampleState();
 
-      void setupDescriptorSets();
-      void createPipelineLayout();
-      void createGraphicsPipeline();
-
-      /**
-       * Create Buffer
-       */
-//      void createUploadBuffer(int _concurrentFrameCount);
-//
-//      void createBuffer();
-//      void allocateMemory();
-//      void mapBufferMemory();
-
-      void buildFrame();
-      void ensureBuffers();
-      void ensureInstanceBuffer();
-      void buildDrawCallsForItems();
-      void buildDrawCallsForFloor();
-
       void markViewProjDirty();
 
-      /**
-       * Destroy Resources
-       */
-      void destroyPipeline();
+    /**
+     * Resources - Destroy Helpers
+     * -------------------------------------------------
+     *
+     */
+    private:
+      void destroyPipelines();
       void destroyDescriptorSets();
       void destroyBuffers();
       void destroyShaderModules();
+
+    /**
+     * Frame Helpers (on Worker Thread)
+     * -------------------------------------------------
+     * - Buffers
+     * - Draw Calls
+     * - Render Pass
+     */
+    private:
+      void buildFrame();
+      void createBuffers();
+      void buildDrawCalls(
+        CmdBuffer &_cmdBuffer,
+        QSize &_swapChainImgSize
+      );
+      void cmdRenderPass();
 
     private:
       static device::Size aligned(device::Size v, device::Size byteAlign)
@@ -134,57 +153,48 @@ namespace sdfRay4d
       bool m_isMSAA;
       bool m_isFramePending;
 
-      /**
-       * Qt Vulkan Members
-       */
+    /**
+     * Qt Vulkan Members
+     */
+    private:
       VulkanWindow *m_vkWindow;
       QVulkanInstance *m_vkInstance;
       QVulkanDeviceFunctions *m_deviceFuncs;
 
-      /**
-       * Qt Members - Multi-threading
-       */
+    /**
+     * Qt Members - Multi-threading
+     */
+    private:
       QFuture<void> m_pipelinesFuture;
       QFutureWatcher<void> m_frameWatcher;
       QMutex m_guiMutex;
 
+    private:
       QMatrix4x4 m_proj;
       int m_vpDirty = 0;
 
-      /**
-       * Vulkan Members - Device, Memory & Buffer
-       */
+    /**
+     * Vulkan Members - Device, Memory & Buffer
+     */
+    private:
       Device m_device = VK_NULL_HANDLE;
-//      vma::Allocator m_allocator;
       device::Memory m_bufMem = VK_NULL_HANDLE;
       Buffer m_buf = VK_NULL_HANDLE;
       Buffer m_uniformBuffer = VK_NULL_HANDLE;
 
-      /**
-       * Vulkan Members - Descriptor Sets
-       */
+    /**
+     * Vulkan Members - Descriptor Sets
+     */
+    private:
       descriptor::BufferInfo m_uniformBufInfo[QVulkanWindow::MAX_CONCURRENT_FRAME_COUNT];
       descriptor::Set m_descSet[QVulkanWindow::MAX_CONCURRENT_FRAME_COUNT];
 
-      /**
-       * Vulkan Members - Pipeline
-       */
+    /**
+     * Vulkan Members - Pipeline
+     */
+    private:
       pipeline::Cache m_pipelineCache = VK_NULL_HANDLE;
-//      pipeline::ShaderStageInfo m_shaderStages[2];
-//      pipeline::VertexInputInfo m_vertexInputInfo;
 
       float m_rotation = 0.0f;
-
-      static const int UNIFORM_DATA_SIZE = 16 * sizeof(float);
-
-      // Note that the vertex data and the projection matrix assume OpenGL. With
-      // Vulkan Y is negated in clip space and the near/far plane is at 0/1 instead
-      // of -1/1. These will be corrected for by an extra transformation when
-      // calculating the modelview-projection matrix.
-      constexpr static const float vertexData[] = { // Y up, front = CCW
-        0.0f,   0.5f,   1.0f, 0.0f, 0.0f,
-        -0.5f,  -0.5f,   0.0f, 1.0f, 0.0f,
-        0.5f,  -0.5f,   0.0f, 0.0f, 1.0f
-      };
   };
 }

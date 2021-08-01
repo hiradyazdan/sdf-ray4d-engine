@@ -1,7 +1,5 @@
 #pragma once
 
-//#define VMA_IMPLEMENTATION
-//#include "vk_mem_alloc.h"
 #include <QVulkanFunctions>
 
 namespace sdfRay4d::vk
@@ -25,15 +23,6 @@ namespace sdfRay4d::vk
   using Viewport = VkViewport;
   using Rect2D = VkRect2D;
   using PushConstantRange = VkPushConstantRange;
-
-//  namespace vma
-//  {
-//    using AllocatorInfo = VmaAllocatorCreateInfo;
-//    using Allocator = VmaAllocator;
-//
-//    using AllocInfo = VmaAllocationCreateInfo;
-//    using Alloc = VmaAllocation;
-//  }
 
   namespace memory
   {

@@ -21,69 +21,13 @@ Renderer::Renderer(
   m_vkWindow(_vkWindow),
   m_isMSAA(_isMSAA)
 {
-  QObject::connect(
-    &m_frameWatcher,
-    &QFutureWatcherBase::finished,
-    [this]
-  {
-    if (m_isFramePending)
-    {
-      m_isFramePending = false;
-      m_vkWindow->frameReady();
-      m_vkWindow->requestUpdate();
-    }
-  });
+  connect(
+    &m_frameWatcher, &QFutureWatcherBase::finished,
+    this, &Renderer::updateFrame
+  );
 }
 
 void Renderer::markViewProjDirty()
 {
   m_vpDirty = m_vkWindow->concurrentFrameCount();
 }
-
-//ShaderModule Renderer::createShader(
-//  const QString &_filePath,
-//  ShaderStageFlags _stage
-//)
-//{
-//  QFile file(_filePath);
-//  if (!file.open(QIODevice::ReadOnly)) {
-//    qWarning("Failed to read shader %s", qPrintable(_filePath));
-//    return VK_NULL_HANDLE;
-//  }
-//  auto buffer = file.readAll();
-//  file.close();
-//
-////  GLSLCompiler compiler;
-////
-////  std::vector<uint32_t> spirV;
-////  std::string infoLog;
-////
-////  if(!compiler.compile_to_spirv(_stage, buffer, "main", spirV, infoLog))
-////  {
-////    qWarning("Failed to compile shader, {}", infoLog.c_str());
-////
-////    return VK_NULL_HANDLE;
-////  }
-//
-//  ShaderModuleInfo shaderInfo;
-//  memset(&shaderInfo, 0, sizeof(shaderInfo));
-//  shaderInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-//  shaderInfo.codeSize = /*spirV*/buffer.size();
-//  shaderInfo.pCode = reinterpret_cast<const uint32_t *>(buffer.constData());//spirV.data();
-//
-//  ShaderModule shaderModule;
-//  Result err = m_deviceFuncs->vkCreateShaderModule(
-//    m_vkWindow->device(),
-//    &shaderInfo,
-//    nullptr,
-//    &shaderModule
-//  );
-//
-//  if (err != VK_SUCCESS)
-//  {
-//    qWarning("Failed to create shader module: %d", err);
-//    return VK_NULL_HANDLE;
-//  }
-//
-//  return shaderModule;
-//}
