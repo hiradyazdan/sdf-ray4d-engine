@@ -3,6 +3,7 @@
 ## Requirements
 
 - cmake v3.12+ (tested with 3.19 - for faster builds use v3.16+)
+- Bash Shell
 - Qt v5.10+ (tested with 5.15)
 - Vulkan SDK v1.2.x (tested with v1.2.176.1)
 
