@@ -66,7 +66,7 @@ there's no `Module Header units` support for C++17 which is used in this project
     - Bind Buffer Memory
     - Map/Unmap Memory
     - Create/Destroy Descriptor Pool
-    - Create/Destroy Descriptor SeyLayout
+    - Create/Destroy Descriptor SetLayout
     - Allocate/Update Descriptor Sets
     - Create/Destroy Pipeline Cache
     - Create/Destroy Pipeline Layout

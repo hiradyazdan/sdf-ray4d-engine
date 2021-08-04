@@ -30,9 +30,9 @@ using namespace sdfRay4d;
 //  if (oldMessageHandler) oldMessageHandler(_msgType, _logContext, _text);
 //}
 
-MainWindow::MainWindow() :
-m_shaderMan(ShaderManager::instance()),
-m_outputNode(nullptr)
+MainWindow::MainWindow()
+: m_shaderMan(ShaderManager::instance()),
+  m_outputNode(nullptr)
 {
 //  messageLogWidget = new QPlainTextEdit(QLatin1String(QLibraryInfo::build()) + QLatin1Char('\n'));
 //  messageLogWidget->setReadOnly(true);

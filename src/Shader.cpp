@@ -14,9 +14,14 @@
 
 using namespace sdfRay4d;
 
+Shader::Shader()
+{
+  m_shadersPath = "assets/shaders/Raymarch/";
+}
+
 Shader::Data *Shader::getData()
 {
-  if (m_maybeRunning && !m_data.isValid())
+  if (m_isLoading && !m_data.isValid())
   {
     m_data = m_future.result();
   }
@@ -24,8 +29,13 @@ Shader::Data *Shader::getData()
   return &m_data;
 }
 
+bool Shader::isValid()
+{
+  return m_data.isValid();
+}
+
 void Shader::reset()
 {
   m_data = Data();
-  m_maybeRunning = false;
+  m_isLoading = false;
 }

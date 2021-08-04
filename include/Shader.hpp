@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <QVulkanInstance>
 #include <QFuture>
 
@@ -12,6 +14,9 @@ namespace sdfRay4d
   class Shader
   {
     public:
+      Shader();
+
+    public:
       struct Data
       {
         shader::Module shaderModule = VK_NULL_HANDLE;
@@ -19,34 +24,65 @@ namespace sdfRay4d
         bool isValid() const { return shaderModule != VK_NULL_HANDLE; }
       };
 
+    /**
+     * Load Function Overloads (Public)
+     * -------------------------------------------------
+     *
+     */
     public:
       void load(
         Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs,
-        const QString &_filePath
+        const QString &_filePath,
+        const QStringList &_partialFilePaths = {}
       );
+    /**
+     * General Helpers
+     * -------------------------------------------------
+     *
+     */
+    public:
       Data *getData();
-      bool isValid() { return m_data.isValid(); }
+      bool isValid();
       void reset();
 
+    /**
+     * Load Function Helpers
+     * -------------------------------------------------
+     *
+     */
     private:
-      static QByteArray readShaderBinary(const QString &_filePath);
+      static QByteArray getFileBytes(const QString &_filePath);
       static shader::StageFlags getShaderStage(const std::string &_fileExtension);
 
+      void serialize(
+        const QStringList &_partialFilePaths,
+        QByteArray &_rawBytes
+      );
+
+    /**
+     * Load Overloads (Private)
+     * -------------------------------------------------
+     *
+     */
     private:
       Data load(
-        std::vector<uint32_t> &_spv,
-        const QByteArray &_buffer,
+        std::vector<uint32_t> &_spvBytes,
+        const QByteArray &_rawSPVBytes = nullptr,
         bool _isPrecompiled = false
       );
 
     private:
-      bool m_maybeRunning = false;
-
-      Device m_device = VK_NULL_HANDLE;
-      QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
+      bool m_isLoading = false;
       Data m_data;
 
+    /**
+     * Qt Vulkan Members
+     */
+    private:
+      Device m_device = VK_NULL_HANDLE;
+      QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
       QFuture<Data> m_future;
+      QString m_shadersPath;
   };
 }

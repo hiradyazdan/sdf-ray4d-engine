@@ -47,7 +47,7 @@ namespace sdfRay4d
         shader::StageFlags _stage,
         const QByteArray &_glslSource,
         const std::string &_entryPoint,
-        std::vector<std::uint32_t> &_spvBytecode,
+        std::vector<std::uint32_t> &_spvBytes,
         std::string &_log
       );
 

@@ -18,7 +18,8 @@ void Renderer::startNextFrame()
 
 void Renderer::buildFrame()
 {
-//  QMutexLocker locker(&m_guiMutex);
+  // To make this function Thread-safe
+  QMutexLocker locker(&m_guiMutex);
 
   createBuffers();
 //  ensureInstanceBuffer();

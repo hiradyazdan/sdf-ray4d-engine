@@ -21,7 +21,7 @@ void Renderer::initShaders()
     m_objMaterial.vertexShader.load(
       m_device,
       m_deviceFuncs,
-      "assets/shaders/SDF/static/fullscreentri.vert.spv"
+      "static/fullscreentri.vert.spv"
     );
   }
 
@@ -30,7 +30,11 @@ void Renderer::initShaders()
     m_objMaterial.fragmentShader.load(
       m_device,
       m_deviceFuncs,
-      "assets/shaders/SDF/static/rtprimitives.frag.spv"
+      "dynamic/rtprimitives.frag",
+      {
+        "_partials/distance_functions.partial.glsl",
+        "_partials/operations.partial.glsl"
+      }
     );
   }
 }

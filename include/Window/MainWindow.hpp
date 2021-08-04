@@ -29,17 +29,11 @@ namespace sdfRay4d
       NodePtrSet getNodes() { return m_sdfGraphScene->getNodes(); }
 
     public slots:
-      void onVulkanInfoReceived(const QString &text);
-      void onFrameQueued(int colorValue);
-      void onGrabRequested();
+//      void onVulkanInfoReceived(const QString &text);
+//      void onFrameQueued(int colorValue);
+//      void onGrabRequested();
 
       virtual void onNodeChanged(const sdfRay4d::NodePtrSet &_nodes);
-
-    private:
-      void mousePressEvent(QMouseEvent *_event) override;
-      void mouseReleaseEvent(QMouseEvent *_event) override;
-      void mouseMoveEvent(QMouseEvent *_event) override;
-      void keyPressEvent(QKeyEvent *_event) override;
 
     private:
       void initVkInstance();
@@ -59,21 +53,28 @@ namespace sdfRay4d
         PortIndex portIndex = 0,
         unsigned int _cp = 0
       );
+
+    private:
+//      void mousePressEvent(QMouseEvent *_event) override;
+//      void mouseReleaseEvent(QMouseEvent *_event) override;
+//      void mouseMoveEvent(QMouseEvent *_event) override;
+      void keyPressEvent(QKeyEvent *_event) override;
 //
 //      void createActions();
 //      void createMenuBar();
 //      void createConnections();
 
+    /**
+     * Vulkan
+     */
     private:
-      /**
-       * Vulkan
-       */
       QVulkanInstance *m_vkInstance;
       VulkanWindow *m_vkWindow;
 
-      /**
-       * SDF Graph
-       */
+    /**
+     * SDF Graph
+     */
+    private:
       FlowScene *m_sdfGraphScene;
       FlowView *m_sdfGraphView;
 
@@ -83,9 +84,10 @@ namespace sdfRay4d
       std::string m_shaderStart;
       std::string m_shaderEnd;
 
-      /**
-       * Qt Widgets
-       */
+    /**
+     * Qt Widgets
+     */
+    private:
       QWidget *m_vpWidget;
       QWidget *m_wrapperWidget;
 
@@ -98,8 +100,5 @@ namespace sdfRay4d
 
       QPushButton *m_grabBtn;
       QPushButton *m_quitBtn;
-
-      bool m_pressed = false;
-      QPoint m_lastPos;
   };
 }

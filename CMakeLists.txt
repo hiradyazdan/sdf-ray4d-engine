@@ -92,7 +92,8 @@ target_link_libraries(${TARGET_NAME} PRIVATE Qt5::Widgets Qt5::OpenGL Qt5::Concu
 #############################################################################
 
 find_program(SHELL bash HINTS /bin)
-set(STATIC_SHADERS_PATH assets/shaders/SDF/static)
+set(SHADERS_PATH assets/shaders/Raymarch) # TODO: Pass this as a compile definition or env var to code
+set(STATIC_SHADERS_PATH ${SHADERS_PATH}/static)
 set(SPV_COMPILE_SCRIPT spirv_static_compile.sh)
 
 if(NOT DEFINED CMAKE_BUILD_TYPE)

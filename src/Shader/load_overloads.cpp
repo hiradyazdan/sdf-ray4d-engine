@@ -11,26 +11,41 @@
 using namespace sdfRay4d;
 
 /**
+ * PUBLIC
  *
  * @brief
  * Helper function to load a shader module asynchronously or
  * wait for the shader compilation to be finished, based on
  * type of the shader file
- * @param _device {Device}
- * @param _deviceFuncs {QVulkanDeviceFunctions}
- * @param _filePath {QString}
+ *
+ * if shader file is not spv, it can optionally serialize multiple
+ * GLSL shader partial files (separate static shader instructions) into
+ * a single bytecode array, compile it into SPIRV shader and finally
+ * load it as a shader module
+ * @param _device {Device} vulkan device
+ * @param _deviceFuncs {QVulkanDeviceFunctions} qt vulkan device functions
+ * @param _filePath {QString} main shader file path
+ * @param _partialFilePaths {QStringList} shader's partial file paths (optional)
+ *
+ * TODO:
+ * Make this function a variadic template with parameter pack
+ * for filePaths. The complexity would be to make a separate
+ * header file to have decl/definition in one file and also
+ * the strings need to be either views or references so not to
+ * copy over, initializer_list collection might be worth looking at.
  */
 void Shader::load(
   Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs,
-  const QString &_filePath
+  const QString &_filePath,
+  const QStringList &_partialFilePaths
 )
 {
   reset();
 
   m_device = _device;
   m_deviceFuncs = _deviceFuncs;
-  m_maybeRunning = true;
+  m_isLoading = true;
 
   auto fileExtension = _filePath.toStdString();
   fileExtension = fileExtension.substr(fileExtension.find_last_of('.') + 1);
@@ -56,32 +71,52 @@ void Shader::load(
    * So, for the sake of code readability/maintainability, it may be cleaner to put everything inside the async
    * callback function.
    */
-  m_future = QtConcurrent::run([fileExtension, _filePath, this]()
+  m_future = QtConcurrent::run([fileExtension, _filePath, _partialFilePaths, this]()
   {
     auto isPrecompiled = fileExtension == "spv";
-    auto buffer = readShaderBinary(_filePath);
+    auto rawBytes = getFileBytes(m_shadersPath + _filePath);
 
-    std::vector<uint32_t> spv;
+    std::vector<uint32_t> spvBytes;
     std::string log;
 
-    /**
-    * NOTE:
-    *
-    * SPV Compiler cannot synchronously compile multiple shaders
-    * It should only be called once per process, not per thread.
-    */
-    if(!isPrecompiled &&
-       !SPIRVCompiler::compile(
-         getShaderStage(fileExtension),
-         buffer, "main", spv, log
-       )
-    )
+    if(isPrecompiled && !_partialFilePaths.isEmpty())
     {
-      qWarning("Failed to compile shader, Error: {}", log.c_str());
-      return Data();
+      qWarning("\nWARNING: Partial files cannot be merged back into precompiled SPIRV files. Therefore, they're ignored\n");
     }
 
-    return load(spv, buffer, isPrecompiled);
+    if(!isPrecompiled)
+    {
+      // only if there is any partial shader helper file
+      if(!_partialFilePaths.isEmpty())
+      {
+        serialize(_partialFilePaths, rawBytes);
+      }
+
+      /**
+       * TODO: make SPIRVCompiler::compile thread-safe with lock/unlock?
+       *
+       * NOTE:
+       *
+       * SPV Compiler is not thread-safe and cannot synchronously compile
+       * multiple shaders. It should only be called once per process, not per thread.
+       */
+      if(
+        !SPIRVCompiler::compile(
+          getShaderStage(fileExtension),
+          rawBytes, "main", spvBytes, log
+        )
+      )
+      {
+        qWarning("Failed to compile shader: %s", log.c_str());
+        return Data();
+      }
+    }
+
+    return load(
+      spvBytes, // runtime compiled spirv bytes (if available, otherwise empty)
+      rawBytes, // pre-compiled spv file bytes
+      isPrecompiled
+    );
   });
 
   /**
@@ -98,29 +133,30 @@ void Shader::load(
 }
 
 /**
- * @brief Helper function to create/load shader module
- * @param _spv {std::vector<uint32_t>}
- * @param _buffer {const QByteArray}
+ * PRIVATE
+ *
+ * @brief Helper function to create/load shader module from the passed spirv bytecodes
+ * @param _spvBytes {std::vector<uint32_t>} compiled spirv bytecodes at runtime
+ * @param _rawSPVBytes {const QByteArray} pre-compiled spirv bytecodes from spv files
  * @param _isPrecompiled {bool}
  * @return data {Shader::Data} struct
  */
 Shader::Data Shader::load(
-  std::vector<uint32_t> &_spv,
-  const QByteArray &_buffer,
+  std::vector<uint32_t> &_spvBytes,
+  const QByteArray &_rawSPVBytes,
   bool _isPrecompiled
 )
 {
   Data data;
 
-  shader::Info shaderInfo;
-  memset(&shaderInfo, 0, sizeof(shaderInfo));
+  shader::Info shaderInfo = {};
   shaderInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
   shaderInfo.codeSize = !_isPrecompiled
-                        ? _spv.size() * sizeof(uint32_t)
-                        : _buffer.size();
+                        ? _spvBytes.size() * sizeof(uint32_t)
+                        : _rawSPVBytes.size();
   shaderInfo.pCode = !_isPrecompiled
-                     ? _spv.data()
-                     : reinterpret_cast<const uint32_t *>(_buffer.constData());
+                     ? _spvBytes.data()
+                     : reinterpret_cast<const uint32_t *>(_rawSPVBytes.constData());
 
   auto result = m_deviceFuncs->vkCreateShaderModule(
     m_device,

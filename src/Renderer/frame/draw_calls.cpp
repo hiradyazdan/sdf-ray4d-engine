@@ -78,7 +78,7 @@ void Renderer::buildDrawCalls(CmdBuffer &_cmdBuffer, QSize &_swapChainImgSize)
     &m_uniformBuffer, &vbOffset
   );
 
-//  QMatrix4x4 mvp = m_proj; //* m_cam.viewMatrix() * m_floorModel;
+  auto mvp = m_proj * m_camera.viewMatrix();// * m_floorModel;
 
   float fragmentConstants[4] = {
     (float)_swapChainImgSize.width(),
@@ -101,7 +101,8 @@ void Renderer::buildDrawCalls(CmdBuffer &_cmdBuffer, QSize &_swapChainImgSize)
     m_objMaterial.pipelineLayout,
     VK_SHADER_STAGE_FRAGMENT_BIT,
     0/*sizeof(mvp) - 4*/,
-    sizeof(fragmentConstants), fragmentConstants//mvp.constData()
+    sizeof(fragmentConstants), fragmentConstants
+//    sizeof(mvp), mvp.constData()
   );
 
   m_deviceFuncs->vkCmdDraw(

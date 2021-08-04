@@ -3,6 +3,7 @@
  * Members: Load Function Helpers (Private)
  *****************************************************/
 
+#include <regex>
 #include <QFile>
 
 #include "Shader.hpp"
@@ -31,15 +32,50 @@ shader::StageFlags Shader::getShaderStage(const std::string &_fileExtension)
   throw std::runtime_error("No Vulkan shader stage found for the file extension name.");
 }
 
-QByteArray Shader::readShaderBinary(const QString &_filePath)
+QByteArray Shader::getFileBytes(const QString &_filePath)
 {
   QFile file(_filePath);
 
   if (!file.open(QIODevice::ReadOnly))
   {
     qWarning("Failed to read shader %s", qPrintable(_filePath));
-    return VK_NULL_HANDLE;
+    return {};
   }
 
   return file.readAll();
+}
+
+void Shader::serialize(
+  const QStringList &_partialFilePaths,
+  QByteArray &_rawBytes
+)
+{
+  for(const auto &partialPath : _partialFilePaths)
+  {
+    _rawBytes.prepend(getFileBytes(m_shadersPath + partialPath));
+  }
+
+  /**
+   * TODO: Optimize - rewrite with string::replace for less memory copying
+   * This could be quite expensive as it has string manipulation with
+   * copying memory all over the place.
+   */
+  std::string modifiedShader;
+  auto versionDirective = "#version 450";
+  auto shaderCode = _rawBytes.toStdString();
+  std::regex_replace(
+    back_inserter(modifiedShader), // copies
+    shaderCode.begin(),
+    shaderCode.end(),
+    std::regex(R"(\#version)"),
+    "//"
+  );
+
+  QByteArray modifiedBytes(modifiedShader.c_str());
+  QByteArray versionDirectiveBytes(versionDirective);
+  QByteArray newLineBytes("\n");
+
+  _rawBytes = modifiedBytes;
+  _rawBytes.prepend(newLineBytes);
+  _rawBytes.prepend(versionDirectiveBytes);
 }

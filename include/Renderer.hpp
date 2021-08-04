@@ -4,6 +4,7 @@
 #include <QtConcurrentRun>
 
 #include "Window/VulkanWindow.hpp"
+#include "Camera.hpp"
 
 #include "PSO.hpp"
 #include "Shader.hpp"
@@ -45,6 +46,16 @@ namespace sdfRay4d
        * Draw/Paint Frame
        */
       void startNextFrame() override;
+
+    /**
+     * Frame - User Input Helpers/Handlers
+     * -------------------------------------------------
+     */
+    public:
+      void yaw(float degrees);
+      void pitch(float degrees);
+      void walk(float amount);
+      void strafe(float amount);
 
     /**
      * Resources: Init Helpers (General)
@@ -151,15 +162,15 @@ namespace sdfRay4d
 
     private:
       bool m_isMSAA;
-      bool m_isFramePending;
+      bool m_isFramePending = false;
 
     /**
      * Qt Vulkan Members
      */
     private:
       VulkanWindow *m_vkWindow;
-      QVulkanInstance *m_vkInstance;
-      QVulkanDeviceFunctions *m_deviceFuncs;
+      QVulkanInstance *m_vkInstance = VK_NULL_HANDLE;
+      QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
     /**
      * Qt Members - Multi-threading
@@ -172,6 +183,7 @@ namespace sdfRay4d
     private:
       QMatrix4x4 m_proj;
       int m_vpDirty = 0;
+      Camera m_camera;
 
     /**
      * Vulkan Members - Device, Memory & Buffer
@@ -186,8 +198,8 @@ namespace sdfRay4d
      * Vulkan Members - Descriptor Sets
      */
     private:
-      descriptor::BufferInfo m_uniformBufInfo[QVulkanWindow::MAX_CONCURRENT_FRAME_COUNT];
-      descriptor::Set m_descSet[QVulkanWindow::MAX_CONCURRENT_FRAME_COUNT];
+//      descriptor::BufferInfo m_uniformBufInfo[QVulkanWindow::MAX_CONCURRENT_FRAME_COUNT];
+//      descriptor::Set m_descSet[QVulkanWindow::MAX_CONCURRENT_FRAME_COUNT];
 
     /**
      * Vulkan Members - Pipeline

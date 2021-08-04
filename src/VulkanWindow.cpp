@@ -14,7 +14,11 @@
 
 using namespace sdfRay4d;
 
-VulkanWindow::VulkanWindow(bool _isDebug) : m_isDebug(_isDebug) {}
+VulkanWindow::VulkanWindow(
+  bool _isDebug
+) :
+  m_isDebug(_isDebug)
+{}
 
 QVulkanWindowRenderer *VulkanWindow::createRenderer()
 {

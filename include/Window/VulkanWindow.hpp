@@ -9,6 +9,7 @@
 #include "SDFGraph/DistanceFieldData.hpp"
 
 #include "Renderer.hpp"
+#include "ShaderManager.hpp"
 
 namespace sdfRay4d
 {
@@ -56,9 +57,24 @@ namespace sdfRay4d
        */
       void frameQueued(int _colorValue);
 
+//    public slots:
+//      void onVulkanInfoReceived(const QString &text);
+//      void onFrameQueued(int colorValue);
+//      void onGrabRequested();
+
+    private:
+      void mousePressEvent(QMouseEvent *_event) override;
+      void mouseReleaseEvent(QMouseEvent *_event) override;
+      void mouseMoveEvent(QMouseEvent *_event) override;
+      void wheelEvent(QWheelEvent *_event) override;
+      void keyPressEvent(QKeyEvent *_event) override;
+
     private:
       Renderer *m_renderer;
       bool m_isDebug;
+
+      bool m_pressed = false;
+      QPoint m_lastPos;
 //      std::shared_ptr<ShaderManager> m_shaderMan;
 //      std::string m_shaderStart;
 //      std::string m_shaderEnd;

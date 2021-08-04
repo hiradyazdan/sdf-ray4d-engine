@@ -37,7 +37,7 @@ using namespace sdfRay4d;
  * @param _stage The Vulkan shader stage flag
  * @param _glslSource The GLSL source code to be compiled
  * @param _entryPoint The entrypoint function name of the shader stage
- * @param[out] _spvBytecode The generated SPIRV code
+ * @param[out] _spvBytes The generated SPIRV code
  * @param[out] _log Stores any log messages during the compilation process
  * @return
  */
@@ -45,7 +45,7 @@ bool SPIRVCompiler::compile(
   shader::StageFlags _stage,
   const QByteArray &_glslSource,
   const std::string &_entryPoint,
-  std::vector<std::uint32_t> &_spvBytecode,
+  std::vector<std::uint32_t> &_spvBytes,
   std::string &_log
 )
 {
@@ -119,7 +119,7 @@ bool SPIRVCompiler::compile(
 
     spv::SpvBuildLogger logger;
 
-    glslang::GlslangToSpv(*intermediate, _spvBytecode, &logger);
+    glslang::GlslangToSpv(*intermediate, _spvBytes, &logger);
 
     _log += logger.getAllMessages() + "\n";
 
