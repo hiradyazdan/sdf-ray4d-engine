@@ -2,6 +2,7 @@
 
 ## Requirements
 
+- C++ 17 compiler
 - cmake v3.12+ (tested with 3.19 - for faster builds use v3.16+)
 - Bash Shell
 - Qt v5.10+ (tested with 5.15)
@@ -10,9 +11,11 @@
 ## Build
 
 ```shell
-cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_PATH} -DVCPKG_TARGET_TRIPLET=x64-windows ..
+cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_PATH} ..
 cmake --build .
 ```
+
+***Note:*** if on Windows, make sure vcpkg packages are 64-bit system compatible with `-DVCPKG_TARGET_TRIPLET=x64-windows`.
 
 #### CMake Compilation Performance
 
@@ -124,9 +127,27 @@ more overhead than if it was managed through `VMA` (Vulkan Memory Allocator),
 which is a vulkan Memory Allocation Library, to simplify the creation and
 allocation of resources, while giving access to Vulkan functions.
 
-## Node Editor
+## Qt Widgets
 
 TBC
+
+## SDF Graph (Node Editor)
+
+![SDF Graph Design (High-level)](./docs/design/sdf-graph-architecture.png)
+
+The graph is loaded only after the main window scene
+and an initial render of a base shader. It was designed for simplicity and efficient usability to avoid any race condition
+accessing the material instance in order to load dynamic shaders as they
+require shader modules to have device functions already
+available at their disposal.
+
+Therefore, SDF Graph window/widget is activated by
+clicking on a menu button by the user which provides access
+to all required functionality to load dynamic shaders.
+
+SDF Graph recompiles the shader which means the pipeline object will need to be updated
+by the shader modification. However, as in Vulkan almost all objects are immutable, on shader recompilation,
+the pipeline object is no exception and cannot be updated, so it needs to be recreated.
 
 ## Shaders (Vulkan Shaders - SPIR-V)
 
@@ -162,6 +183,9 @@ This requires a specific algorithm to identify which shaders need to be picked u
 - They do not validate `glsl` version `410` and below (because of second point as it lacks `binding` value, and they need uniform buffers binding).
 - They do not validate uniforms without blocks (they need to be wrapped into ubo)
 - `in` and `out` variables need to be specified with their locations
+
+SPIRV shaders are essentially a set of shader instructions in bytecode, which means they won't have any comments or empty spaces
+included and therefore are already space-optimized. Using Vulkan SDK's SPIRV Disassembler (`spirv-dis`) prints out shader instructions.
 
 ## Unity Native Plugin
 

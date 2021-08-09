@@ -1,5 +1,5 @@
-    return pos;
-  }
+//    return pos;
+//  }
 
   // Ray for tracing
   mat2x3 createRay(vec3 _origin, vec3 _lookAt, vec3 _upV, vec2 _uv, float _fov, float _aspect)

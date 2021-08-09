@@ -18,8 +18,8 @@ Renderer::Renderer(
   VulkanWindow *_vkWindow,
   bool _isMSAA
 ) :
-  m_vkWindow(_vkWindow),
-  m_isMSAA(_isMSAA)
+  m_vkWindow(_vkWindow)
+  , m_isMSAA(_isMSAA)
 {
   connect(
     &m_frameWatcher, &QFutureWatcherBase::finished,

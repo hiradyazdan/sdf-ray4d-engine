@@ -7,16 +7,15 @@
 
 using namespace sdfRay4d;
 
-void Renderer::createPipelines()
-{
-  createPipelineCache();
-  createObjPipeline();
-}
-
 void Renderer::createPipelineCache()
 {
   /**
-   * TODO: Why should I need this?
+   * NOTE:
+   *
+   * This will reduce pipeline (re)creation cost
+   *
+   * Just in case to cache the layouts/descriptor sets & shader module
+   * though most modern drivers have a cache of their own
    */
   pipeline::CacheInfo pipelineCacheInfo = {}; // memset
 
@@ -35,13 +34,32 @@ void Renderer::createPipelineCache()
   }
 }
 
+void Renderer::createSDFPipeline()
+{
+  createPipelineWorker(
+    m_sdfPipelineWorker,
+    m_sdfMaterial
+  );
+}
+
+void Renderer::createPipelineWorker(
+  QFuture<void> &_pipelineFuture,
+  const MaterialPtr &_material
+)
+{
+  _pipelineFuture = QtConcurrent::run(
+    this, &Renderer::createMaterialPipeline,
+    _material
+  );
+}
+
 /**
  * per Material Pipeline
  */
-void Renderer::createObjPipeline()
+void Renderer::createMaterialPipeline(const MaterialPtr &_material)
 {
-  createPipelineLayout();
-  createGraphicsPipeline();
+  createPipelineLayout(_material);
+  createGraphicsPipeline(_material);
 
   /**
    * TODO: Should I create buffers at this stage?
@@ -53,7 +71,7 @@ void Renderer::createObjPipeline()
 /**
  * per Material Pipeline
  */
-void Renderer::createPipelineLayout()
+void Renderer::createPipelineLayout(const MaterialPtr &_material)
 {
   PushConstantRange pushConstant;
   pushConstant.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -71,7 +89,7 @@ void Renderer::createPipelineLayout()
     m_device,
     &pipelineLayoutInfo,
     nullptr,
-    &m_objMaterial.pipelineLayout
+    &_material->pipelineLayout
   );
 
   if (result != VK_SUCCESS)
@@ -81,19 +99,52 @@ void Renderer::createPipelineLayout()
 }
 
 /**
+ * TODO: implement compute pipeline with compute shaders
+ *
  * per Material Pipeline
  */
-void Renderer::createGraphicsPipeline()
+void Renderer::createComputePipeline(const MaterialPtr &_material)
 {
-  initShaderStages();
-  initPSOs();
+//  initShaderStages();
+//  initPSOs();
 
-  auto &pso = m_objMaterial.pso;
+  auto &pso = _material->pso;
+
+  pipeline::ComputePipelineInfo pipelineInfo = {};
+
+  pipelineInfo.sType                = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+//  pipelineInfo.stage                = m_objMaterial->shaderStages.data();
+  pipelineInfo.layout               = _material->pipelineLayout;
+
+  auto result = m_deviceFuncs->vkCreateComputePipelines(
+    m_device,
+    m_pipelineCache,
+    1,
+    &pipelineInfo,
+    nullptr,
+    &_material->pipeline
+  );
+
+  if (result != VK_SUCCESS)
+  {
+    qFatal("Failed to create compute pipeline: %d", result);
+  }
+}
+
+/**
+ * per Material Pipeline
+ */
+void Renderer::createGraphicsPipeline(const MaterialPtr &_material)
+{
+  initShaderStages(_material);
+  initPSOs(_material);
+
+  auto &pso = _material->pso;
 
   pipeline::GraphicsPipelineInfo pipelineInfo = {}; // memset
   pipelineInfo.sType                = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
   pipelineInfo.stageCount           = 2;
-  pipelineInfo.pStages              = m_objMaterial.shaderStages.data();
+  pipelineInfo.pStages              = _material->shaderStages.data();
 
   // Set Pipeline State Objects (PSOs)
   pipelineInfo.pDynamicState        = &pso.dynamicState;
@@ -105,7 +156,7 @@ void Renderer::createGraphicsPipeline()
   pipelineInfo.pDepthStencilState   = &pso.depthStencilState;
   pipelineInfo.pMultisampleState    = &pso.multisampleState;
 
-  pipelineInfo.layout               = m_objMaterial.pipelineLayout;
+  pipelineInfo.layout               = _material->pipelineLayout;
   pipelineInfo.renderPass           = m_vkWindow->defaultRenderPass();
 
   auto result = m_deviceFuncs->vkCreateGraphicsPipelines(
@@ -114,7 +165,7 @@ void Renderer::createGraphicsPipeline()
     1,
     &pipelineInfo,
     nullptr,
-    &m_objMaterial.pipeline
+    &_material->pipeline
   );
 
   if (result != VK_SUCCESS)
@@ -131,21 +182,21 @@ void Renderer::createGraphicsPipeline()
    * as the usage of the heap memory on PSOs for the renderer is very minimal
    * and CPU performance is not a big concern here
    */
-  m_objMaterial.pso = {}; // memset
+  _material->pso = {}; // memset
 }
 
 /**
  * per Material Pipeline
  */
-void Renderer::initShaderStages()
+void Renderer::initShaderStages(const MaterialPtr &_material)
 {
-  m_objMaterial.shaderStages = {
+  _material->shaderStages = {
     {
       VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, // sType
       nullptr, // pNext
       0, // flags
       VK_SHADER_STAGE_VERTEX_BIT, // stage
-      m_objMaterial.vertexShader.getData()->shaderModule, // module
+      _material->vertexShader.getData()->shaderModule, // module
       "main", // pName
       nullptr // pSpecializationInfo
     },
@@ -154,7 +205,7 @@ void Renderer::initShaderStages()
       nullptr, // pNext
       0, // flags
       VK_SHADER_STAGE_FRAGMENT_BIT, // stage
-      m_objMaterial.fragmentShader.getData()->shaderModule, // module
+      _material->fragmentShader.getData()->shaderModule, // module
       "main", // pName
       nullptr // pSpecializationInfo
     }
@@ -164,8 +215,13 @@ void Renderer::initShaderStages()
 /**
  * per Material Pipeline
  */
-void Renderer::setupDescriptorSets()
+void Renderer::setupDescriptorSets(const MaterialPtr &_material)
 {
+
+  /**
+   * TODO: Rewrite this
+   */
+
   // Descriptor set layout.
   VkDescriptorPoolSize descPoolSizes[] = {
     { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 2 }
@@ -176,9 +232,17 @@ void Renderer::setupDescriptorSets()
   descPoolInfo.maxSets = 1; // a single set is enough due to the dynamic uniform buffer
   descPoolInfo.poolSizeCount = sizeof(descPoolSizes) / sizeof(descPoolSizes[0]);
   descPoolInfo.pPoolSizes = descPoolSizes;
-  VkResult err = m_deviceFuncs->vkCreateDescriptorPool(m_device, &descPoolInfo, nullptr, &m_objMaterial.descPool);
+  VkResult err = m_deviceFuncs->vkCreateDescriptorPool(
+    m_device,
+    &descPoolInfo,
+    nullptr,
+    &_material->descPool
+  );
+
   if (err != VK_SUCCESS)
+  {
     qFatal("Failed to create descriptor pool: %d", err);
+  }
 
   VkDescriptorSetLayoutBinding layoutBindings[] =
     {
@@ -208,7 +272,7 @@ void Renderer::setupDescriptorSets()
     m_device,
     &descLayoutInfo,
     nullptr,
-    &m_objMaterial.descSetLayout
+    &_material->descSetLayout
   );
   if (err != VK_SUCCESS)
     qFatal("Failed to create descriptor set layout: %d", err);
@@ -216,11 +280,11 @@ void Renderer::setupDescriptorSets()
   VkDescriptorSetAllocateInfo descSetAllocInfo = {
     VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
     nullptr,
-    m_objMaterial.descPool,
+    _material->descPool,
     1,
-    &m_objMaterial.descSetLayout
+    &_material->descSetLayout
   };
-  err = m_deviceFuncs->vkAllocateDescriptorSets(m_device, &descSetAllocInfo, &m_objMaterial.descSet);
+  err = m_deviceFuncs->vkAllocateDescriptorSets(m_device, &descSetAllocInfo, &_material->descSet);
   if (err != VK_SUCCESS)
     qFatal("Failed to allocate descriptor set: %d", err);
 }

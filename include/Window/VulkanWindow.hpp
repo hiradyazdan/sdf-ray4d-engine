@@ -9,17 +9,22 @@
 #include "SDFGraph/DistanceFieldData.hpp"
 
 #include "Renderer.hpp"
-#include "ShaderManager.hpp"
 
 namespace sdfRay4d
 {
   class Renderer;
-
-  using NodePtrSet = std::unordered_map<QUuid, std::shared_ptr<Node>>;
+  struct Material;
 
   class VulkanWindow : public QVulkanWindow
   {
     Q_OBJECT
+
+    using NodePtrSet = std::unordered_map
+    <
+      QUuid,
+      std::shared_ptr<Node>
+    >;
+    using MaterialPtr = std::shared_ptr<Material>;
 
     public:
       explicit VulkanWindow(bool _isDebug = false);
@@ -32,42 +37,23 @@ namespace sdfRay4d
       QVulkanWindowRenderer *createRenderer() override;
 
     public:
-//      std::shared_ptr<ShaderManager> &getShaderMan() { return m_shaderMan; }
-//      std::string &getShaderStart() { return m_shaderStart; }
-//      std::string &getShaderEnd() { return m_shaderEnd; }
-
-
+      void createSDFPipeline();
+      void destroySDFPipeline();
+      MaterialPtr getSDFMaterial();
 
     signals:
       /**
        *
        * @param _nodes
        */
-      void nodeEditorModified(NodePtrSet _nodes);
-
-      /**
-       * @brief
-       * @param _text {DESCRIPTION}
-       */
-      void vulkanInfoReceived(const QString &_text);
-
-      /**
-       * @brief
-       * @param _colorValue {DESCRIPTION}
-       */
-      void frameQueued(int _colorValue);
-
-//    public slots:
-//      void onVulkanInfoReceived(const QString &text);
-//      void onFrameQueued(int colorValue);
-//      void onGrabRequested();
+      void sdfGraphChanged(sdfRay4d::VulkanWindow::NodePtrSet _nodes);
 
     private:
-      void mousePressEvent(QMouseEvent *_event) override;
-      void mouseReleaseEvent(QMouseEvent *_event) override;
-      void mouseMoveEvent(QMouseEvent *_event) override;
-      void wheelEvent(QWheelEvent *_event) override;
-      void keyPressEvent(QKeyEvent *_event) override;
+      void mousePressEvent    (QMouseEvent *_event) override;
+      void mouseReleaseEvent  (QMouseEvent *_event) override;
+      void mouseMoveEvent     (QMouseEvent *_event) override;
+      void wheelEvent         (QWheelEvent *_event) override;
+      void keyPressEvent      (QKeyEvent   *_event) override;
 
     private:
       Renderer *m_renderer;
@@ -75,8 +61,5 @@ namespace sdfRay4d
 
       bool m_pressed = false;
       QPoint m_lastPos;
-//      std::shared_ptr<ShaderManager> m_shaderMan;
-//      std::string m_shaderStart;
-//      std::string m_shaderEnd;
   };
 }

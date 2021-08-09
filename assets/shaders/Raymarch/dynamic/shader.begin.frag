@@ -203,6 +203,6 @@ vec3 opRepetition(vec3 p, vec3 c)
   return q;
 }
 
-vec4 map(vec3 _position)
-{
-  vec4 pos = vec4(4.0, 3.0, 4.0, 0.0);
+//vec4 map(vec3 _position)
+//{
+//  vec4 pos = vec4(4.0, 3.0, 4.0, 0.0);

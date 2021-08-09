@@ -14,7 +14,10 @@ namespace sdfRay4d
   class Shader
   {
     public:
-      Shader();
+      Shader(
+        Device &_device,
+        QVulkanDeviceFunctions *_deviceFuncs
+      );
 
     public:
       struct Data
@@ -31,11 +34,19 @@ namespace sdfRay4d
      */
     public:
       void load(
-        Device &_device,
-        QVulkanDeviceFunctions *_deviceFuncs,
         const QString &_filePath,
         const QStringList &_partialFilePaths = {}
       );
+      void load(
+        const std::string &_shaderData
+      );
+
+    public:
+      void preload(
+//        const QString &_replaceItem,
+        const QStringList &_partialFilePaths
+      );
+
     /**
      * General Helpers
      * -------------------------------------------------
@@ -54,7 +65,11 @@ namespace sdfRay4d
     private:
       static QByteArray getFileBytes(const QString &_filePath);
       static shader::StageFlags getShaderStage(const std::string &_fileExtension);
+      static void serializeVersionDirective(QByteArray &_rawBytes);
 
+      void serialize(
+        const QByteArray &_rawBytes
+      );
       void serialize(
         const QStringList &_partialFilePaths,
         QByteArray &_rawBytes
@@ -75,6 +90,7 @@ namespace sdfRay4d
     private:
       bool m_isLoading = false;
       Data m_data;
+      QByteArray m_rawBytes;
 
     /**
      * Qt Vulkan Members

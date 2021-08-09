@@ -12,6 +12,10 @@ void Renderer::startNextFrame()
   Q_ASSERT(!m_isFramePending);
   m_isFramePending = true;
 
+  /**
+   * Command buffers handle CPU Workload
+   * So, generating command buffers can be offloaded to a CPU worker thread
+   */
   auto future = QtConcurrent::run(this, &Renderer::buildFrame);
   m_frameWatcher.setFuture(future);
 }
@@ -23,7 +27,7 @@ void Renderer::buildFrame()
 
   createBuffers();
 //  ensureInstanceBuffer();
-  m_pipelinesFuture.waitForFinished();
+  m_sdfPipelineWorker.waitForFinished();
 
   cmdRenderPass();
 }

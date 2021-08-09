@@ -100,18 +100,46 @@ void MainWindow::keyPressEvent(QKeyEvent *_event)
   switch(_event->key())
   {
     // escape key to quite
-    case Qt::Key_Escape: QApplication::exit(EXIT_SUCCESS); break;
+    case Qt::Key_Escape: quitApp(); break;
     case Qt::Key_Space:
     case Qt::Key_Return:
     {
 //			if(_event->modifiers() == Qt::ShiftModifier)
 //			{
-      emit m_vkWindow->nodeEditorModified(getNodes());
+      emit m_vkWindow->sdfGraphChanged(m_sdfGraph->getNodes());
 //			}
     }
       break;
 //    case Qt::Key_S : m_nodes->save(); break;
 //    case Qt::Key_L : m_nodes->load(); break;
     default: break;
+  }
+}
+
+void MainWindow::resizeEvent(QResizeEvent *_event)
+{
+  m_windowSize = _event->size();
+
+  resizeSDFGraph(dockWidgetArea(m_sdfGraphWidget));
+}
+
+void MainWindow::resizeSDFGraph(Qt::DockWidgetArea _area)
+{
+  if(
+    _area == Qt::TopDockWidgetArea ||
+    _area == Qt::BottomDockWidgetArea
+  )
+  {
+    m_sdfGraphWidget->setMaximumSize(m_windowSize.width(), m_windowSize.height() / 2);
+    m_sdfGraphWidget->setMinimumSize(m_windowSize.width(), m_windowSize.height() / 3);
+  }
+
+  if(
+    _area == Qt::LeftDockWidgetArea ||
+    _area == Qt::RightDockWidgetArea
+  )
+  {
+    m_sdfGraphWidget->setMaximumSize(m_windowSize.width() / 2, m_windowSize.height());
+    m_sdfGraphWidget->setMinimumSize(m_windowSize.width() / 3, m_windowSize.height());
   }
 }

@@ -9,32 +9,30 @@ using namespace sdfRay4d;
 
 void Renderer::initVkFunctions()
 {
-  m_vkInstance  = m_vkWindow->vulkanInstance();
-  m_device      = m_vkWindow->device();
-  m_deviceFuncs = m_vkInstance->deviceFunctions(m_device);
+  auto &&vkInstance = m_vkWindow->vulkanInstance();
+  m_device          = m_vkWindow->device();
+  m_deviceFuncs     = vkInstance->deviceFunctions(m_device);
 }
 
-void Renderer::initShaders()
+void Renderer::initSDFShaders()
 {
-  if (!m_objMaterial.vertexShader.isValid())
+  if (!m_sdfMaterial->vertexShader.isValid())
   {
-    m_objMaterial.vertexShader.load(
-      m_device,
-      m_deviceFuncs,
-      "static/fullscreentri.vert.spv"
+    m_sdfMaterial->vertexShader.load(
+      "static/fullscreentri.vert", {}
+//      "static/screenQuad.vert", {}
     );
   }
 
-  if (!m_objMaterial.fragmentShader.isValid())
+  if (!m_sdfMaterial->fragmentShader.isValid())
   {
-    m_objMaterial.fragmentShader.load(
-      m_device,
-      m_deviceFuncs,
+    m_sdfMaterial->fragmentShader.load(
       "dynamic/rtprimitives.frag",
       {
         "_partials/distance_functions.partial.glsl",
         "_partials/operations.partial.glsl"
       }
+//      "static/blank.frag", {}
     );
   }
 }

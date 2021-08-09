@@ -8,21 +8,21 @@
 
 using namespace sdfRay4d;
 
-void Renderer::initPSOs()
+void Renderer::initPSOs(const MaterialPtr &_material)
 {
-  setDynamicState();
-  setVertexInputState();
-  setInputAssemblyState();
-  setRasterizationState();
-  setColorBlendState();
-  setViewportState();
-  setDepthStencilState();
-  setMultisampleState();
+  setDynamicState(_material);
+  setVertexInputState(_material);
+  setInputAssemblyState(_material);
+  setRasterizationState(_material);
+  setColorBlendState(_material);
+  setViewportState(_material);
+  setDepthStencilState(_material);
+  setMultisampleState(_material);
 }
 
-void Renderer::setDynamicState()
+void Renderer::setDynamicState(const MaterialPtr &_material)
 {
-  auto &pso = m_objMaterial.pso;
+  auto &pso = _material->pso;
   auto &dynamicState = pso.dynamicState = {}; // memset
   auto &states = pso.dynamicStates = {
     VK_DYNAMIC_STATE_VIEWPORT,
@@ -34,9 +34,9 @@ void Renderer::setDynamicState()
   dynamicState.pDynamicStates = states.data();
 }
 
-void Renderer::setVertexInputState()
+void Renderer::setVertexInputState(const MaterialPtr &_material)
 {
-  auto &pso = m_objMaterial.pso;
+  auto &pso = _material->pso;
   auto &vertexInputState = pso.vertexInputState = {}; // memset
   auto &vertexBindingDesc = pso.vertexBindingDesc = {
     {
@@ -69,9 +69,9 @@ void Renderer::setVertexInputState()
   vertexInputState.flags = 0;
 }
 
-void Renderer::setInputAssemblyState()
+void Renderer::setInputAssemblyState(const MaterialPtr &_material)
 {
-  auto &pso = m_objMaterial.pso;
+  auto &pso = _material->pso;
   auto &inputAssemblyState = pso.inputAssemblyState = {}; // memset
 
   inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -79,9 +79,9 @@ void Renderer::setInputAssemblyState()
   inputAssemblyState.primitiveRestartEnable = VK_FALSE;
 }
 
-void Renderer::setRasterizationState()
+void Renderer::setRasterizationState(const MaterialPtr &_material)
 {
-  auto &pso = m_objMaterial.pso;
+  auto &pso = _material->pso;
   auto &rasterizationState = pso.rasterizationState = {}; // memset
 
   rasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -97,9 +97,9 @@ void Renderer::setRasterizationState()
   rasterizationState.lineWidth = 1.0f;
 }
 
-void Renderer::setColorBlendState()
+void Renderer::setColorBlendState(const MaterialPtr &_material)
 {
-  auto &pso = m_objMaterial.pso;
+  auto &pso = _material->pso;
   auto &colorBlendState = pso.colorBlendState = {}; // memset
 
   colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -125,9 +125,9 @@ void Renderer::setColorBlendState()
   colorBlendState.pAttachments = &att;
 }
 
-void Renderer::setViewportState()
+void Renderer::setViewportState(const MaterialPtr &_material)
 {
-  auto &pso = m_objMaterial.pso;
+  auto &pso = _material->pso;
   auto &viewportState = pso.viewportState = {}; // memset
 
   viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -137,9 +137,9 @@ void Renderer::setViewportState()
   viewportState.pScissors = nullptr;
 }
 
-void Renderer::setDepthStencilState()
+void Renderer::setDepthStencilState(const MaterialPtr &_material)
 {
-  auto &pso = m_objMaterial.pso;
+  auto &pso = _material->pso;
   auto &depthStencilState = pso.depthStencilState = {}; // memset
 
   depthStencilState.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
@@ -148,9 +148,9 @@ void Renderer::setDepthStencilState()
   depthStencilState.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
 }
 
-void Renderer::setMultisampleState()
+void Renderer::setMultisampleState(const MaterialPtr &_material)
 {
-  auto &pso = m_objMaterial.pso;
+  auto &pso = _material->pso;
   auto &multisampleState = pso.multisampleState = {}; // memset
 
   multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;

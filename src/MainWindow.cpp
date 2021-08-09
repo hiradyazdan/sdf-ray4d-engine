@@ -10,8 +10,6 @@
  * directory named as the class name
  *****************************************************/
 
-#include <fstream>
-
 #include <QPointer>
 #include <QLibraryInfo>
 
@@ -19,45 +17,21 @@
 
 using namespace sdfRay4d;
 
-//Q_LOGGING_CATEGORY(lcVk, "qt.vulkan")
-
-//static QPointer<QPlainTextEdit> messageLogWidget;
-//static QtMessageHandler oldMessageHandler = nullptr;
-//
-//static void messageHandler(QtMsgType _msgType, const QMessageLogContext &_logContext, const QString &_text)
-//{
-//  if (!messageLogWidget.isNull()) messageLogWidget->appendPlainText(_text);
-//  if (oldMessageHandler) oldMessageHandler(_msgType, _logContext, _text);
-//}
-
 MainWindow::MainWindow()
-: m_shaderMan(ShaderManager::instance()),
-  m_outputNode(nullptr)
+: m_vkWindow(nullptr)
 {
-//  messageLogWidget = new QPlainTextEdit(QLatin1String(QLibraryInfo::build()) + QLatin1Char('\n'));
-//  messageLogWidget->setReadOnly(true);
-//
-//  oldMessageHandler = qInstallMessageHandler(messageHandler);
-
   initVkWindow();
-  initSDFGraph();
 
   initWidgets();
   initLayouts();
 
-  std::ifstream s("shaders/shader.begin.frag");
-  std::ifstream e("shaders/shader.end.frag");
-  m_shaderStart = std::string((std::istreambuf_iterator<char>(s)), std::istreambuf_iterator<char>());
-  m_shaderEnd = std::string((std::istreambuf_iterator<char>(e)), std::istreambuf_iterator<char>());
-
-  connect(
-    m_vkWindow, &VulkanWindow::nodeEditorModified, // signal/sender (event)
-    this, &MainWindow::onNodeChanged // slot/receiver (event handler)
-  );
+  createActions();
+  createMenus();
 
 //  connect(m_vkWindow, &VulkanWindow::vulkanInfoReceived, this, &MainWindow::onVulkanInfoReceived);
 //  connect(m_vkWindow, &VulkanWindow::frameQueued, this, &MainWindow::onFrameQueued);
 }
+
 
 QPalette MainWindow::setPalette()
 {

@@ -34,16 +34,39 @@ void Renderer::initResources()
   m_isFramePending = false;
 
   initVkFunctions();
-  initShaders();
 
-  m_pipelinesFuture = QtConcurrent::run(this, &Renderer::createPipelines);
+  m_objMaterial = std::make_shared<Material>(
+    m_device,
+    m_deviceFuncs
+  );
+
+  m_sdfMaterial = std::make_shared<Material>(
+    m_device,
+    m_deviceFuncs
+  );
+
+  m_materials = {
+    m_objMaterial,
+    m_sdfMaterial
+  };
+
+  initSDFShaders();
+
+  createPipelineCache();
+  createPipelineWorker(m_sdfPipelineWorker, m_sdfMaterial);
 }
 
 void Renderer::releaseResources()
 {
   qDebug("releaseResources");
 
-  m_pipelinesFuture.waitForFinished();
+  /**
+   * NOTE:
+   *
+   * This may not be necessary since SDF Pipeline is already created
+   * before opening the SDF Graph (race condition was avoided by UI design)
+   */
+  m_sdfPipelineWorker.waitForFinished();
 
   destroyDescriptorSets();
   destroyPipelines();

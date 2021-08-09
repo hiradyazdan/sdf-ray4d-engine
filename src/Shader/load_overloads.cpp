@@ -22,8 +22,6 @@ using namespace sdfRay4d;
  * GLSL shader partial files (separate static shader instructions) into
  * a single bytecode array, compile it into SPIRV shader and finally
  * load it as a shader module
- * @param _device {Device} vulkan device
- * @param _deviceFuncs {QVulkanDeviceFunctions} qt vulkan device functions
  * @param _filePath {QString} main shader file path
  * @param _partialFilePaths {QStringList} shader's partial file paths (optional)
  *
@@ -35,16 +33,12 @@ using namespace sdfRay4d;
  * copy over, initializer_list collection might be worth looking at.
  */
 void Shader::load(
-  Device &_device,
-  QVulkanDeviceFunctions *_deviceFuncs,
   const QString &_filePath,
   const QStringList &_partialFilePaths
 )
 {
   reset();
 
-  m_device = _device;
-  m_deviceFuncs = _deviceFuncs;
   m_isLoading = true;
 
   auto fileExtension = _filePath.toStdString();
@@ -130,6 +124,96 @@ void Shader::load(
     // equivalent to std::future::wait_for with std::future_status::ready
     m_future.waitForFinished();
   }
+}
+
+/**
+ * PUBLIC
+ *
+ * @brief
+ * @param _partialFilePaths
+ */
+void Shader::preload(
+//  const QString &_replaceItem,
+  const QStringList &_partialFilePaths
+)
+{
+  for (auto i = 0; i < _partialFilePaths.size(); i++)
+  {
+    auto filePath = _partialFilePaths[i];
+//
+//    if(filePath.isEmpty())
+//    {
+//      m_rawBytes.append(QByteArray("PLACEHOLDER\n"));
+//
+//      continue;
+//    }
+
+    m_rawBytes.append(getFileBytes(m_shadersPath + filePath));
+  }
+
+//  for(auto &filePath : _partialFilePaths)
+//  {
+//    if(filePath.isEmpty())
+//    {
+//
+//    }
+//  }
+}
+
+/**
+ * PUBLIC
+ *
+ * @brief
+ * @param _shaderData
+ */
+void Shader::load(
+  const std::string &_shaderData
+)
+{
+  reset();
+
+  m_isLoading = true;
+
+  m_future = QtConcurrent::run([_shaderData, this]()
+  {
+    serialize(QByteArray(_shaderData.data()));
+
+    std::vector<uint32_t> spvBytes;
+    std::string log;
+
+    /**
+     * TODO: make SPIRVCompiler::compile thread-safe with lock/unlock?
+     *
+     * NOTE:
+     *
+     * SPV Compiler is not thread-safe and cannot synchronously compile
+     * multiple shaders. It should only be called once per process, not per thread.
+     */
+    if(
+      !SPIRVCompiler::compile(
+        getShaderStage("frag"),
+        m_rawBytes, "main", spvBytes, log
+        )
+      )
+    {
+      qWarning("Failed to compile shader: %s", log.c_str());
+      return Data();
+    }
+
+    return load(
+      spvBytes // runtime compiled spirv bytes (if available, otherwise empty)
+    );
+  });
+
+  /**
+   * This will avoid triggering synchronous spirv compilation
+   * as it will crash the app otherwise. This is due to the
+   * glslang compiler initialize call being only per process
+   * and not per thread.
+   */
+  m_future.waitForFinished();
+
+  std::cout << m_rawBytes.constData();
 }
 
 /**

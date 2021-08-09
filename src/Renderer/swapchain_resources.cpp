@@ -44,7 +44,8 @@ void Renderer::releaseSwapChainResources()
   m_frameWatcher.waitForFinished();
   // Cannot count on the finished() signal being emitted before returning
   // from here.
-  if (m_isFramePending) {
+  if (m_isFramePending)
+  {
     m_isFramePending = false;
     m_vkWindow->frameReady();
   }

@@ -1,20 +1,12 @@
 #pragma once
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QDockWidget>
-#include <QtWidgets/QPlainTextEdit>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QMessageBox>
+#include <QtWidgets>
 
 #include "Types.hpp"
 #include "VulkanWindow.hpp"
-#include "ShaderManager.hpp"
 
 namespace sdfRay4d
 {
-  using NodePtrSet = std::unordered_map<QUuid, std::shared_ptr<Node>>;
-
   class MainWindow : public QMainWindow
   {
     Q_OBJECT
@@ -25,64 +17,48 @@ namespace sdfRay4d
     public:
       static QPalette setPalette();
 
-    public:
-      NodePtrSet getNodes() { return m_sdfGraphScene->getNodes(); }
-
-    public slots:
-//      void onVulkanInfoReceived(const QString &text);
-//      void onFrameQueued(int colorValue);
-//      void onGrabRequested();
-
-      virtual void onNodeChanged(const sdfRay4d::NodePtrSet &_nodes);
+    private slots:
+      void loadSDFGraph();
+      void resizeSDFGraph(Qt::DockWidgetArea _area);
+      void toggleSDFGraph();
+      void toggleSDFGraphMenu(bool _isVisible);
+      void loadAboutDialog();
+      void autoCompileSDFGraph();
+      void compileSDFGraph();
+      void saveSDFNodes();
+      void quitApp();
 
     private:
       void initVkInstance();
       void initVkLayers();
       void initVkWindow();
 
-      void registerModels();
-      void initSDFGraph();
-      void setupOutputNode();
+    private:
+      void createActions();
+      void createMenus();
 
       void initWidgets();
       void initLayouts();
-
-      std::string recurseNodeTree(
-        const std::shared_ptr<Node> &_node,
-        Mat4f _t,
-        PortIndex portIndex = 0,
-        unsigned int _cp = 0
-      );
 
     private:
 //      void mousePressEvent(QMouseEvent *_event) override;
 //      void mouseReleaseEvent(QMouseEvent *_event) override;
 //      void mouseMoveEvent(QMouseEvent *_event) override;
       void keyPressEvent(QKeyEvent *_event) override;
-//
-//      void createActions();
-//      void createMenuBar();
-//      void createConnections();
+      void resizeEvent(QResizeEvent *_event) override;
 
     /**
      * Vulkan
      */
     private:
-      QVulkanInstance *m_vkInstance;
+      QVulkanInstance *m_vkInstance = VK_NULL_HANDLE;
       VulkanWindow *m_vkWindow;
 
     /**
      * SDF Graph
      */
     private:
-      FlowScene *m_sdfGraphScene;
-      FlowView *m_sdfGraphView;
-
-      Node *m_outputNode;
-
-      std::shared_ptr<ShaderManager> m_shaderMan;
-      std::string m_shaderStart;
-      std::string m_shaderEnd;
+      SDFGraph *m_sdfGraph;
 
     /**
      * Qt Widgets
@@ -90,15 +66,32 @@ namespace sdfRay4d
     private:
       QWidget *m_vpWidget;
       QWidget *m_wrapperWidget;
+      QWidget *m_mainMenuBar;
 
-      QDockWidget *m_dockWidget;
-
+      QToolBar *m_sdfGraphToolbar;
+      QDockWidget *m_sdfGraphWidget;
       QVBoxLayout *m_mainLayout;
 
-      QTabWidget *m_infoTab;
-      QPlainTextEdit *m_info;
+    /**
+     * Qt Widget Menus
+     */
+    private:
+      QMenu *m_windowMenu;
+      QMenu *m_sdfGraphMenu;
+      QMenu *m_helpMenu;
 
-      QPushButton *m_grabBtn;
-      QPushButton *m_quitBtn;
+    /**
+     * Qt Widget Actions
+     */
+    private:
+      QAction *m_loadSDFGraphAction;
+      QAction *m_toggleSDFGraphAction;
+      QAction *m_aboutAction;
+      QAction *m_quitAction;
+      QAction *m_autoCompileAction;
+      QAction *m_compileAction;
+      QAction *m_saveAction;
+
+      QSize m_windowSize;
   };
 }

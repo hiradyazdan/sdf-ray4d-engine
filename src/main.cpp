@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
   MainWindow mainWindow;
 
-//  mainWindow.resize(1024, 768);
+  mainWindow.setMinimumSize(1024, 768);
   mainWindow.showMaximized();
 
   return QApplication::exec();

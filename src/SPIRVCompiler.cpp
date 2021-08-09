@@ -52,9 +52,9 @@ bool SPIRVCompiler::compile(
   glslang::InitializeProcess();
 
     auto messages = (EShMessages) (
-      EShMsgDefault |
-      EShMsgVulkanRules |
-      EShMsgSpvRules
+        EShMsgDefault
+      | EShMsgVulkanRules
+      | EShMsgSpvRules
     );
     auto language = getShaderLang(_stage);
     auto source = std::string(_glslSource.begin(), _glslSource.end());
@@ -72,11 +72,13 @@ bool SPIRVCompiler::compile(
   //    shader.setEnvTarget(SPIRVCompiler::env_target_language, SPIRVCompiler::env_target_language_version);
   //  }
 
-    if (!shader.parse(
-      &glslang::DefaultTBuiltInResource,
-      100,
-      false,
-      messages)
+    if (
+      !shader.parse(
+        &glslang::DefaultTBuiltInResource,
+        100,
+        false,
+        messages
+      )
     )
     {
       _log = std::string(shader.getInfoLog()) + "\n" + std::string(shader.getInfoDebugLog());
@@ -107,7 +109,7 @@ bool SPIRVCompiler::compile(
       _log += std::string(program.getInfoLog()) + "\n" + std::string(program.getInfoDebugLog());
     }
 
-    glslang::TIntermediate *intermediate = program.getIntermediate(language);
+    auto intermediate = program.getIntermediate(language);
 
     // Translate to SPIRV.
     if (!intermediate)
@@ -123,7 +125,7 @@ bool SPIRVCompiler::compile(
 
     _log += logger.getAllMessages() + "\n";
 
-  // Shutdown glslang library.
+  // kill glslang process
   glslang::FinalizeProcess();
 
   return true;

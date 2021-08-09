@@ -14,10 +14,14 @@
 
 using namespace sdfRay4d;
 
-Shader::Shader()
-{
-  m_shadersPath = "assets/shaders/Raymarch/";
-}
+Shader::Shader(
+  Device &_device,
+  QVulkanDeviceFunctions *_deviceFuncs
+) :
+  m_device(_device)
+  , m_deviceFuncs(_deviceFuncs)
+  , m_shadersPath("../assets/shaders/Raymarch/")
+{}
 
 Shader::Data *Shader::getData()
 {

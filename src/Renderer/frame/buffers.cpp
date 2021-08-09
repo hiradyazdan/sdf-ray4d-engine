@@ -20,7 +20,7 @@ void Renderer::createBuffers()
 
   BufferInfo bufferInfo = {}; // memset
   bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-  bufferInfo.size  = UPLOAD_BUFFER_SIZE;//(m_objMaterial.vertUniSize + m_objMaterial.fragUniSize) * concurrentFrameCount;
+  bufferInfo.size  = UPLOAD_BUFFER_SIZE;//(m_sdfMaterial->vertUniSize + m_sdfMaterial->fragUniSize) * concurrentFrameCount;
   bufferInfo.usage =
     VK_BUFFER_USAGE_VERTEX_BUFFER_BIT  |
     VK_BUFFER_USAGE_INDEX_BUFFER_BIT   |
@@ -44,11 +44,11 @@ void Renderer::createBuffers()
   m_deviceFuncs->vkGetBufferMemoryRequirements(m_device, m_uniformBuffer, &uniMemReq);
 
   // Allocate memory for everything at once.
-//  m_objMaterial.uniMemStartOffset = aligned(floorVertMemReq.alignment + floorVertMemReq.size, uniMemReq.alignment);
+//  m_objMaterial->uniMemStartOffset = aligned(floorVertMemReq.alignment + floorVertMemReq.size, uniMemReq.alignment);
   memory::AllocInfo memAllocInfo = {
     VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
     nullptr,
-    /*m_objMaterial.uniMemStartOffset + */uniMemReq.size,
+    /*m_objMaterial->uniMemStartOffset + */uniMemReq.size,
     m_vkWindow->hostVisibleMemoryIndex()
   };
   result = m_deviceFuncs->vkAllocateMemory(m_device, &memAllocInfo, nullptr, &m_bufMem);
@@ -62,7 +62,7 @@ void Renderer::createBuffers()
     m_device,
     m_uniformBuffer,
     m_bufMem,
-    0/*m_objMaterial.uniMemStartOffset*/
+    0/*m_objMaterial->uniMemStartOffset*/
   );
 
   if (result != VK_SUCCESS)
@@ -76,7 +76,7 @@ void Renderer::createBuffers()
     m_device,
     m_bufMem,
     0,
-    VK_WHOLE_SIZE/*m_objMaterial.uniMemStartOffset*/,
+    VK_WHOLE_SIZE/*m_objMaterial->uniMemStartOffset*/,
     0,
     reinterpret_cast<void**>(&p)
   );

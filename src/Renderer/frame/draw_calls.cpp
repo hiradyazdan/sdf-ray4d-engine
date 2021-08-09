@@ -11,7 +11,7 @@ using namespace sdfRay4d;
 //{
 //  VkCommandBuffer cb = m_vkWindow->currentCommandBuffer();
 //
-//  m_deviceFuncs->vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, m_objMaterial.pipeline);
+//  m_deviceFuncs->vkCmdBindPipeline(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, _material->pipeline);
 //
 //  VkDeviceSize vbOffset = 0;
 //  m_deviceFuncs->vkCmdBindVertexBuffers(cb, 0, 1, &m_uniformBuffer, &vbOffset);
@@ -19,10 +19,10 @@ using namespace sdfRay4d;
 //
 //  // Now provide offsets so that the two dynamic buffers point to the
 //  // beginning of the vertex and fragment uniform data for the current frame.
-//  uint32_t frameUniOffset = m_vkWindow->currentFrame() * (m_objMaterial.vertUniSize + m_objMaterial.fragUniSize);
+//  uint32_t frameUniOffset = m_vkWindow->currentFrame() * (_material->vertUniSize + _material->fragUniSize);
 //  uint32_t frameUniOffsets[] = { frameUniOffset, frameUniOffset };
-//  m_deviceFuncs->vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, m_objMaterial.pipelineLayout, 0, 1,
-//                                         &m_objMaterial.descSet, 2, frameUniOffsets);
+//  m_deviceFuncs->vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, _material->pipelineLayout, 0, 1,
+//                                         &_material->descSet, 2, frameUniOffsets);
 //
 //  if (m_animating)
 //    m_rotation += 0.5;
@@ -39,8 +39,8 @@ using namespace sdfRay4d;
 //    // the beginning and the uniforms for other frames.
 //    quint8 *p;
 //    VkResult err = m_deviceFuncs->vkMapMemory(dev, m_bufMem,
-//                                              m_objMaterial.uniMemStartOffset + frameUniOffset,
-//                                              m_objMaterial.vertUniSize + m_objMaterial.fragUniSize,
+//                                              _material->uniMemStartOffset + frameUniOffset,
+//                                              _material->vertUniSize + _material->fragUniSize,
 //                                              0, reinterpret_cast<void **>(&p));
 //    if (err != VK_SUCCESS)
 //      qFatal("Failed to map memory: %d", err);
@@ -54,7 +54,7 @@ using namespace sdfRay4d;
 //    memcpy(p + 128 + 32, mnp + 6, 12);
 //
 //    // Fragment shader uniforms
-//    p += m_objMaterial.vertUniSize;
+//    p += _material->vertUniSize;
 //    writeFragUni(p, eyePos);
 //
 //    m_deviceFuncs->vkUnmapMemory(dev, m_bufMem);
@@ -63,12 +63,16 @@ using namespace sdfRay4d;
 //  m_deviceFuncs->vkCmdDraw(cb, (m_useLogo ? m_logoMesh.data() : m_blockMesh.data())->vertexCount, m_instCount, 0, 0);
 //}
 
-void Renderer::buildDrawCalls(CmdBuffer &_cmdBuffer, QSize &_swapChainImgSize)
+void Renderer::buildDrawCalls(
+  const MaterialPtr &_material,
+  CmdBuffer &_cmdBuffer,
+  QSize &_swapChainImgSize
+)
 {
   m_deviceFuncs->vkCmdBindPipeline(
     _cmdBuffer,
     VK_PIPELINE_BIND_POINT_GRAPHICS,
-    m_objMaterial.pipeline
+    _material->pipeline
   );
 
   device::Size vbOffset = 0;
@@ -90,7 +94,7 @@ void Renderer::buildDrawCalls(CmdBuffer &_cmdBuffer, QSize &_swapChainImgSize)
 
 //  qDebug("sizeof(QMatrix4x4): %u ", sizeof(mvp));
 
-//  m_deviceFuncs->vkCmdPushConstants(cmdBuffer, m_objMaterial.pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(mvp), mvp.constData());
+//  m_deviceFuncs->vkCmdPushConstants(cmdBuffer, _material->pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(mvp), mvp.constData());
 
 //  float color[] = { 0.3f, 0.3f, 0.3f };
 
@@ -98,7 +102,7 @@ void Renderer::buildDrawCalls(CmdBuffer &_cmdBuffer, QSize &_swapChainImgSize)
 
   m_deviceFuncs->vkCmdPushConstants(
     _cmdBuffer,
-    m_objMaterial.pipelineLayout,
+    _material->pipelineLayout,
     VK_SHADER_STAGE_FRAGMENT_BIT,
     0/*sizeof(mvp) - 4*/,
     sizeof(fragmentConstants), fragmentConstants

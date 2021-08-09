@@ -61,7 +61,7 @@ void Renderer::cmdRenderPass()
     };
     m_deviceFuncs->vkCmdSetScissor(cmdBuffer, 0, 1, &scissor);
 
-    buildDrawCalls(cmdBuffer, windowSize);
+    buildDrawCalls(m_sdfMaterial, cmdBuffer, windowSize);
 
   m_deviceFuncs->vkCmdEndRenderPass(cmdBuffer);
 }

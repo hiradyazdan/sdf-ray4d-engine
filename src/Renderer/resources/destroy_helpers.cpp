@@ -1,45 +1,91 @@
 /*****************************************************
  * Partial Class: Renderer
- * Members: Destroy Resources helpers (Private)
+ * Members: Destroy Resources helpers (Public/Private)
  *****************************************************/
 
 #include "Renderer.hpp"
 
 using namespace sdfRay4d;
 
-void Renderer::destroyDescriptorSets()
+void Renderer::destroySDFPipeline()
 {
-  if (m_objMaterial.descSetLayout)
+  if (m_isFramePending)
   {
-    m_deviceFuncs->vkDestroyDescriptorSetLayout(m_device, m_objMaterial.descSetLayout, nullptr);
-    m_objMaterial.descSetLayout = VK_NULL_HANDLE;
+    m_isFramePending = false;
+    m_vkWindow->frameReady();
   }
 
-  if (m_objMaterial.descPool)
+  destroyPipeline(m_sdfMaterial);
+  destroyPipelineLayout(m_sdfMaterial);
+  destroyShaderModule(m_sdfMaterial->fragmentShader);
+}
+
+void Renderer::destroyPipeline(
+  const MaterialPtr &_material
+)
+{
+  if (_material->pipeline)
   {
-    m_deviceFuncs->vkDestroyDescriptorPool(m_device, m_objMaterial.descPool, nullptr);
-    m_objMaterial.descPool = VK_NULL_HANDLE;
+    m_deviceFuncs->vkDestroyPipeline(
+      m_device,
+      _material->pipeline,
+      nullptr
+      );
+    _material->pipeline = VK_NULL_HANDLE;
   }
 }
 
-void Renderer::destroyPipelines()
+void Renderer::destroyPipelineLayout(
+  const MaterialPtr &_material
+)
 {
-  if (m_objMaterial.pipeline)
+  if (_material->pipelineLayout)
   {
-    m_deviceFuncs->vkDestroyPipeline(m_device, m_objMaterial.pipeline, nullptr);
-    m_objMaterial.pipeline = VK_NULL_HANDLE;
+    m_deviceFuncs->vkDestroyPipelineLayout(
+      m_device,
+      _material->pipelineLayout,
+      nullptr
+      );
+    _material->pipelineLayout = VK_NULL_HANDLE;
   }
+}
 
-  if (m_objMaterial.pipelineLayout)
+void Renderer::destroyShaderModule(Shader &_shader)
+{
+  if (_shader.isValid())
   {
-    m_deviceFuncs->vkDestroyPipelineLayout(m_device, m_objMaterial.pipelineLayout, nullptr);
-    m_objMaterial.pipelineLayout = VK_NULL_HANDLE;
+    m_deviceFuncs->vkDestroyShaderModule(
+      m_device,
+      _shader.getData()->shaderModule,
+      nullptr
+      );
+    _shader.reset();
   }
+}
 
-  if (m_pipelineCache)
+void Renderer::destroyDescriptorSets()
+{
+  for(const auto &material : m_materials)
   {
-    m_deviceFuncs->vkDestroyPipelineCache(m_device, m_pipelineCache, nullptr);
-    m_pipelineCache = VK_NULL_HANDLE;
+    if (material->descSetLayout)
+    {
+      m_deviceFuncs->vkDestroyDescriptorSetLayout(
+        m_device,
+        material->descSetLayout,
+        nullptr
+        );
+      material->descSetLayout = VK_NULL_HANDLE;
+    }
+
+    if (material->descPool)
+    {
+      m_deviceFuncs->vkDestroyDescriptorPool(
+        m_device,
+        material->descPool,
+        nullptr
+        );
+      material->descPool = VK_NULL_HANDLE;
+    }
   }
 }
 
@@ -47,31 +93,49 @@ void Renderer::destroyBuffers()
 {
   if (m_uniformBuffer)
   {
-    m_deviceFuncs->vkDestroyBuffer(m_device, m_uniformBuffer, nullptr);
+    m_deviceFuncs->vkDestroyBuffer(
+      m_device,
+      m_uniformBuffer,
+      nullptr
+    );
     m_uniformBuffer = VK_NULL_HANDLE;
   }
 
   if (m_bufMem)
   {
-    m_deviceFuncs->vkFreeMemory(m_device, m_bufMem, nullptr);
+    m_deviceFuncs->vkFreeMemory(
+      m_device,
+      m_bufMem,
+      nullptr
+    );
     m_bufMem = VK_NULL_HANDLE;
+  }
+}
+
+void Renderer::destroyPipelines()
+{
+  for(const auto &material : m_materials)
+  {
+    destroyPipeline(material);
+    destroyPipelineLayout(material);
+  }
+
+  if (m_pipelineCache)
+  {
+    m_deviceFuncs->vkDestroyPipelineCache(
+      m_device,
+      m_pipelineCache,
+      nullptr
+      );
+    m_pipelineCache = VK_NULL_HANDLE;
   }
 }
 
 void Renderer::destroyShaderModules()
 {
-  auto vertexShader = m_objMaterial.vertexShader;
-  auto fragmentShader = m_objMaterial.fragmentShader;
-
-  if (vertexShader.isValid())
+  for(const auto &material : m_materials)
   {
-    m_deviceFuncs->vkDestroyShaderModule(m_device, vertexShader.getData()->shaderModule, nullptr);
-    vertexShader.reset();
-  }
-
-  if (fragmentShader.isValid())
-  {
-    m_deviceFuncs->vkDestroyShaderModule(m_device, fragmentShader.getData()->shaderModule, nullptr);
-    fragmentShader.reset();
+    destroyShaderModule(material->vertexShader);
+    destroyShaderModule(material->fragmentShader);
   }
 }
