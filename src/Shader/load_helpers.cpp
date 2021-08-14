@@ -14,7 +14,7 @@ shader::StageFlags Shader::getShaderStage(
 )
 {
   /**
-   * NOTE:
+   * @note
    *
    * in C++ switch can only be used for integral types
    * Also, enum wouldn't be nice choice either as we need

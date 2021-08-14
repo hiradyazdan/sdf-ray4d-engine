@@ -22,8 +22,8 @@ using namespace sdfRay4d;
  * GLSL shader partial files (separate static shader instructions) into
  * a single bytecode array, compile it into SPIRV shader and finally
  * load it as a shader module
- * @param _filePath {QString} main shader file path
- * @param _partialFilePaths {QStringList} shader's partial file paths (optional)
+ * @param[in] _filePath (QString) main shader file path
+ * @param[in] _partialFilePaths (QStringList) shader's partial file paths (optional)
  *
  * TODO:
  * Make this function a variadic template with parameter pack
@@ -45,7 +45,7 @@ void Shader::load(
   fileExtension = fileExtension.substr(fileExtension.find_last_of('.') + 1);
 
   /**
-   * NOTE:
+   * @note
    *
    * As compiling the shader cannot be done asynchronously,
    * there could be two ways of implementing this:
@@ -65,7 +65,7 @@ void Shader::load(
    * So, for the sake of code readability/maintainability, it may be cleaner to put everything inside the async
    * callback function.
    */
-  m_future = QtConcurrent::run([fileExtension, _filePath, _partialFilePaths, this]()
+  m_worker = QtConcurrent::run([fileExtension, _filePath, _partialFilePaths, this]()
   {
     auto isPrecompiled = fileExtension == "spv";
     auto rawBytes = getFileBytes(m_shadersPath + _filePath);
@@ -89,7 +89,7 @@ void Shader::load(
       /**
        * TODO: make SPIRVCompiler::compile thread-safe with lock/unlock?
        *
-       * NOTE:
+       * @note
        *
        * SPV Compiler is not thread-safe and cannot synchronously compile
        * multiple shaders. It should only be called once per process, not per thread.
@@ -122,7 +122,7 @@ void Shader::load(
   if(fileExtension != "spv")
   {
     // equivalent to std::future::wait_for with std::future_status::ready
-    m_future.waitForFinished();
+    m_worker.waitForFinished();
   }
 }
 
@@ -130,7 +130,7 @@ void Shader::load(
  * PUBLIC
  *
  * @brief
- * @param _partialFilePaths
+ * @param[in] _partialFilePaths
  */
 void Shader::preload(
 //  const QString &_replaceItem,
@@ -164,7 +164,7 @@ void Shader::preload(
  * PUBLIC
  *
  * @brief
- * @param _shaderData
+ * @param[in] _shaderData
  */
 void Shader::load(
   const std::string &_shaderData
@@ -174,7 +174,7 @@ void Shader::load(
 
   m_isLoading = true;
 
-  m_future = QtConcurrent::run([_shaderData, this]()
+  m_worker = QtConcurrent::run([_shaderData, this]()
   {
     serialize(QByteArray(_shaderData.data()));
 
@@ -184,7 +184,7 @@ void Shader::load(
     /**
      * TODO: make SPIRVCompiler::compile thread-safe with lock/unlock?
      *
-     * NOTE:
+     * @note
      *
      * SPV Compiler is not thread-safe and cannot synchronously compile
      * multiple shaders. It should only be called once per process, not per thread.
@@ -211,18 +211,18 @@ void Shader::load(
    * glslang compiler initialize call being only per process
    * and not per thread.
    */
-  m_future.waitForFinished();
+  m_worker.waitForFinished();
 
-  std::cout << m_rawBytes.constData();
+//  std::cout << m_rawBytes.constData();
 }
 
 /**
  * PRIVATE
  *
  * @brief Helper function to create/load shader module from the passed spirv bytecodes
- * @param _spvBytes {std::vector<uint32_t>} compiled spirv bytecodes at runtime
- * @param _rawSPVBytes {const QByteArray} pre-compiled spirv bytecodes from spv files
- * @param _isPrecompiled {bool}
+ * @param[in] _spvBytes {std::vector<uint32_t>} compiled spirv bytecodes at runtime
+ * @param[in] _rawSPVBytes {const QByteArray} pre-compiled spirv bytecodes from spv files
+ * @param[in] _isPrecompiled {bool}
  * @return data {Shader::Data} struct
  */
 Shader::Data Shader::load(

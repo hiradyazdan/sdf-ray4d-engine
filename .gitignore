@@ -42,6 +42,7 @@ _deps
 build/
 **/*build*/*
 vcpkg_installed/
+renderdoc/*
 
 # OS and ide files
 .DS_Store

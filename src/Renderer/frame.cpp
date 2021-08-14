@@ -14,20 +14,24 @@ void Renderer::startNextFrame()
 
   /**
    * Command buffers handle CPU Workload
-   * So, generating command buffers can be offloaded to a CPU worker thread
+   * So, generating command buffers can be
+   * offloaded to a CPU worker thread
    */
-  auto future = QtConcurrent::run(this, &Renderer::buildFrame);
-  m_frameWatcher.setFuture(future);
+  auto worker = QtConcurrent::run(
+    this,
+    &Renderer::buildFrame
+  );
+  m_frameWatcher.setFuture(worker);
 }
 
 void Renderer::buildFrame()
 {
-  // To make this function Thread-safe
+  // makes this function Thread-safe
   QMutexLocker locker(&m_guiMutex);
 
   createBuffers();
 //  ensureInstanceBuffer();
-  m_sdfPipelineWorker.waitForFinished();
+  m_pipelineHelper.waitForWorkersToFinish();
 
   cmdRenderPass();
 }

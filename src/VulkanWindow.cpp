@@ -8,6 +8,8 @@
  *
  * The partials can be found in the respective
  * directory named as the class name
+ *
+ * Partials:
  *****************************************************/
 
 #include "Window/VulkanWindow.hpp"
@@ -24,7 +26,7 @@ VulkanWindow::VulkanWindow(
 QVulkanWindowRenderer *VulkanWindow::createRenderer()
 {
   /**
-   * NOTE:
+   * @note
    *
    * QVulkanWindowPrivate init function calls this function earlier than
    * creating the device with vkCreateDevice. On initial load of the window,

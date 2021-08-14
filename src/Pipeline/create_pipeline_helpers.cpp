@@ -1,16 +1,16 @@
 /*****************************************************
- * Partial Class: Renderer
- * Members: Create Pipeline Helpers (Private)
+ * Partial Class: Pipeline
+ * Members: Create Pipeline Helpers (Public/Private)
  *****************************************************/
 
-#include "Renderer.hpp"
+#include "Pipeline.hpp"
 
 using namespace sdfRay4d;
 
-void Renderer::createPipelineCache()
+void PipelineHelper::createCache()
 {
   /**
-   * NOTE:
+   * @note
    *
    * This will reduce pipeline (re)creation cost
    *
@@ -26,7 +26,7 @@ void Renderer::createPipelineCache()
     &pipelineCacheInfo,
     nullptr,
     &m_pipelineCache
-  );
+    );
 
   if (result != VK_SUCCESS)
   {
@@ -34,31 +34,17 @@ void Renderer::createPipelineCache()
   }
 }
 
-void Renderer::createSDFPipeline()
+void PipelineHelper::createPipelines()
 {
-  createPipelineWorker(
-    m_sdfPipelineWorker,
-    m_sdfMaterial
-  );
+  for(const auto &material : m_materials)
+  {
+    createPipeline(material);
+  }
 }
 
-void Renderer::createPipelineWorker(
-  QFuture<void> &_pipelineFuture,
-  const MaterialPtr &_material
-)
+void PipelineHelper::createPipeline(const MaterialPtr &_material)
 {
-  _pipelineFuture = QtConcurrent::run(
-    this, &Renderer::createMaterialPipeline,
-    _material
-  );
-}
-
-/**
- * per Material Pipeline
- */
-void Renderer::createMaterialPipeline(const MaterialPtr &_material)
-{
-  createPipelineLayout(_material);
+  createLayout(_material);
   createGraphicsPipeline(_material);
 
   /**
@@ -68,22 +54,16 @@ void Renderer::createMaterialPipeline(const MaterialPtr &_material)
 //  createBuffers();
 }
 
-/**
- * per Material Pipeline
- */
-void Renderer::createPipelineLayout(const MaterialPtr &_material)
+void PipelineHelper::createLayout(const MaterialPtr &_material)
 {
-  PushConstantRange pushConstant;
-  pushConstant.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-  pushConstant.offset = 0;
-  pushConstant.size = 64;
+  createDescriptorSets(_material);
 
   pipeline::LayoutInfo pipelineLayoutInfo = {}; // memset
   pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  pipelineLayoutInfo.pushConstantRangeCount = 1;
-  pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
-//  pipelineLayoutInfo.setLayoutCount = 1;
-//  pipelineLayoutInfo.pSetLayouts = &m_descSetLayout;
+  pipelineLayoutInfo.pushConstantRangeCount = _material->pushConstantRangeCount;
+  pipelineLayoutInfo.pPushConstantRanges = &_material->pushConstantRange;
+  pipelineLayoutInfo.setLayoutCount = _material->descSetLayoutCount;
+  pipelineLayoutInfo.pSetLayouts = &_material->descSetLayout;
 
   auto result = m_deviceFuncs->vkCreatePipelineLayout(
     m_device,
@@ -103,17 +83,19 @@ void Renderer::createPipelineLayout(const MaterialPtr &_material)
  *
  * per Material Pipeline
  */
-void Renderer::createComputePipeline(const MaterialPtr &_material)
+void PipelineHelper::createComputePipeline(
+  const MaterialPtr &_material
+)
 {
-//  initShaderStages();
-//  initPSOs();
+  //  initShaderStages();
+  //  initPSOs();
 
   auto &pso = _material->pso;
 
   pipeline::ComputePipelineInfo pipelineInfo = {};
 
   pipelineInfo.sType                = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-//  pipelineInfo.stage                = m_objMaterial->shaderStages.data();
+  //  pipelineInfo.stage                = m_actorMaterial->shaderStages.data();
   pipelineInfo.layout               = _material->pipelineLayout;
 
   auto result = m_deviceFuncs->vkCreateComputePipelines(
@@ -123,7 +105,7 @@ void Renderer::createComputePipeline(const MaterialPtr &_material)
     &pipelineInfo,
     nullptr,
     &_material->pipeline
-  );
+    );
 
   if (result != VK_SUCCESS)
   {
@@ -134,7 +116,9 @@ void Renderer::createComputePipeline(const MaterialPtr &_material)
 /**
  * per Material Pipeline
  */
-void Renderer::createGraphicsPipeline(const MaterialPtr &_material)
+void PipelineHelper::createGraphicsPipeline(
+  const MaterialPtr &_material
+)
 {
   initShaderStages(_material);
   initPSOs(_material);
@@ -143,7 +127,7 @@ void Renderer::createGraphicsPipeline(const MaterialPtr &_material)
 
   pipeline::GraphicsPipelineInfo pipelineInfo = {}; // memset
   pipelineInfo.sType                = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-  pipelineInfo.stageCount           = 2;
+  pipelineInfo.stageCount           = _material->shaderStages.size();
   pipelineInfo.pStages              = _material->shaderStages.data();
 
   // Set Pipeline State Objects (PSOs)
@@ -157,7 +141,7 @@ void Renderer::createGraphicsPipeline(const MaterialPtr &_material)
   pipelineInfo.pMultisampleState    = &pso.multisampleState;
 
   pipelineInfo.layout               = _material->pipelineLayout;
-  pipelineInfo.renderPass           = m_vkWindow->defaultRenderPass();
+  pipelineInfo.renderPass           = m_renderPass;
 
   auto result = m_deviceFuncs->vkCreateGraphicsPipelines(
     m_device,
@@ -174,7 +158,7 @@ void Renderer::createGraphicsPipeline(const MaterialPtr &_material)
   }
 
   /*
-   * NOTE:
+   * @note
    *
    * This may be a micro optimization:
    *
@@ -188,7 +172,7 @@ void Renderer::createGraphicsPipeline(const MaterialPtr &_material)
 /**
  * per Material Pipeline
  */
-void Renderer::initShaderStages(const MaterialPtr &_material)
+void PipelineHelper::initShaderStages(const MaterialPtr &_material)
 {
   _material->shaderStages = {
     {
@@ -210,81 +194,4 @@ void Renderer::initShaderStages(const MaterialPtr &_material)
       nullptr // pSpecializationInfo
     }
   };
-}
-
-/**
- * per Material Pipeline
- */
-void Renderer::setupDescriptorSets(const MaterialPtr &_material)
-{
-
-  /**
-   * TODO: Rewrite this
-   */
-
-  // Descriptor set layout.
-  VkDescriptorPoolSize descPoolSizes[] = {
-    { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 2 }
-  };
-  VkDescriptorPoolCreateInfo descPoolInfo;
-  memset(&descPoolInfo, 0, sizeof(descPoolInfo));
-  descPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-  descPoolInfo.maxSets = 1; // a single set is enough due to the dynamic uniform buffer
-  descPoolInfo.poolSizeCount = sizeof(descPoolSizes) / sizeof(descPoolSizes[0]);
-  descPoolInfo.pPoolSizes = descPoolSizes;
-  VkResult err = m_deviceFuncs->vkCreateDescriptorPool(
-    m_device,
-    &descPoolInfo,
-    nullptr,
-    &_material->descPool
-  );
-
-  if (err != VK_SUCCESS)
-  {
-    qFatal("Failed to create descriptor pool: %d", err);
-  }
-
-  VkDescriptorSetLayoutBinding layoutBindings[] =
-    {
-      {
-        0, // binding
-        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-        1, // descriptorCount
-        VK_SHADER_STAGE_VERTEX_BIT,
-        nullptr
-      },
-      {
-        1,
-        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-        1,
-        VK_SHADER_STAGE_FRAGMENT_BIT,
-        nullptr
-      }
-    };
-  VkDescriptorSetLayoutCreateInfo descLayoutInfo = {
-    VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-    nullptr,
-    0,
-    sizeof(layoutBindings) / sizeof(layoutBindings[0]),
-    layoutBindings
-  };
-  err = m_deviceFuncs->vkCreateDescriptorSetLayout(
-    m_device,
-    &descLayoutInfo,
-    nullptr,
-    &_material->descSetLayout
-  );
-  if (err != VK_SUCCESS)
-    qFatal("Failed to create descriptor set layout: %d", err);
-
-  VkDescriptorSetAllocateInfo descSetAllocInfo = {
-    VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-    nullptr,
-    _material->descPool,
-    1,
-    &_material->descSetLayout
-  };
-  err = m_deviceFuncs->vkAllocateDescriptorSets(m_device, &descSetAllocInfo, &_material->descSet);
-  if (err != VK_SUCCESS)
-    qFatal("Failed to allocate descriptor set: %d", err);
 }

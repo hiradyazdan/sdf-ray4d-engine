@@ -8,6 +8,9 @@
  *
  * The partials can be found in the respective
  * directory named as the class name
+ *
+ * Partials:
+ * - compile_helpers.cpp
  *****************************************************/
 
 #include "SPIRVCompiler.hpp"

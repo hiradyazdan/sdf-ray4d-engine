@@ -16,7 +16,9 @@ namespace sdfRay4d
     public:
       Shader(
         Device &_device,
-        QVulkanDeviceFunctions *_deviceFuncs
+        QVulkanDeviceFunctions *_deviceFuncs,
+        const QString &_shadersPath = QStringLiteral("shaders/"),
+        int _version = 450
       );
 
     public:
@@ -65,8 +67,10 @@ namespace sdfRay4d
     private:
       static QByteArray getFileBytes(const QString &_filePath);
       static shader::StageFlags getShaderStage(const std::string &_fileExtension);
-      static void serializeVersionDirective(QByteArray &_rawBytes);
 
+      void serializeVersionDirective(
+        QByteArray &_rawBytes
+      ) const;
       void serialize(
         const QByteArray &_rawBytes
       );
@@ -88,9 +92,11 @@ namespace sdfRay4d
       );
 
     private:
+      Constants m_appConstants;
+
+      const int m_version;
       bool m_isLoading = false;
       Data m_data;
-      QByteArray m_rawBytes;
 
     /**
      * Qt Vulkan Members
@@ -98,7 +104,10 @@ namespace sdfRay4d
     private:
       Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
-      QFuture<Data> m_future;
+
+      QFuture<Data> m_worker;
       QString m_shadersPath;
+
+      QByteArray m_rawBytes;
   };
 }

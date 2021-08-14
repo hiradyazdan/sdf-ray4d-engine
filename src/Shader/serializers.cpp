@@ -29,7 +29,13 @@ void Shader::serialize(
   serializeVersionDirective(_rawBytes);
 }
 
-void Shader::serializeVersionDirective(QByteArray &_rawBytes)
+/**
+ *
+ * @param[in,out] _rawBytes
+ */
+void Shader::serializeVersionDirective(
+  QByteArray &_rawBytes
+) const
 {
   /**
    * TODO: Optimize - rewrite with string::replace for less memory copying
@@ -37,7 +43,7 @@ void Shader::serializeVersionDirective(QByteArray &_rawBytes)
    * copying memory all over the place.
    */
   std::string modifiedShader;
-  auto versionDirective = "#version 450";
+  auto versionDirective = "#version " + std::to_string(m_version);
   auto shaderCode = _rawBytes.toStdString();
   std::regex_replace(
     back_inserter(modifiedShader), // copies
@@ -45,10 +51,10 @@ void Shader::serializeVersionDirective(QByteArray &_rawBytes)
     shaderCode.end(),
     std::regex(R"(\#version)"),
     "//"
-    );
+  );
 
   QByteArray modifiedBytes(modifiedShader.c_str());
-  QByteArray versionDirectiveBytes(versionDirective);
+  QByteArray versionDirectiveBytes(versionDirective.c_str());
   QByteArray newLineBytes("\n");
 
   _rawBytes = modifiedBytes;

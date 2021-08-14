@@ -12,27 +12,31 @@ void Renderer::initVkFunctions()
   auto &&vkInstance = m_vkWindow->vulkanInstance();
   m_device          = m_vkWindow->device();
   m_deviceFuncs     = vkInstance->deviceFunctions(m_device);
+
+  m_pipelineHelper.init(
+    m_device,
+    m_deviceFuncs,
+    m_isMSAA ? m_vkWindow->sampleCountFlagBits() : VK_SAMPLE_COUNT_1_BIT,
+    m_vkWindow->defaultRenderPass(),
+    false
+  );
 }
 
-void Renderer::initSDFShaders()
+void Renderer::initMaterials()
 {
-  if (!m_sdfMaterial->vertexShader.isValid())
-  {
-    m_sdfMaterial->vertexShader.load(
-      "static/fullscreentri.vert", {}
-//      "static/screenQuad.vert", {}
-    );
-  }
+  auto *deviceLimits = &m_vkWindow->physicalDeviceProperties()->limits;
 
-  if (!m_sdfMaterial->fragmentShader.isValid())
-  {
-    m_sdfMaterial->fragmentShader.load(
-      "dynamic/rtprimitives.frag",
-      {
-        "_partials/distance_functions.partial.glsl",
-        "_partials/operations.partial.glsl"
-      }
-//      "static/blank.frag", {}
-    );
-  }
+  initActorMaterial(deviceLimits);
+  initSDFRMaterial(deviceLimits);
+
+  m_materials = {
+    m_actorMaterial,
+    m_sdfrMaterial
+  };
+}
+
+void Renderer::initShaders()
+{
+  initSDFRShaders();
+  initActorShaders();
 }

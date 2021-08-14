@@ -43,13 +43,15 @@ SDFGraph::SDFGraph(
 
   createMapNode();
 
+  const auto &raymarchShaders = m_appConstants.shadersPaths.raymarch;
+
   m_shapeMaterial->fragmentShader.preload(
 //    "",
     {
-      "_partials/distance_functions.partial.glsl",
-      "_partials/operations.partial.glsl",
+      raymarchShaders.frag.partials.distanceFuncs,
+      raymarchShaders.frag.partials.operations,
 //      "",
-      "dynamic/rtprimitives.frag"
+      raymarchShaders.frag.main
 //      "dynamic/shader.begin.frag",
 //      "",
 //      "dynamic/shader.end.frag"

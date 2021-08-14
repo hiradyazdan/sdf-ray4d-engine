@@ -1,9 +1,16 @@
 #version 450
 //#extension GL_ARB_separate_shader_objects : enable
 
+layout(location = 0) in vec3 vECVertNormal;
+layout(location = 1) in vec3 vECVertPos;
+layout(location = 2) in vec2 vECTexCoords;
+
 layout(location = 0) out vec4 outColor;
 
-layout(push_constant) uniform FSConst {
+layout(binding = 1) uniform sampler2D depthTexture;
+
+layout(push_constant) uniform FSConst
+{
   vec2 resolution;
   vec2 mouse;
   float time;
@@ -44,7 +51,7 @@ vec2 map( in vec3 pos )
   return res;
 }
 
-vec2 castRay( in vec3 ro, in vec3 rd )
+vec2 castRay( in vec3 ro, in vec3 rd, in float depth )
 {
   float tmin = 1.0;
   float tmax = 20.0;
@@ -67,18 +74,18 @@ vec2 castRay( in vec3 ro, in vec3 rd )
   }
     #endif
 
-  float t = tmin;
+  float t = depth;//tmin;
   float m = -1.0;
-  for( int i=0; i<64; i++ )
+  for( int i=0; i<255;/*64;*/ i++ )
   {
-    float precis = 0.0005*t;
+    float precis = 0.0005;//*t;
     vec2 res = map( ro+rd*t );
-    if( res.x<precis || t>tmax ) break;
     t += res.x;
     m = res.y;
+    if( res.x<precis || t>tmax ) break;
   }
 
-  if( t>tmax ) m=-1.0;
+//  if( t>tmax ) m=-1.0;
   return vec2( t, m );
 }
 
@@ -130,10 +137,10 @@ float calcAO( in vec3 pos, in vec3 nor )
   return clamp( 1.0 - 3.0*occ, 0.0, 1.0 );
 }
 
-vec3 render( in vec3 ro, in vec3 rd )
+vec3 render( in vec3 ro, in vec3 rd, in float depth )
 {
   vec3 col = vec3(0.7, 0.9, 1.0) +rd.y*0.8;
-  vec2 res = castRay(ro,rd);
+  vec2 res = castRay(ro,rd, depth);
   float t = res.x;
   float m = res.y;
   if( m>-0.5 )
@@ -214,8 +221,10 @@ void main( )
     // ray direction
     vec3 rd = ca * normalize( vec3(p.xy,2.0) );
 
+    float depth = texture(depthTexture, vECTexCoords).r; // rasterized Depth
+
     // render
-    vec3 col = render( ro, rd );
+    vec3 col = render( ro, rd, depth );
 
     // gamma
     col = pow( col, vec3(0.4545) );

@@ -2,6 +2,8 @@
 
 #include <QVulkanFunctions>
 
+#include "_constants.hpp"
+
 namespace sdfRay4d
 {
   namespace qt
@@ -11,8 +13,8 @@ namespace sdfRay4d
   {
     using PhysicalDeviceLimits  = VkPhysicalDeviceLimits;
     using Buffer                = VkBuffer;
-    using BufferInfo            = VkBufferCreateInfo;
     using Result                = VkResult;
+    using Format                = VkFormat;
 
     using VertexBindingDesc     = VkVertexInputBindingDescription;
     using VertexAttrDesc        = VkVertexInputAttributeDescription;
@@ -24,10 +26,34 @@ namespace sdfRay4d
     using ClearColor            = VkClearColorValue;
     using ClearDepthStencil     = VkClearDepthStencilValue;
     using Clear                 = VkClearValue;
-    using RenderPassBeginInfo   = VkRenderPassBeginInfo;
     using Viewport              = VkViewport;
     using Rect2D                = VkRect2D;
     using PushConstantRange     = VkPushConstantRange;
+    using SampleCountFlags      = VkSampleCountFlagBits;
+
+    using AttachmentDesc        = VkAttachmentDescription;
+    using AttachmentRef         = VkAttachmentReference;
+    using SubpassDesc           = VkSubpassDescription;
+
+    using RenderPass            = VkRenderPass;
+    using RenderPassInfo        = VkRenderPassCreateInfo;
+    using RenderPassBeginInfo   = VkRenderPassBeginInfo;
+
+    namespace texture
+    {
+      using Image               = VkImage;
+      using ImageInfo           = VkImageCreateInfo;
+      using ImageView           = VkImageView;
+      using ImageViewInfo       = VkImageViewCreateInfo;
+      using Sampler             = VkSampler;
+      using SamplerInfo         = VkSamplerCreateInfo;
+    }
+
+    namespace buffer
+    {
+      using Info                = VkBufferCreateInfo;
+      using UsageFlags          = VkBufferUsageFlags;
+    }
 
     namespace memory
     {
@@ -44,6 +70,7 @@ namespace sdfRay4d
     namespace descriptor
     {
       using BufferInfo    = VkDescriptorBufferInfo;
+      using ImageInfo     = VkDescriptorImageInfo;
       using Set           = VkDescriptorSet;
 
       using Pool          = VkDescriptorPool;

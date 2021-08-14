@@ -1,12 +1,12 @@
 #pragma once
 
 #include <QFutureWatcher>
-#include <QtConcurrentRun>
 
 #include "Window/VulkanWindow.hpp"
+#include "Mesh.hpp"
 #include "Camera.hpp"
 #include "SDFGraph.hpp"
-#include "Material.hpp"
+#include "Pipeline.hpp"
 
 namespace sdfRay4d
 {
@@ -19,7 +19,10 @@ namespace sdfRay4d
     using MaterialPtr = std::shared_ptr<Material>;
 
     public:
-      explicit Renderer(VulkanWindow *_vkWindow, bool _isMSAA = false);
+      explicit Renderer(
+        VulkanWindow *_vkWindow,
+        bool _isMSAA = false
+      );
 
     public slots:
       void updateFrame();
@@ -46,10 +49,14 @@ namespace sdfRay4d
        */
       void startNextFrame() override;
 
+    /**
+     * SDF resource wrappers for targeted external use
+     * -------------------------------------------------
+     */
     public:
       void createSDFPipeline();
       void destroySDFPipeline();
-      MaterialPtr &getSDFMaterial() { return m_sdfMaterial; }
+      MaterialPtr &getSDFMaterial() { return m_sdfrMaterial; }
 
     /**
      * Frame - User Input Helpers/Handlers
@@ -68,52 +75,16 @@ namespace sdfRay4d
      */
     private:
       void initVkFunctions();
-      void initSDFShaders();
 
-    /**
-     * Resources: Create Pipeline Helpers (on Worker Thread)
-     * -------------------------------------------------
-     *
-     * Pipeline Cache: Once
-     *
-     * Shader Stages: per Material Pipeline
-     * Vertex Layout: per Material Pipeline
-     * Descriptor Sets/Layouts: per Material Pipeline
-     * Pipeline Layout: per Material Pipeline
-     */
+      void initMaterials();
+      void initActorMaterial(const PhysicalDeviceLimits *_limits);
+      void initSDFRMaterial(const PhysicalDeviceLimits *_limits);
+
+      void initShaders();
+      void initActorShaders();
+      void initSDFRShaders();
+
     private:
-      void createPipelineCache();
-
-      void createPipelineWorker(
-        QFuture<void> &_pipeline,
-        const MaterialPtr &_material
-      );
-
-      void createMaterialPipeline(const MaterialPtr &_material);
-      void createPipelineLayout(const MaterialPtr &_material);
-      void createComputePipeline(const MaterialPtr &_material);
-      void createGraphicsPipeline(const MaterialPtr &_material);
-
-      static void initShaderStages(const MaterialPtr &_material);
-      void setupDescriptorSets(const MaterialPtr &_material);
-
-    /**
-     * Resources: Init PSO (Pipeline State Objects) Helpers (on Worker Thread)
-     * -------------------------------------------------
-     *
-     */
-    private:
-      void initPSOs(const MaterialPtr &_material);
-
-      static void setDynamicState(const MaterialPtr &_material);
-      static void setVertexInputState(const MaterialPtr &_material);
-      static void setInputAssemblyState(const MaterialPtr &_material);
-      static void setRasterizationState(const MaterialPtr &_material);
-      static void setColorBlendState(const MaterialPtr &_material);
-      static void setViewportState(const MaterialPtr &_material);
-      static void setDepthStencilState(const MaterialPtr &_material);
-      void setMultisampleState(const MaterialPtr &_material);
-
       void markViewProjDirty();
 
     /**
@@ -122,11 +93,8 @@ namespace sdfRay4d
      *
      */
     private:
-      void destroyPipelines();
-      void destroyPipeline(const MaterialPtr &_material);
-      void destroyPipelineLayout(const MaterialPtr &_material);
-      void destroyDescriptorSets();
       void destroyBuffers();
+      void destroyBuffer(Buffer &_buffer);
       void destroyShaderModules();
       void destroyShaderModule(Shader &_shader);
 
@@ -138,22 +106,64 @@ namespace sdfRay4d
      * - Render Pass
      */
     private:
+      void getMatrices(
+        QMatrix4x4 *vp,
+        QMatrix4x4 *model,
+        QMatrix3x3 *modelNormal,
+        QVector3D *eyePos
+      );
+      void writeFragUni(
+        quint8 *p,
+        const QVector3D &eyePos
+      );
+
+
       void buildFrame();
+
       void createBuffers();
-      void buildDrawCalls(
+      void createBuffer(
+        device::Size _size,
+        buffer::UsageFlags _usage,
+        Buffer &_buffer,
+        memory::Reqs &_memReq
+      );
+      void allocateMemory();
+      void bindBufferToMemory(
+        const Buffer &_buffer,
+        const device::Size &_memOffset
+      );
+      void mapMemory(size_t _byteSize);
+      void updateDescriptorSets();
+
+      void cmdSetViewportAndScissor(
+        CmdBuffer &_cmdBuffer,
+        uint32_t _extentWidth,
+        uint32_t _extentHeight
+      ); // TODO: Rename
+      void createSDFDrawCalls(
         const MaterialPtr &_material,
         CmdBuffer &_cmdBuffer,
-        QSize &_swapChainImgSize
+        float _extentWidth,
+        float _extentHeight
+      );
+      void createActorDrawCalls(
+        const MaterialPtr &_material,
+        CmdBuffer &_cmdBuffer
       );
       void cmdRenderPass();
 
     private:
-      static device::Size aligned(device::Size v, device::Size byteAlign)
+      static device::Size aligned(
+        device::Size v,
+        device::Size byteAlign
+      )
       {
         return (v + byteAlign - 1) & ~(byteAlign - 1);
       }
 
     private:
+      Constants m_appConstants;
+
       bool m_isMSAA;
       bool m_isFramePending = false;
 
@@ -162,22 +172,27 @@ namespace sdfRay4d
      */
     private:
       Device m_device = VK_NULL_HANDLE;
-      device::Memory m_bufMem = VK_NULL_HANDLE;
-      Buffer m_buf = VK_NULL_HANDLE;
-      Buffer m_uniformBuffer = VK_NULL_HANDLE;
+
+      Buffer m_actorVertexBuffer  = VK_NULL_HANDLE;
+      Buffer m_sdfUniformBuffer   = VK_NULL_HANDLE;
+      Buffer m_dynamicUniformBuffer = VK_NULL_HANDLE;
+
+      std::vector<Buffer> m_buffers;
+
+      memory::Reqs m_actorVertexMemReq = {};
+      memory::Reqs m_sdfUniformMemReq = {};
+      memory::Reqs m_dynamicUniformMemReq = {};
+
+      device::Size m_sdfUniformStartOffset = 0;
+
+      device::Memory m_bufferMemory = VK_NULL_HANDLE;
 
     /**
-     * Vulkan Members - Descriptor Sets
+     * Vulkan Helper Members
+     * - Pipeline
      */
     private:
-//      descriptor::BufferInfo m_uniformBufInfo[QVulkanWindow::MAX_CONCURRENT_FRAME_COUNT];
-//      descriptor::Set m_descSet[QVulkanWindow::MAX_CONCURRENT_FRAME_COUNT];
-
-    /**
-     * Vulkan Members - Pipeline
-     */
-    private:
-      pipeline::Cache m_pipelineCache = VK_NULL_HANDLE;
+      PipelineHelper m_pipelineHelper;
 
     /**
      * Qt Vulkan Members
@@ -190,22 +205,26 @@ namespace sdfRay4d
      * Qt Members - Multi-threading
      */
     private:
-      QFuture<void> m_sdfPipelineWorker;
       QFutureWatcher<void> m_frameWatcher;
       QMutex m_guiMutex;
 
     private:
+      float m_verticalAngle = 45.0f;
+      float m_nearPlane = 0.01f;
+      float m_farPlane = 1000.0f;
       QMatrix4x4 m_proj;
       int m_vpDirty = 0;
       Camera m_camera;
+//      QVector3D m_lightPos;
 
     /**
      * Materials
      */
     private:
-      // Use this material for mesh (non-sdf-raymarched) objects
-      MaterialPtr m_objMaterial;
-      MaterialPtr m_sdfMaterial;
+      MaterialPtr m_actorMaterial;
+      MaterialPtr m_sdfrMaterial;
+
+      Mesh m_actorMesh;
 
       std::vector<MaterialPtr> m_materials;
 

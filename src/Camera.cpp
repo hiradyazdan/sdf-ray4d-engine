@@ -1,13 +1,7 @@
 /*****************************************************
- * Partial Class: Camera (Ctor & General)
- * Members: General Functions (Public/Private)
- *
- * This Class is split into partials to categorize
- * and classify the functionality
- * for the purpose of readability/maintainability
- *
- * The partials can be found in the respective
- * directory named as the class name
+ * Class: Camera (Ctor & General)
+ * Members: General Functions (Public)
+ * Partials: None
  *****************************************************/
 
 #include "Camera.hpp"

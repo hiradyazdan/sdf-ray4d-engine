@@ -56,5 +56,7 @@ namespace sdfRay4d
       FlowView *m_graphView;
 
       Node *m_outputNode;
+
+      Constants m_appConstants;
   };
 }

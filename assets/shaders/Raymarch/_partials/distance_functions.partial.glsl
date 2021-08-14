@@ -144,3 +144,24 @@ float sdCylinder6( vec3 p, vec2 h )
 {
     return max( length6(p.xz)-h.x, abs(p.y)-h.y );
 }
+
+// https://www.shadertoy.com/view/Ws3XWl
+//float sdFbm( vec3 p, float d )
+//{
+//    float s = 1.0;
+//    for( int i=0; i<7; i++ )
+//    {
+//        // evaluate new octave
+//        float n = s*noiseSDF(p);
+//
+//        // subtract
+//        d = smax( d, -n, 0.2*s );
+//
+//        // prepare next octave
+//        p = mat3(0.00, 1.60, 1.20,
+//        -1.60, 0.72,-0.96,
+//        -1.20,-0.96, 1.28)*p;
+//        s = 0.5*s;
+//    }
+//    return d;
+//}

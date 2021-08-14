@@ -1,14 +1,13 @@
 /*****************************************************
- * Partial Class: Renderer
+ * Partial Class: Pipeline
  * Members: Init PSO (Pipeline State Objects) Helpers (Private)
  *****************************************************/
 
-#include "PSO.hpp"
-#include "Renderer.hpp"
+#include "Pipeline.hpp"
 
 using namespace sdfRay4d;
 
-void Renderer::initPSOs(const MaterialPtr &_material)
+void PipelineHelper::initPSOs(const MaterialPtr &_material)
 {
   setDynamicState(_material);
   setVertexInputState(_material);
@@ -20,7 +19,7 @@ void Renderer::initPSOs(const MaterialPtr &_material)
   setMultisampleState(_material);
 }
 
-void Renderer::setDynamicState(const MaterialPtr &_material)
+void PipelineHelper::setDynamicState(const MaterialPtr &_material)
 {
   auto &pso = _material->pso;
   auto &dynamicState = pso.dynamicState = {}; // memset
@@ -34,29 +33,35 @@ void Renderer::setDynamicState(const MaterialPtr &_material)
   dynamicState.pDynamicStates = states.data();
 }
 
-void Renderer::setVertexInputState(const MaterialPtr &_material)
+void PipelineHelper::setVertexInputState(const MaterialPtr &_material)
 {
   auto &pso = _material->pso;
   auto &vertexInputState = pso.vertexInputState = {}; // memset
   auto &vertexBindingDesc = pso.vertexBindingDesc = {
     {
       0, // binding
-      3 * sizeof(float),
-      VK_VERTEX_INPUT_RATE_VERTEX
+      3 * sizeof(float), // stride
+      VK_VERTEX_INPUT_RATE_VERTEX // inputRate
     }
   };
   auto &vertexAttrDesc = pso.vertexAttrDesc = {
     { // position
       0, // location
       0, // binding
-      VK_FORMAT_R32G32B32_SFLOAT,
-      0
+      VK_FORMAT_R32G32B32_SFLOAT, // format
+      0 // offset
     },
     { // normal
-      1,
-      0,
-      VK_FORMAT_R32G32B32_SFLOAT, // VK_FORMAT_R8G8B8A8_UNORM
-      5 * sizeof(float)
+      1, // location
+      0, // binding
+      VK_FORMAT_R32G32B32_SFLOAT, // format // VK_FORMAT_R8G8B8A8_UNORM
+      3 * sizeof(float) // offset
+    },
+    { // texCoords
+      2, // location
+      0, // binding
+      VK_FORMAT_R32G32B32_SFLOAT, // format
+      2 * sizeof(float) // offset
     }
   };
 
@@ -69,7 +74,7 @@ void Renderer::setVertexInputState(const MaterialPtr &_material)
   vertexInputState.flags = 0;
 }
 
-void Renderer::setInputAssemblyState(const MaterialPtr &_material)
+void PipelineHelper::setInputAssemblyState(const MaterialPtr &_material)
 {
   auto &pso = _material->pso;
   auto &inputAssemblyState = pso.inputAssemblyState = {}; // memset
@@ -79,7 +84,7 @@ void Renderer::setInputAssemblyState(const MaterialPtr &_material)
   inputAssemblyState.primitiveRestartEnable = VK_FALSE;
 }
 
-void Renderer::setRasterizationState(const MaterialPtr &_material)
+void PipelineHelper::setRasterizationState(const MaterialPtr &_material)
 {
   auto &pso = _material->pso;
   auto &rasterizationState = pso.rasterizationState = {}; // memset
@@ -97,7 +102,7 @@ void Renderer::setRasterizationState(const MaterialPtr &_material)
   rasterizationState.lineWidth = 1.0f;
 }
 
-void Renderer::setColorBlendState(const MaterialPtr &_material)
+void PipelineHelper::setColorBlendState(const MaterialPtr &_material)
 {
   auto &pso = _material->pso;
   auto &colorBlendState = pso.colorBlendState = {}; // memset
@@ -125,7 +130,7 @@ void Renderer::setColorBlendState(const MaterialPtr &_material)
   colorBlendState.pAttachments = &att;
 }
 
-void Renderer::setViewportState(const MaterialPtr &_material)
+void PipelineHelper::setViewportState(const MaterialPtr &_material)
 {
   auto &pso = _material->pso;
   auto &viewportState = pso.viewportState = {}; // memset
@@ -137,7 +142,7 @@ void Renderer::setViewportState(const MaterialPtr &_material)
   viewportState.pScissors = nullptr;
 }
 
-void Renderer::setDepthStencilState(const MaterialPtr &_material)
+void PipelineHelper::setDepthStencilState(const MaterialPtr &_material)
 {
   auto &pso = _material->pso;
   auto &depthStencilState = pso.depthStencilState = {}; // memset
@@ -148,13 +153,13 @@ void Renderer::setDepthStencilState(const MaterialPtr &_material)
   depthStencilState.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
 }
 
-void Renderer::setMultisampleState(const MaterialPtr &_material)
+void PipelineHelper::setMultisampleState(const MaterialPtr &_material)
 {
   auto &pso = _material->pso;
   auto &multisampleState = pso.multisampleState = {}; // memset
 
   multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-  multisampleState.rasterizationSamples = m_isMSAA ? m_vkWindow->sampleCountFlagBits() : VK_SAMPLE_COUNT_1_BIT;
+  multisampleState.rasterizationSamples = m_sampleCountFlags;
   multisampleState.sampleShadingEnable = VK_FALSE;
   multisampleState.minSampleShading = 1.0f;
   multisampleState.pSampleMask = nullptr;

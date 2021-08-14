@@ -34,26 +34,14 @@ void Renderer::initResources()
   m_isFramePending = false;
 
   initVkFunctions();
+  initMaterials();
+  initShaders();
 
-  m_objMaterial = std::make_shared<Material>(
-    m_device,
-    m_deviceFuncs
-  );
-
-  m_sdfMaterial = std::make_shared<Material>(
-    m_device,
-    m_deviceFuncs
-  );
-
-  m_materials = {
-    m_objMaterial,
-    m_sdfMaterial
-  };
-
-  initSDFShaders();
-
-  createPipelineCache();
-  createPipelineWorker(m_sdfPipelineWorker, m_sdfMaterial);
+  m_pipelineHelper.createCache();
+  m_pipelineHelper.createWorkers({
+    m_sdfrMaterial,
+    m_actorMaterial
+  });
 }
 
 void Renderer::releaseResources()
@@ -61,15 +49,16 @@ void Renderer::releaseResources()
   qDebug("releaseResources");
 
   /**
-   * NOTE:
+   * @note
    *
    * This may not be necessary since SDF Pipeline is already created
    * before opening the SDF Graph (race condition was avoided by UI design)
    */
-  m_sdfPipelineWorker.waitForFinished();
+  m_pipelineHelper.waitForWorkersToFinish();
 
-  destroyDescriptorSets();
-  destroyPipelines();
+  m_pipelineHelper.destroyDescriptors();
+  m_pipelineHelper.destroyPipelines();
+
   destroyBuffers();
   destroyShaderModules();
 }

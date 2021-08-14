@@ -8,6 +8,18 @@
 - Qt v5.10+ (tested with 5.15)
 - Vulkan SDK v1.2.x (tested with v1.2.176.1)
 
+## Download
+
+clone repository with its submodules:
+
+- glslang (***Note*** The latest pull (09 Aug) from `glslang` has a typo in its cmake config.
+  Please modify its `CMakeLists.txt` at line `144` to `endif(MSVC AND OVERRIDE_MSVCCRT)`.)
+- nodeeditor
+
+```shell
+git clone --recursive https://github.com/hiradyazdan/masters-project
+```
+
 ## Build
 
 ```shell
@@ -36,6 +48,18 @@ Currently, `UNITY_BUILD` is used here, as `PCH` need more configuration and also
 there's no `Module Header units` support for C++17 which is used in this project.
 
 ## Design
+
+### SDF Raymarching (Sphere Tracing)
+
+#### SDF Raymarched Objects Interaction with Mesh-based (Rasterized Geometry) Objects - Depth Calculation
+
+![SDF Raymarching Architecture](./docs/design/sdf-raymarching-architecture.svg)
+
+In c
+
+- https://www.iquilezles.org/www/articles/raypolys/raypolys.htm
+- https://computergraphics.stackexchange.com/questions/7674/how-to-align-ray-marching-on-top-of-traditional-3d-rasterization
+-
 
 ### Vulkan vs. DirectX vs. OpenGL
 
@@ -186,6 +210,10 @@ This requires a specific algorithm to identify which shaders need to be picked u
 
 SPIRV shaders are essentially a set of shader instructions in bytecode, which means they won't have any comments or empty spaces
 included and therefore are already space-optimized. Using Vulkan SDK's SPIRV Disassembler (`spirv-dis`) prints out shader instructions.
+
+## Codebase Future Improvements
+
+- Make Helper classes non-copyable
 
 ## Unity Native Plugin
 

@@ -12,7 +12,7 @@ void Renderer::initSwapChainResources()
   qDebug("initSwapChainResources");
 
   /**
-   * NOTE:
+   * @note
    *
    * The vertex data and the projection matrix assume OpenGL. With
    * Vulkan Y is negated in clip space and the near/far plane is at 0/1 instead
@@ -22,13 +22,14 @@ void Renderer::initSwapChainResources()
    * Y: up, front: CCW
    *
    */
-  m_proj = m_vkWindow->clipCorrectionMatrix();
   auto windowSize = m_vkWindow->swapChainImageSize();
+  auto aspectRatio = (float) windowSize.width() / (float) windowSize.height();
+
+  m_proj = m_vkWindow->clipCorrectionMatrix();
   m_proj.perspective(
-    45.0f,
-    (float) windowSize.width() / (float) windowSize.height(),
-    0.01f,
-    1000.0f
+    m_verticalAngle,
+    aspectRatio,
+    m_nearPlane, m_farPlane
   );
 //  m_proj.translate(0, 0, -4);
 

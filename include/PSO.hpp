@@ -9,7 +9,7 @@ namespace sdfRay4d
   using namespace vk;
 
   /**
-   * NOTE:
+   * @note
    *
    * Vulkan uses PipelineStateObjects
    * similar to D3D 12
