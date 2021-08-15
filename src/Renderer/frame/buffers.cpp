@@ -50,11 +50,11 @@ void Renderer::createBuffer(
 void Renderer::allocateMemory()
 {
   // Allocate memory for everything at once.
-  m_sdfUniformStartOffset = aligned(
+  m_sdfUniformStartOffset = setDynamicAlignmentOffset(
     0 + m_actorVertexMemReq.size,
     m_sdfUniformMemReq.alignment
   );
-  m_actorMaterial->uniMemStartOffset = aligned(
+  m_actorMaterial->uniMemStartOffset = setDynamicAlignmentOffset(
     m_sdfUniformStartOffset + m_sdfUniformMemReq.size,
     m_dynamicUniformMemReq.alignment
   );
@@ -121,7 +121,7 @@ void Renderer::mapMemory(size_t _byteSize)
 
 void Renderer::updateDescriptorSets()
 {
-  descriptor::Write descWrite[4] = {}; // memset
+  descriptor::Write descWrite[3] = {}; // memset
 
   auto actorVertLayoutBindings = m_actorMaterial->layoutBindings[0];
   auto actorFragLayoutBindings = m_actorMaterial->layoutBindings[1];
@@ -152,31 +152,39 @@ void Renderer::updateDescriptorSets()
   descWrite[1].descriptorType = actorFragLayoutBindings.descriptorType;
   descWrite[1].pBufferInfo = &fragUni;
 
-  auto sdfrVertLayoutBindings = m_sdfrMaterial->layoutBindings[0];
-  auto sdfrFragLayoutBindings = m_sdfrMaterial->layoutBindings[1];
+//  auto sdfrVertLayoutBindings = m_sdfrMaterial->layoutBindings[0];
+  auto sdfrFragLayoutBindings = m_sdfrMaterial->layoutBindings[0];
+
+//  descriptor::BufferInfo sdfrVertUni = {
+//    m_sdfUniformBuffer, // buffer
+//    0, // offset
+//    m_sdfrMaterial->vertUniSize // range
+//  };
+
+  createDepthImageView();
 
   descriptor::ImageInfo imageInfo = {};
-  imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-  imageInfo.imageView = m_vkWindow->depthStencilImageView();
+  imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+  imageInfo.imageView = m_imageView;
   imageInfo.sampler = m_sdfrMaterial->depthTexture.getSampler();
+
+//  descWrite[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+//  descWrite[2].dstSet = m_sdfrMaterial->descSets[0];
+//  descWrite[2].dstBinding = sdfrVertLayoutBindings.binding;
+//  descWrite[2].descriptorCount = sdfrVertLayoutBindings.descriptorCount;
+//  descWrite[2].descriptorType = sdfrVertLayoutBindings.descriptorType;
+//  descWrite[2].pBufferInfo = &sdfrVertUni;
 
   descWrite[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
   descWrite[2].dstSet = m_sdfrMaterial->descSet;
-  descWrite[2].dstBinding = sdfrVertLayoutBindings.binding;
-  descWrite[2].descriptorCount = sdfrVertLayoutBindings.descriptorCount;
-  descWrite[2].descriptorType = sdfrVertLayoutBindings.descriptorType;
-  descWrite[2].pBufferInfo = &vertUni;
-
-  descWrite[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-  descWrite[3].dstSet = m_sdfrMaterial->descSet;
-  descWrite[3].dstBinding = sdfrFragLayoutBindings.binding;
-  descWrite[3].descriptorCount = sdfrFragLayoutBindings.descriptorCount;
-  descWrite[3].descriptorType = sdfrFragLayoutBindings.descriptorType;
-  descWrite[3].pImageInfo = &imageInfo;
+  descWrite[2].dstBinding = sdfrFragLayoutBindings.binding;
+  descWrite[2].descriptorCount = sdfrFragLayoutBindings.descriptorCount;
+  descWrite[2].descriptorType = sdfrFragLayoutBindings.descriptorType;
+  descWrite[2].pImageInfo = &imageInfo;
 
   m_deviceFuncs->vkUpdateDescriptorSets(
     m_device,
-    2,
+    3,
     descWrite,
     0,
     nullptr
@@ -210,7 +218,7 @@ void Renderer::createBuffers()
   auto UPLOAD_BUFFER_SIZE = m_vpDirty * UPLOAD_REGION_SIZE;
 
   /**
-   * Raymarch (SDF) Uniform Buffer
+   * Raymarch (SDF) Fragment Buffer
    */
   createBuffer(
     UPLOAD_BUFFER_SIZE,
@@ -233,7 +241,10 @@ void Renderer::createBuffers()
    * active-frame-specific offset at the time of binding the descriptor set.
    */
   createBuffer(
-    (m_actorMaterial->vertUniSize + m_actorMaterial->fragUniSize) * m_vpDirty,
+    (
+      m_actorMaterial->vertUniSize +
+      m_actorMaterial->fragUniSize
+    ) * m_vpDirty,
     VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
     m_dynamicUniformBuffer,
     m_dynamicUniformMemReq

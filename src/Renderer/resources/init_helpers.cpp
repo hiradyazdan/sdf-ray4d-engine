@@ -18,7 +18,7 @@ void Renderer::initVkFunctions()
     m_deviceFuncs,
     m_isMSAA ? m_vkWindow->sampleCountFlagBits() : VK_SAMPLE_COUNT_1_BIT,
     m_vkWindow->defaultRenderPass(),
-    false
+    &m_imageView
   );
 }
 
@@ -37,6 +37,6 @@ void Renderer::initMaterials()
 
 void Renderer::initShaders()
 {
-  initSDFRShaders();
   initActorShaders();
+  initSDFRShaders();
 }

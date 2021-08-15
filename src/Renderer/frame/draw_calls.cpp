@@ -63,7 +63,7 @@ using namespace sdfRay4d;
 //  m_deviceFuncs->vkCmdDraw(cb, (m_useLogo ? m_logoMesh.data() : m_blockMesh.data())->vertexCount, m_instCount, 0, 0);
 //}
 
-void Renderer::createSDFDrawCalls(
+void Renderer::createSDFRDrawCalls(
   const MaterialPtr &_material,
   CmdBuffer &_cmdBuffer,
   float _extentWidth,
@@ -113,9 +113,39 @@ void Renderer::createSDFDrawCalls(
 //    sizeof(mvp), mvp.constData()
   );
 
+  uint32_t frameUniOffset = m_vkWindow->currentFrame() * (
+    m_sdfrMaterial->vertUniSize +
+    m_sdfrMaterial->fragUniSize
+  );
+  uint32_t frameUniOffsets[] = { frameUniOffset, frameUniOffset };
+  m_deviceFuncs->vkCmdBindDescriptorSets(
+    _cmdBuffer,
+    VK_PIPELINE_BIND_POINT_GRAPHICS,
+    m_sdfrMaterial->pipelineLayout,
+    0, 1,
+    &m_sdfrMaterial->descSet,
+    0,
+    frameUniOffsets
+  );
+
+//  uint32_t frameBufOffset = m_vkWindow->currentFrame() * (
+//    m_sdfrMaterial->vertUniSize +
+//    m_sdfrMaterial->fragUniSize
+//  );
+//  uint32_t frameBufOffsets[] = { frameBufOffset, frameBufOffset };
+//  m_deviceFuncs->vkCmdBindDescriptorSets(
+//    _cmdBuffer,
+//    VK_PIPELINE_BIND_POINT_GRAPHICS,
+//    m_sdfrMaterial->pipelineLayout,
+//    1, 1,
+//    &m_sdfrMaterial->descSets[1],
+//    1,
+//    frameBufOffsets
+//  );
+
   m_deviceFuncs->vkCmdDraw(
     _cmdBuffer,
-    3,1,
+    2 * 3,1,
     0,0
   );
 }
@@ -131,7 +161,7 @@ void Renderer::createActorDrawCalls(
     m_actorMaterial->pipeline
   );
 
-  VkDeviceSize vbOffset = 0;
+  device::Size vbOffset = 0;
   m_deviceFuncs->vkCmdBindVertexBuffers(
     _cmdBuffer,
     0, 1,

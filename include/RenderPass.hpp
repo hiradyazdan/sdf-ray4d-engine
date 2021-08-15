@@ -25,8 +25,7 @@ namespace sdfRay4d
         const Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs,
         const SampleCountFlags &_sampleCountFlags,
-        const RenderPass &_renderPass,
-        bool _useDefault = true
+        const RenderPass &_renderPass
       );
 
     /**
@@ -39,7 +38,7 @@ namespace sdfRay4d
     public:
       void createCustomRenderPass(
         const Format &_colorFormat = VK_FORMAT_B8G8R8A8_UNORM,
-        const Format &_depthStencilFormat = VK_FORMAT_D24_UNORM_S8_UINT
+        const Format &_depthStencilFormat = VK_FORMAT_D16_UNORM//VK_FORMAT_D24_UNORM_S8_UINT
       );
       void setCmdBuffer(CmdBuffer &_cmdBuffer);
       void cmdSetViewportAndScissor(
@@ -47,7 +46,7 @@ namespace sdfRay4d
         uint32_t _extentWidth,
         uint32_t _extentHeight
       ); // TODO: Rename
-      void createSDFDrawCalls(
+      void createSDFRDrawCalls(
         const MaterialPtr &_material,
         CmdBuffer &_cmdBuffer,
         float _extentWidth,
@@ -60,12 +59,7 @@ namespace sdfRay4d
       void cmdRenderPass();
 
     private:
-      /**
-       * @note this method should only be available to PipelineHelper
-       * as RenderPass instance should not be accessed independently.
-       * @return RenderPass instance
-       */
-      RenderPass getRenderPass() { return m_customRenderPass; }
+      RenderPass getRenderPass();
 
     private:
       Device m_device = VK_NULL_HANDLE;
@@ -73,6 +67,6 @@ namespace sdfRay4d
 
       SampleCountFlags m_sampleCountFlags;
 
-      RenderPass m_customRenderPass = VK_NULL_HANDLE;
+      RenderPass m_renderPass = VK_NULL_HANDLE;
   };
 }

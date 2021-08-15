@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtConcurrentRun>
+#include <QSize>
 
 #include "Material.hpp"
 #include "RenderPass.hpp"
@@ -16,6 +17,7 @@ namespace sdfRay4d
    */
   class PipelineHelper
   {
+//    using ImageViews  = std::vector<std::reference_wrapper<texture::ImageView>>;
     using MaterialPtr = std::shared_ptr<Material>;
 
     public:
@@ -24,7 +26,7 @@ namespace sdfRay4d
         QVulkanDeviceFunctions *_deviceFuncs,
         const SampleCountFlags &_sampleCountFlags,
         const RenderPass &_defaultRenderPass,
-        bool _useDefaultRenderPass = true
+        texture::ImageView *_attachments
       );
 
     public:
@@ -42,7 +44,8 @@ namespace sdfRay4d
       void destroyPipelineLayout        (const MaterialPtr &_material);
 
     public:
-      RenderPass getRenderPass() { return m_renderPass; }
+      RenderPass getRenderPass(bool _useDefault = true);
+      Framebuffer getFramebuffer(uint32_t _width, uint32_t _height);
 
     /**
      * Create Pipeline Helpers (on Worker Thread)
@@ -86,17 +89,23 @@ namespace sdfRay4d
       void setMultisampleState          (const MaterialPtr &_material);
 
     private:
+      void createFramebuffer(uint32_t _width, uint32_t _height);
+
+    private:
       Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
       RenderPassHelper m_renderPassHelper;
-
       SampleCountFlags m_sampleCountFlags;
 
       RenderPass m_renderPass = VK_NULL_HANDLE;
+
+      Framebuffer m_frameBuffer = VK_NULL_HANDLE;
       pipeline::Cache m_pipelineCache = VK_NULL_HANDLE;
 
       std::vector<MaterialPtr> m_materials;
       std::vector<QFuture<void>> m_workers;
+
+      texture::ImageView *m_attachments;
   };
 }

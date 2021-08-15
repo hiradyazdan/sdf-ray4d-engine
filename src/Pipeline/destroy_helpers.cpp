@@ -70,6 +70,12 @@ void PipelineHelper::destroyDescriptors()
       material->descSetLayout = VK_NULL_HANDLE;
     }
 
+    // TODO: Is this needed?
+    if (material->descSetLayouts)
+    {
+      material->descSetLayouts = VK_NULL_HANDLE;
+    }
+
     if (material->descPool)
     {
       m_deviceFuncs->vkDestroyDescriptorPool(

@@ -68,6 +68,8 @@ namespace sdfRay4d
       void walk(float amount);
       void strafe(float amount);
 
+      void createDepthImageView();
+
     /**
      * Resources: Init Helpers (General)
      * -------------------------------------------------
@@ -140,7 +142,7 @@ namespace sdfRay4d
         uint32_t _extentWidth,
         uint32_t _extentHeight
       ); // TODO: Rename
-      void createSDFDrawCalls(
+      void createSDFRDrawCalls(
         const MaterialPtr &_material,
         CmdBuffer &_cmdBuffer,
         float _extentWidth,
@@ -153,12 +155,12 @@ namespace sdfRay4d
       void cmdRenderPass();
 
     private:
-      static device::Size aligned(
-        device::Size v,
-        device::Size byteAlign
+      static device::Size setDynamicAlignmentOffset(
+        device::Size _offset,
+        device::Size _byteAlign
       )
       {
-        return (v + byteAlign - 1) & ~(byteAlign - 1);
+        return (_offset + _byteAlign - 1) & ~(_byteAlign - 1);
       }
 
     private:
@@ -194,6 +196,12 @@ namespace sdfRay4d
     private:
       PipelineHelper m_pipelineHelper;
 
+    private:
+      VkImageView m_imageView{};
+      VkImage m_image{};
+      memory::Reqs memReqs{};
+      device::Memory imageMem{};
+
     /**
      * Qt Vulkan Members
      */
@@ -215,6 +223,7 @@ namespace sdfRay4d
       QMatrix4x4 m_proj;
       int m_vpDirty = 0;
       Camera m_camera;
+      QSize m_windowSize;
 //      QVector3D m_lightPos;
 
     /**

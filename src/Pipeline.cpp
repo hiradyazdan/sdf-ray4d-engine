@@ -14,6 +14,7 @@
  * - create_pipeline_helpers.cpp
  * - create_pipeline_workers.cpp
  * - destroy_helpers.cpp
+ * - framebuffer_helpers.cpp
  * - init_pso_helpers.cpp
  *****************************************************/
 
@@ -24,22 +25,35 @@ using namespace sdfRay4d;
 /**
  *
  * @brief initializes the PipelineHelper members
- * @note this replaces the constructor as we cannot use a default constructor
- * to initialize device and deviceFuncs members, because they're only initialized
- * after Renderer constructor and within QVulkanRenderer's initResources()
  *
- * @param _device
- * @param _deviceFuncs
- * @param _sampleCountFlags
- * @param _defaultRenderPass
- * @param _useDefaultRenderPass
+ * @note
+ * this replaces the constructor as cannot use a default constructor
+ * to initialize device and deviceFuncs members, because they're only initialized
+ * after Renderer constructor and within QVulkanRenderer's initResources().
+ *
+ * @note
+ * As attachments is populated later in the frame loop it should
+ * be reference, so that its reference value gets used here directly
+ * and as they could be multiple attachments/image views later on,
+ * it should be either a vector of references which is not directly
+ * available in C++ except by using std::reference_wrapper or just pass
+ * the ImageView handle as itself is a handle/reference type
+ *
+ *
+ * @param[in] _device
+ * @param[in] _deviceFuncs
+ * @param[in] _sampleCountFlags
+ * @param[in] _defaultRenderPass
+ * @param[in] _attachments
+ * @param[in] _swapChainImageSize
+ * @param[in] _useDefaultRenderPass
  */
 void PipelineHelper::init(
   const Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs,
   const SampleCountFlags &_sampleCountFlags,
   const RenderPass &_defaultRenderPass,
-  bool _useDefaultRenderPass
+  texture::ImageView *_attachments
 )
 {
   m_device = _device;
@@ -48,12 +62,17 @@ void PipelineHelper::init(
   m_renderPassHelper = RenderPassHelper(
     _device, _deviceFuncs,
     _sampleCountFlags,
-    _defaultRenderPass,
-    _useDefaultRenderPass
+    _defaultRenderPass
   );
-  m_renderPass = _useDefaultRenderPass
-    ? _defaultRenderPass
-    : m_renderPassHelper.getRenderPass();
+  m_renderPass = _defaultRenderPass;
+  m_attachments = _attachments;
+}
+
+RenderPass PipelineHelper::getRenderPass(bool _useDefault)
+{
+  return _useDefault
+  ? m_renderPass
+  : m_renderPassHelper.getRenderPass();
 }
 
 void PipelineHelper::waitForWorkersToFinish()

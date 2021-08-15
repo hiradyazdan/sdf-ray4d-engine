@@ -44,26 +44,29 @@ void PipelineHelper::createPipelines()
 
 void PipelineHelper::createPipeline(const MaterialPtr &_material)
 {
+  createDescriptorSets(_material);
   createLayout(_material);
   createGraphicsPipeline(_material);
 
   /**
    * TODO: Should I create buffers at this stage?
-   * if buffers don't need to update per frame
+   * if buffers don't need to update per frame (static)
    */
 //  createBuffers();
 }
 
 void PipelineHelper::createLayout(const MaterialPtr &_material)
 {
-  createDescriptorSets(_material);
+  auto &descLayoutCount = _material->descSetLayoutCount;
 
   pipeline::LayoutInfo pipelineLayoutInfo = {}; // memset
   pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
   pipelineLayoutInfo.pushConstantRangeCount = _material->pushConstantRangeCount;
   pipelineLayoutInfo.pPushConstantRanges = &_material->pushConstantRange;
-  pipelineLayoutInfo.setLayoutCount = _material->descSetLayoutCount;
-  pipelineLayoutInfo.pSetLayouts = &_material->descSetLayout;
+  pipelineLayoutInfo.setLayoutCount = descLayoutCount;
+  pipelineLayoutInfo.pSetLayouts = descLayoutCount > 1
+    ? _material->descSetLayouts.get()
+    : &_material->descSetLayout;
 
   auto result = m_deviceFuncs->vkCreatePipelineLayout(
     m_device,
@@ -141,7 +144,7 @@ void PipelineHelper::createGraphicsPipeline(
   pipelineInfo.pMultisampleState    = &pso.multisampleState;
 
   pipelineInfo.layout               = _material->pipelineLayout;
-  pipelineInfo.renderPass           = m_renderPass;
+  pipelineInfo.renderPass           = _material->renderPass;
 
   auto result = m_deviceFuncs->vkCreateGraphicsPipelines(
     m_device,

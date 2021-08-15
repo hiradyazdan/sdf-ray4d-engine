@@ -17,6 +17,10 @@ namespace sdfRay4d
   struct Material
   {
     using ShaderStageInfoList = std::vector<pipeline::ShaderStageInfo>;
+    using LayoutBindingList    = std::vector<descriptor::LayoutBinding>;
+
+    using DescLayoutPtr       = std::unique_ptr<descriptor::Layout[]>;
+    using DescSetPtr          = std::unique_ptr<descriptor::Set[]>;
 
     device::Size                vertUniSize = 0;
     device::Size                fragUniSize = 0;
@@ -32,9 +36,11 @@ namespace sdfRay4d
     uint32_t                    pushConstantRangeCount = 0;
 
     descriptor::Pool            descPool = VK_NULL_HANDLE;
-    descriptor::LayoutBinding   layoutBindings[2];
+    LayoutBindingList           layoutBindings;
     descriptor::Layout          descSetLayout = VK_NULL_HANDLE;
+    DescLayoutPtr               descSetLayouts;
     descriptor::Set             descSet = VK_NULL_HANDLE;
+    DescSetPtr                  descSets;
 
     PushConstantRange           pushConstantRange = {};
     pipeline::Layout            pipelineLayout = VK_NULL_HANDLE;
@@ -42,6 +48,7 @@ namespace sdfRay4d
     ShaderStageInfoList         shaderStages;
 
     Pipeline                    pipeline = VK_NULL_HANDLE;
+    RenderPass                  renderPass = VK_NULL_HANDLE;
 
     Material(
       Device &_device,

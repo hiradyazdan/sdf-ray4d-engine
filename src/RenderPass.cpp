@@ -12,18 +12,12 @@ RenderPassHelper::RenderPassHelper(
   const Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs,
   const SampleCountFlags &_sampleCountFlags,
-  const RenderPass &_renderPass,
-  bool _useDefault
+  const RenderPass &_renderPass
 ) :
   m_device(_device)
   , m_deviceFuncs(_deviceFuncs)
   , m_sampleCountFlags(_sampleCountFlags)
-{
-  if(!_useDefault)
-  {
-    createCustomRenderPass();
-  }
-}
+{}
 
 /**
  * @brief
@@ -35,81 +29,71 @@ RenderPassHelper::RenderPassHelper(
  * {VK_SAMPLE_COUNT_1_BIT}. Renderers must take this into account, for
  * example when providing clear values.
  *
- * @param _colorFormat
- * @param _depthStencilFormat
+ * @param[in] _colorFormat
+ * @param[in] _depthStencilFormat
+ * @param[out] m_renderPass
  */
 void RenderPassHelper::createCustomRenderPass(
   const Format &_colorFormat,
   const Format &_depthStencilFormat
 )
 {
-  const bool isMsaa = m_sampleCountFlags > VK_SAMPLE_COUNT_1_BIT;
+  AttachmentDesc attDesc[1] = {};
 
-  AttachmentDesc attDesc[3] = {};
-
-  // This is either the non-msaa render target or the resolve target.
-  attDesc[0].format = _colorFormat;
-  attDesc[0].samples = VK_SAMPLE_COUNT_1_BIT;
-  attDesc[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; // ignored when msaa
+  attDesc[0].format = _depthStencilFormat;
+  attDesc[0].samples = m_sampleCountFlags;
+  attDesc[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
   attDesc[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-  attDesc[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+  attDesc[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
   attDesc[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
   attDesc[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  attDesc[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+  attDesc[0].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-  attDesc[1].format = _depthStencilFormat;
-  attDesc[1].samples = m_sampleCountFlags;
-  attDesc[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-  attDesc[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-  attDesc[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-  attDesc[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-  attDesc[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  attDesc[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-  if (isMsaa) {
-    // msaa render target
-    attDesc[2].format = _colorFormat;
-    attDesc[2].samples = m_sampleCountFlags;
-    attDesc[2].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    attDesc[2].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attDesc[2].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attDesc[2].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attDesc[2].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attDesc[2].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-  }
-
-  AttachmentRef colorRef = { 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
-  AttachmentRef resolveRef = { 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
-  AttachmentRef dsRef = { 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
+  AttachmentRef dsRef = {
+    0,
+    VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+  };
 
   SubpassDesc subPassDesc = {}; // memset
   subPassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-  subPassDesc.colorAttachmentCount = 1;
-  subPassDesc.pColorAttachments = &colorRef;
+  subPassDesc.colorAttachmentCount = 0;
+  subPassDesc.pColorAttachments = nullptr;
   subPassDesc.pDepthStencilAttachment = &dsRef;
 
   RenderPassInfo renderPassInfo = {}; // memset
   renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-  renderPassInfo.attachmentCount = 2;
+  renderPassInfo.attachmentCount = 1;
   renderPassInfo.pAttachments = attDesc;
   renderPassInfo.subpassCount = 1;
   renderPassInfo.pSubpasses = &subPassDesc;
-
-  if (isMsaa)
-  {
-    colorRef.attachment = 2;
-    subPassDesc.pResolveAttachments = &resolveRef;
-    renderPassInfo.attachmentCount = 3;
-  }
 
   auto result = m_deviceFuncs->vkCreateRenderPass(
     m_device,
     &renderPassInfo,
     nullptr,
-    &m_customRenderPass
+    &m_renderPass
   );
 
-  if (result != VK_SUCCESS) {
+  if (result != VK_SUCCESS)
+  {
     qWarning("Failed to create RenderPass: %d", result);
   }
+}
+
+/**
+ *
+ * @brief
+ * @return RenderPass instance
+ *
+ * @note this method should only be available to PipelineHelper
+ * as RenderPass instance should not be accessed independently.
+ */
+RenderPass RenderPassHelper::getRenderPass()
+{
+  if(!m_renderPass)
+  {
+    createCustomRenderPass();
+  }
+
+  return m_renderPass;
 }

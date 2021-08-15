@@ -1,8 +1,8 @@
-#version 440
+#version 450
 
 layout(location = 0) in vec3 vECVertNormal;
 layout(location = 1) in vec3 vECVertPos;
-//layout(location = 2) flat in vec3 vDiffuseAdjust;
+layout(location = 2) in vec2 vECTexCoords;
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out float depthColor;
@@ -48,6 +48,6 @@ void main()
   float RV = max(0.0, dot(R, V));
   vec3 sColor = att * ubuf.intensity * ubuf.color * pow(RV, ubuf.specularExp);
 
-  fragColor = vec4(ubuf.ka + (ubuf.kd/* + vDiffuseAdjust*/) * dColor + ubuf.ks * sColor, 1.0);
+  fragColor = vec4(ubuf.ka + (ubuf.kd) * dColor + ubuf.ks * sColor, 1.0);
   depthColor = LinearizeDepth(gl_FragCoord.z);
 }

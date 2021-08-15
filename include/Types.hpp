@@ -38,6 +38,8 @@ namespace sdfRay4d
     using RenderPass            = VkRenderPass;
     using RenderPassInfo        = VkRenderPassCreateInfo;
     using RenderPassBeginInfo   = VkRenderPassBeginInfo;
+    using Framebuffer           = VkFramebuffer;
+    using FramebufferInfo       = VkFramebufferCreateInfo;
 
     namespace texture
     {

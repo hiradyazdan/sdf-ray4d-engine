@@ -1,13 +1,13 @@
 #version 450
 //#extension GL_ARB_separate_shader_objects : enable
 
-layout(location = 0) in vec3 vECVertNormal;
-layout(location = 1) in vec3 vECVertPos;
-layout(location = 2) in vec2 vECTexCoords;
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 normal;
+layout(location = 2) in vec2 texCoords;
+
+layout(binding = 0) uniform sampler2D depthTexture;
 
 layout(location = 0) out vec4 outColor;
-
-layout(binding = 1) uniform sampler2D depthTexture;
 
 layout(push_constant) uniform FSConst
 {
@@ -221,7 +221,7 @@ void main( )
     // ray direction
     vec3 rd = ca * normalize( vec3(p.xy,2.0) );
 
-    float depth = texture(depthTexture, vECTexCoords).r; // rasterized Depth
+    float depth = texture(depthTexture, texCoords).r; // rasterized Depth
 
     // render
     vec3 col = render( ro, rd, depth );
