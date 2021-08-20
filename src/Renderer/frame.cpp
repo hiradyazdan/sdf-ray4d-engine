@@ -13,8 +13,12 @@ void Renderer::startNextFrame()
   m_isFramePending = true;
 
   /**
-   * Command buffers handle CPU Workload
-   * So, generating command buffers can be
+   * Qt Vulkan generates command buffers during
+   * frame draw so they're hidden away and ready for use
+   * per frame, exposing the current command buffer.
+   *
+   * As command buffers handle CPU Workload,
+   * generating command buffers can be
    * offloaded to a CPU worker thread
    */
   auto worker = QtConcurrent::run(
@@ -30,7 +34,7 @@ void Renderer::buildFrame()
   QMutexLocker locker(&m_guiMutex);
 
   createBuffers();
-//  ensureInstanceBuffer();
+
   m_pipelineHelper.waitForWorkersToFinish();
 
   cmdRenderPass();
@@ -38,11 +42,19 @@ void Renderer::buildFrame()
 
 void Renderer::updateFrame()
 {
-  if (m_isFramePending)
-  {
-    m_isFramePending = false;
+  if(!m_isFramePending) return;
 
-    m_vkWindow->frameReady();
-    m_vkWindow->requestUpdate();
-  }
+  m_isFramePending = false;
+
+  m_vkWindow->frameReady();
+  m_vkWindow->requestUpdate();
+
+  /**
+   * @note this has to be invoked after
+   * frameReady and requestUpdate methods
+   * as otherwise it adds to the command buffer
+   * that its bound pipeline is already destroyed.
+   *
+   */
+  swapSDFRPipelines();
 }

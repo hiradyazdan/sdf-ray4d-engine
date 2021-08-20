@@ -6,6 +6,7 @@
 #include <QFuture>
 
 #include "Types.hpp"
+#include "SPIRVCompiler.hpp"
 
 namespace sdfRay4d
 {
@@ -92,9 +93,14 @@ namespace sdfRay4d
       );
 
     private:
+      void clear() noexcept;
+
+    private:
       Constants m_appConstants;
 
-      const int m_version;
+      SPIRVCompiler m_spirvCompiler;
+
+      int m_version;
       bool m_isLoading = false;
       Data m_data;
 

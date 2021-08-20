@@ -16,6 +16,7 @@ void PipelineHelper::createDescriptorPool(
   const MaterialPtr &_material
 )
 {
+  // TODO: This should be set per material pipeline
   descriptor::PoolSize descPoolSizes[] = {
     {
       VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
@@ -26,7 +27,7 @@ void PipelineHelper::createDescriptorPool(
   descPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
   /**
    * a single set if dynamic uniform buffer is used
-   * multiple set if texture sampler needed along with other descriptors (one per texture/sampler)
+   * multiple set if texture sampler needed along with other descriptors (one set per texture/sampler)
    */
   descPoolInfo.maxSets = _material->descSetLayoutCount;
   descPoolInfo.poolSizeCount = sizeof(descPoolSizes) / sizeof(descPoolSizes[0]);
@@ -48,59 +49,43 @@ void PipelineHelper::createDescriptorPool(
 /**
  *
  * @param[in] _material
- * @param[out] _material->descSetLayout
+ * @param[out] _material->descSetLayouts
  */
 void PipelineHelper::createDescriptorSetLayout(
   const MaterialPtr &_material
 )
 {
-  auto &layoutBindings = _material->layoutBindings;
-  auto &layoutCount = _material->descSetLayoutCount;
-  auto isMultiSet = layoutCount > 1;
-
-  if(isMultiSet)
-  {
-    _material->descSetLayouts = std::make_unique<descriptor::Layout[]>(layoutCount);
-  }
-
   /**
    * @note
    *
    * In case need to use multiple different descriptor sets/layouts as
    * texture (combined image) sampler cannot be set using one single
    * dynamic uniform buffers along with other descriptors/UBOs.
-   *
-   * This is the case for passing depth color from rasterization pass
-   * to sdf raymarching pass through a texture/combined image sampler
-   * (depth texture)
    */
-  for(auto index = 0; index < layoutCount; index++)
+  auto &layoutBindings = _material->layoutBindings;
+  auto &layoutCount = _material->descSetLayoutCount;
+
+  _material->descSetLayouts.resize(layoutCount);
+
+  for(auto i = 0; i < layoutCount; i++)
   {
-    descriptor::LayoutInfo descLayoutInfo = {
-      VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, // sType
-      nullptr, // pNext
-      0, // flags
-      static_cast<uint32_t>(layoutBindings.size()),//sizeof(layoutBindings) / sizeof(layoutBindings[0]), // bindingCount
-//      layoutCount > 1
-//      ? &layoutBindings[index]
-      layoutBindings.data() // pBindings
-    };
+    descriptor::LayoutInfo descLayoutInfo = {};
+    descLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descLayoutInfo.pNext = nullptr;
+    descLayoutInfo.flags = 0;
+    descLayoutInfo.bindingCount = uint32_t(layoutBindings.size()); //sizeof(layoutBindings) / sizeof(layoutBindings[0])
+    descLayoutInfo.pBindings = layoutBindings.data();
 
     auto result = m_deviceFuncs->vkCreateDescriptorSetLayout(
       m_device,
-      &descLayoutInfo,
+      &descLayoutInfo, // [in]
       nullptr,
-      &_material->descSetLayout // e.g. UBO or other Desc Set Layout + Texture Sampler Set Layout
+      &_material->descSetLayouts[i] // [out] e.g. Texture Sampler Set Layout
     );
 
     if (result != VK_SUCCESS)
     {
       qFatal("Failed to create descriptor set layout: %d", result);
-    }
-
-    if(isMultiSet)
-    {
-      _material->descSetLayouts[index] = _material->descSetLayout;
     }
   }
 }
@@ -108,57 +93,41 @@ void PipelineHelper::createDescriptorSetLayout(
 /**
  *
  * @param[in] _material
- * @param[out] _material->descSet
+ * @param[out] _material->descSets
  */
 void PipelineHelper::allocateDescriptorSets(
   const MaterialPtr &_material
 )
 {
-  auto &layoutCount = _material->descSetLayoutCount;
-  auto isMultiSet = layoutCount > 1;
-
-  if(isMultiSet)
-  {
-    _material->descSets = std::make_unique<descriptor::Set[]>(layoutCount);
-  }
-
   /**
    * @note
    *
    * In case need to use multiple different descriptor sets as
    * texture (combined image) sampler cannot be set using one single
    * dynamic uniform buffers along with other descriptors/UBOs.
-   *
-   * This is the case for passing depth color from rasterization pass
-   * to sdf raymarching pass through a texture/combined image sampler
-   * (depth texture)
    */
-  for(auto index = 0; index < layoutCount; index++)
+  auto &layoutCount = _material->descSetLayoutCount;
+
+  _material->descSets.resize(layoutCount);
+
+  for(auto i = 0; i < layoutCount; i++)
   {
-    descriptor::AllocInfo descSetAllocInfo = {
-      VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-      nullptr,
-      _material->descPool,
-      1,
-      layoutCount > 1
-      ? _material->descSetLayouts.get()
-      : &_material->descSetLayout
-    };
+    descriptor::AllocInfo descSetInfo = {};
+    descSetInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    descSetInfo.pNext = nullptr;
+    descSetInfo.descriptorPool = _material->descPool;
+    descSetInfo.descriptorSetCount = 1;
+    descSetInfo.pSetLayouts = _material->descSetLayouts.data();
 
     auto result = m_deviceFuncs->vkAllocateDescriptorSets(
       m_device,
-      &descSetAllocInfo,
-      &_material->descSet
+      &descSetInfo, // [in]
+      &_material->descSets[i] // [out]
     );
 
     if (result != VK_SUCCESS)
     {
       qFatal("Failed to allocate descriptor set: %d", result);
-    }
-
-    if(isMultiSet)
-    {
-      _material->descSets[index] = _material->descSet;
     }
   }
 }
@@ -170,8 +139,8 @@ void PipelineHelper::allocateDescriptorSets(
  *
  * @param[in] _material
  * @param[out] _material->descPool
- * @param[out] _material->descSetLayout
- * @param[out] _material->descSet
+ * @param[out] _material->descSetLayouts
+ * @param[out] _material->descSets
  */
 void PipelineHelper::createDescriptorSets(
   const MaterialPtr &_material

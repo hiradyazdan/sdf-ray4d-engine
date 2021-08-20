@@ -55,7 +55,11 @@ there's no `Module Header units` support for C++17 which is used in this project
 
 ![SDF Raymarching Architecture](./docs/design/sdf-raymarching-architecture.svg)
 
-In c
+In order to be able to render rasterized objects on top of the raymarched objects
+depth buffer calculation is required. In doing so, an extra rendering pass is introduced
+to pass the depth buffer to the next rendering pass and use it.
+
+
 
 - https://www.iquilezles.org/www/articles/raypolys/raypolys.htm
 - https://computergraphics.stackexchange.com/questions/7674/how-to-align-ray-marching-on-top-of-traditional-3d-rasterization
@@ -131,7 +135,7 @@ and is hidden from the user.
 
   So, the only way is to inject (***Dependency Injection - DI***) or instantiate `VulkanWindow` in the `MainWindow` constructor, which may be better in terms of design and testability but with extra distinguished classes.
 
-#### Performance & Memory Usage
+#### Performance (Speed & Memory Usage)
 
 ###### GUI Overhead (Qt)
 
@@ -142,11 +146,9 @@ bottleneck:
 - Qt `Signal`-`Slot` fast mechanism (statically typed and MOC slot method calls)
 - Qt Multithreading (QtConcurrent & QFuture) - equivalent for `std::async` & `std::future`
 
-This performance however, may come as a cost of higher amount of memory usage.
+###### Graphics API Overhead (Qt Vulkan Wrapper)
 
-###### Graphics API Overhead (Vulkan)
-
-Memory Allocation is managed via`QVulkanDeviceFucntions` which has no
+Memory Allocation is managed via`QVulkanDeviceFunctions` which has no
 more overhead than if it was managed through `VMA` (Vulkan Memory Allocator),
 which is a vulkan Memory Allocation Library, to simplify the creation and
 allocation of resources, while giving access to Vulkan functions.

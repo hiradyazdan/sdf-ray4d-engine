@@ -10,9 +10,11 @@ using namespace sdfRay4d;
 /**
  *
  * @param _stage
- * @return
+ * @returns EShLanguage
  */
-EShLanguage SPIRVCompiler::getShaderLang(shader::StageFlags _stage)
+EShLanguage SPIRVCompiler::getShaderLang(
+  const shader::StageFlags &_stage
+) noexcept
 {
   switch (_stage)
   {

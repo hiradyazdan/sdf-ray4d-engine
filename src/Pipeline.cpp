@@ -65,10 +65,10 @@ void PipelineHelper::init(
     _defaultRenderPass
   );
   m_renderPass = _defaultRenderPass;
-  m_attachments = _attachments;
+  m_attachments = _attachments; // framebuffer attachments
 }
 
-RenderPass PipelineHelper::getRenderPass(bool _useDefault)
+RenderPass &PipelineHelper::getRenderPass(bool _useDefault)
 {
   return _useDefault
   ? m_renderPass
@@ -81,4 +81,22 @@ void PipelineHelper::waitForWorkersToFinish()
   {
     worker.waitForFinished();
   }
+}
+
+/**
+ * TODO: this can be modified to request for
+ * specific worker than implicitly request for
+ * a designated worker which was previously
+ * assigned to exclusiveWorker member. But currently,
+ * the use case is limited to SDF Graph pipeline
+ * creation.
+ */
+void PipelineHelper::waitForWorkerToFinish()
+{
+  m_exclusiveWorker.waitForFinished();
+}
+
+bool PipelineHelper::isWorkerFinished()
+{
+  return m_exclusiveWorker.isFinished();
 }

@@ -1,4 +1,5 @@
 #include <fstream>
+#include <utility>
 
 #include "nodeEditor_old/DataModelRegistry.hpp"
 #include "nodeEditor_old/NodeGraphicsObject.hpp"
@@ -12,10 +13,10 @@
 using namespace sdfRay4d;
 
 SDFGraph::SDFGraph(
-  std::shared_ptr<Material> &_material,
+  std::shared_ptr<Material> _material,
   QWidget *_scene
 ) :
-  m_shapeMaterial(_material)
+  m_shapeMaterial(std::move(_material))
   , m_outputNode(nullptr)
 {
 //  if (!m_shapeMaterial.vertexShader.isValid())
@@ -177,9 +178,13 @@ void SDFGraph::compileGraph(const NodePtrSet &_nodes)
 
       //fragmentShader += m_shaderEnd;
 
-      m_shapeMaterial->fragmentShader.load(
-        fragmentShader
-      );
+//      m_shapeMaterial->vertexShader = ;
+if (!m_shapeMaterial->fragmentShader.isValid())
+{
+  m_shapeMaterial->fragmentShader.load(
+    fragmentShader
+  );
+}
 //
 //      m_shaderMan->updateShader(fragmentShader.c_str());
     }

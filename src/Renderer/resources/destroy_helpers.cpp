@@ -7,28 +7,6 @@
 
 using namespace sdfRay4d;
 
-void Renderer::destroyShaderModule(Shader &_shader)
-{
-  if (_shader.isValid())
-  {
-    m_deviceFuncs->vkDestroyShaderModule(
-      m_device,
-      _shader.getData()->shaderModule,
-      nullptr
-      );
-    _shader.reset();
-  }
-}
-
-void Renderer::destroyShaderModules()
-{
-  for(const auto &material : m_materials)
-  {
-    destroyShaderModule(material->vertexShader);
-    destroyShaderModule(material->fragmentShader);
-  }
-}
-
 void Renderer::destroyBuffer(Buffer &_buffer)
 {
   if (_buffer)
@@ -51,11 +29,13 @@ void Renderer::destroyBuffers()
 
   if (m_bufferMemory)
   {
-    m_deviceFuncs->vkFreeMemory(
-      m_device,
-      m_bufferMemory,
-      nullptr
-    );
+    m_deviceFuncs->vkFreeMemory(m_device, m_bufferMemory,nullptr);
     m_bufferMemory = VK_NULL_HANDLE;
+  }
+
+  if(m_imageBufferMemory)
+  {
+    m_deviceFuncs->vkFreeMemory(m_device, m_imageBufferMemory,nullptr);
+    m_imageBufferMemory = VK_NULL_HANDLE;
   }
 }

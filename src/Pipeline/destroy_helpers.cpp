@@ -7,83 +7,160 @@
 
 using namespace sdfRay4d;
 
+void PipelineHelper::destroyPipeline(Pipeline &_pipeline)
+{
+  if (!_pipeline) return;
+
+  m_deviceFuncs->vkDestroyPipeline(
+    m_device,
+    _pipeline,
+    nullptr
+  );
+  _pipeline = VK_NULL_HANDLE;
+}
+
+void PipelineHelper::destroyPipelineLayout(
+  pipeline::Layout &_pipelineLayout
+)
+{
+  if (!_pipelineLayout) return;
+
+  m_deviceFuncs->vkDestroyPipelineLayout(
+    m_device,
+    _pipelineLayout,
+    nullptr
+  );
+  _pipelineLayout = VK_NULL_HANDLE;
+}
+
 void PipelineHelper::destroyPipeline(
   const MaterialPtr &_material
 )
 {
-  if (_material->pipeline)
-  {
-    m_deviceFuncs->vkDestroyPipeline(
-      m_device,
-      _material->pipeline,
-      nullptr
-    );
-    _material->pipeline = VK_NULL_HANDLE;
-  }
+  destroyPipeline(_material->pipeline);
 }
 
 void PipelineHelper::destroyPipelineLayout(
   const MaterialPtr &_material
 )
 {
-  if (_material->pipelineLayout)
-  {
-    m_deviceFuncs->vkDestroyPipelineLayout(
-      m_device,
-      _material->pipelineLayout,
-      nullptr
-    );
-    _material->pipelineLayout = VK_NULL_HANDLE;
-  }
+  destroyPipelineLayout(_material->pipelineLayout);
 }
 
 void PipelineHelper::destroyPipelines()
 {
   for(const auto &material : m_materials)
   {
-    destroyPipeline(material);
     destroyPipelineLayout(material);
+    destroyPipeline(material);
   }
 
-  if (m_pipelineCache)
+  if (!m_pipelineCache) return;
+
+  m_deviceFuncs->vkDestroyPipelineCache(
+    m_device,
+    m_pipelineCache,
+    nullptr
+  );
+  m_pipelineCache = VK_NULL_HANDLE;
+}
+
+void PipelineHelper::destroyDescriptorSetLayout(DescLayoutList &_setLayouts)
+{
+  if (_setLayouts.empty()) return;
+
+  for (auto &layout : _setLayouts)
   {
-    m_deviceFuncs->vkDestroyPipelineCache(
+    m_deviceFuncs->vkDestroyDescriptorSetLayout(
       m_device,
-      m_pipelineCache,
+      layout,
       nullptr
     );
-    m_pipelineCache = VK_NULL_HANDLE;
   }
+
+  _setLayouts.resize(0);
+}
+
+void PipelineHelper::destroyDescriptorPool(
+  descriptor::Pool &_pool
+)
+{
+  if (!_pool) return;
+
+  m_deviceFuncs->vkDestroyDescriptorPool(
+    m_device,
+    _pool,
+    nullptr
+  );
+  _pool = VK_NULL_HANDLE;
 }
 
 void PipelineHelper::destroyDescriptors()
 {
   for(const auto &material : m_materials)
   {
-    if (material->descSetLayout)
-    {
-      m_deviceFuncs->vkDestroyDescriptorSetLayout(
-        m_device,
-        material->descSetLayout,
-        nullptr
-      );
-      material->descSetLayout = VK_NULL_HANDLE;
-    }
+    destroyDescriptorSetLayout(material->descSetLayouts);
+    destroyDescriptorPool(material->descPool);
+  }
+}
 
-    // TODO: Is this needed?
-    if (material->descSetLayouts)
-    {
-      material->descSetLayouts = VK_NULL_HANDLE;
-    }
+void PipelineHelper::destroyShaderModule(Shader &_shader)
+{
+  if (!_shader.isValid()) return;
 
-    if (material->descPool)
-    {
-      m_deviceFuncs->vkDestroyDescriptorPool(
-        m_device,
-        material->descPool,
-        nullptr
-      );
-      material->descPool = VK_NULL_HANDLE;
-    }
+  m_deviceFuncs->vkDestroyShaderModule(
+    m_device,
+    _shader.getData()->shaderModule,
+    nullptr
+  );
+
+  _shader.reset();
+}
+
+void PipelineHelper::destroyShaderModules()
+{
+  for(const auto &material : m_materials)
+  {
+    destroyShaderModule(material->vertexShader);
+    destroyShaderModule(material->fragmentShader);
+  }
+}
+
+void PipelineHelper::destroyTextures()
+{
+  for(const auto &material : m_materials)
+  {
+    auto &image     = material->texture.getImage();
+    auto &imageView = material->texture.getImageView();
+    auto &sampler   = material->texture.getSampler();
+
+    if(sampler)   m_deviceFuncs->vkDestroySampler   (m_device, sampler,nullptr);
+    if(imageView) m_deviceFuncs->vkDestroyImageView (m_device, imageView,nullptr);
+    if(image)     m_deviceFuncs->vkDestroyImage     (m_device, image,nullptr);
+  }
+}
+
+void PipelineHelper::destroyRenderPass()
+{
+  auto &renderPass = getRenderPass(false);
+
+  if(m_frameBuffer)
+  {
+    m_deviceFuncs->vkDestroyFramebuffer(
+      m_device,
+      m_frameBuffer,
+      nullptr
+    );
+    m_frameBuffer = VK_NULL_HANDLE;
+  }
+
+  if(renderPass)
+  {
+    m_deviceFuncs->vkDestroyRenderPass(
+      m_device,
+      renderPass,
+      nullptr
+    );
+    renderPass = VK_NULL_HANDLE;
   }
 }

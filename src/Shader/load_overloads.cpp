@@ -6,7 +6,6 @@
 #include <QtConcurrentRun>
 
 #include "Shader.hpp"
-#include "SPIRVCompiler.hpp"
 
 using namespace sdfRay4d;
 
@@ -95,9 +94,10 @@ void Shader::load(
        * multiple shaders. It should only be called once per process, not per thread.
        */
       if(
-        !SPIRVCompiler::compile(
+        !m_spirvCompiler.compile(
           getShaderStage(fileExtension),
-          rawBytes, "main", spvBytes, log
+          rawBytes,
+          spvBytes, log
         )
       )
       {
@@ -190,9 +190,10 @@ void Shader::load(
      * multiple shaders. It should only be called once per process, not per thread.
      */
     if(
-      !SPIRVCompiler::compile(
+      !m_spirvCompiler.compile(
         getShaderStage("frag"),
-        m_rawBytes, "main", spvBytes, log
+        m_rawBytes,
+        spvBytes, log
         )
       )
     {

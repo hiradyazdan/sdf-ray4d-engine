@@ -45,8 +45,10 @@ namespace sdfRay4d
     {
       using Image               = VkImage;
       using ImageInfo           = VkImageCreateInfo;
+      using ImageUsage          = VkImageUsageFlags;
       using ImageView           = VkImageView;
       using ImageViewInfo       = VkImageViewCreateInfo;
+      using ImageAspect         = VkImageAspectFlags;
       using Sampler             = VkSampler;
       using SamplerInfo         = VkSamplerCreateInfo;
     }

@@ -44,6 +44,41 @@ void PipelineHelper::createPipelines()
 
 void PipelineHelper::createPipeline(const MaterialPtr &_material)
 {
+  /**
+   * @note makes pipeline creation thread safe
+   * if each pipeline runs on a separate
+   * async CPU thread
+   */
+  QMutexLocker locker(&m_pipeMutex);
+
+  /**
+   * @note SDFR Pipeline is always marked as swappable
+   */
+  if(_material->isHotSwappable)
+  {
+    const auto &shaderData = _material->vertexShader.getData();
+
+    if(!m_isHot) // initial load
+    {
+      /**
+       * @note stores initially loaded shader module
+       * for later destruction after swapping with
+       * new pipelines
+       */
+      m_currentShaderModule = shaderData->shaderModule;
+    }
+    else // SDF Graph compile
+    {
+      /**
+       * @note restores initially loaded shader module
+       * when swapping old with new pipeline, once SDF Graph
+       * compiled and created new pipeline.
+       */
+//       _material->fragmentShader.getData()->shaderModule
+      shaderData->shaderModule = m_currentShaderModule;
+    }
+  }
+
   createDescriptorSets(_material);
   createLayout(_material);
   createGraphicsPipeline(_material);
@@ -55,18 +90,37 @@ void PipelineHelper::createPipeline(const MaterialPtr &_material)
 //  createBuffers();
 }
 
+/**
+ *
+ * @param[in] _oldMaterial
+ * @param[in] _newMaterial
+ */
+void PipelineHelper::swapSDFRPipelines(
+  const MaterialPtr &_oldMaterial,
+  const MaterialPtr &_newMaterial
+)
+{
+  // safe-guard in case if this is invoked elsewhere
+  if(!m_isHot) return;
+
+  m_isHot = false;
+
+  /**
+   * @note When newly created pipeline is ready
+   * swap the old with the new one
+   */
+  _oldMaterial->pipelineLayout  = _newMaterial->pipelineLayout;
+  _oldMaterial->pipeline        = _newMaterial->pipeline;
+}
+
 void PipelineHelper::createLayout(const MaterialPtr &_material)
 {
-  auto &descLayoutCount = _material->descSetLayoutCount;
-
   pipeline::LayoutInfo pipelineLayoutInfo = {}; // memset
   pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
   pipelineLayoutInfo.pushConstantRangeCount = _material->pushConstantRangeCount;
   pipelineLayoutInfo.pPushConstantRanges = &_material->pushConstantRange;
-  pipelineLayoutInfo.setLayoutCount = descLayoutCount;
-  pipelineLayoutInfo.pSetLayouts = descLayoutCount > 1
-    ? _material->descSetLayouts.get()
-    : &_material->descSetLayout;
+  pipelineLayoutInfo.setLayoutCount = _material->descSetLayoutCount;
+  pipelineLayoutInfo.pSetLayouts = _material->descSetLayouts.data();
 
   auto result = m_deviceFuncs->vkCreatePipelineLayout(
     m_device,

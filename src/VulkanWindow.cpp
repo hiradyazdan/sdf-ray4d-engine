@@ -50,17 +50,12 @@ QVulkanWindowRenderer *VulkanWindow::createRenderer()
   return m_renderer;
 }
 
-VulkanWindow::MaterialPtr VulkanWindow::getSDFMaterial()
+VulkanWindow::MaterialPtr &VulkanWindow::getSDFRMaterial(bool _isNew)
 {
-  return m_renderer->getSDFMaterial();
+  return m_renderer->getSDFRMaterial(_isNew);
 }
 
-void VulkanWindow::createSDFPipeline()
+void VulkanWindow::createSDFRPipeline(const MaterialPtr &_newMaterial)
 {
-  m_renderer->createSDFPipeline();
-}
-
-void VulkanWindow::destroySDFPipeline()
-{
-  m_renderer->destroySDFPipeline();
+  m_renderer->createSDFRPipeline(_newMaterial);
 }

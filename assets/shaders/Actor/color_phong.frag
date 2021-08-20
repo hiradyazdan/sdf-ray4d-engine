@@ -5,7 +5,8 @@ layout(location = 1) in vec3 vECVertPos;
 layout(location = 2) in vec2 vECTexCoords;
 
 layout(location = 0) out vec4 fragColor;
-layout(location = 1) out float depthColor;
+
+//layout(binding = 2) uniform sampler2D depthTexture;
 
 layout(std140, binding = 1) uniform buf {
   vec3 ECCameraPosition;
@@ -18,19 +19,7 @@ layout(std140, binding = 1) uniform buf {
   vec3 color;
   float intensity;
   float specularExp;
-
-  float nearPlane;
-  float farPlane;
 } ubuf;
-
-float LinearizeDepth(float depth)
-{
-  float near = ubuf.nearPlane;
-  float far = ubuf.farPlane;
-  float z = depth * 2.0 - 1.0; // NDC (Normalized Device Coordinates)
-
-  return (2.0 * near * far) / (far + near - z * (far - near));
-}
 
 void main()
 {
@@ -49,5 +38,4 @@ void main()
   vec3 sColor = att * ubuf.intensity * ubuf.color * pow(RV, ubuf.specularExp);
 
   fragColor = vec4(ubuf.ka + (ubuf.kd) * dColor + ubuf.ks * sColor, 1.0);
-  depthColor = LinearizeDepth(gl_FragCoord.z);
 }

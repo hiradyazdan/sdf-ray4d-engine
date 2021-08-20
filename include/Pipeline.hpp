@@ -14,11 +14,18 @@ namespace sdfRay4d
    * @class PipelineHelper
    * @brief
    *
+   * @note as Material is big struct with high level of usage
+   * and importance throughout the entire application lifecycle
+   * all functions that uses it as a parameter designated the
+   * parameter as a const reference (&) to use the same memory
+   * address and keep the consistency of the material data intact.
+   *
    */
   class PipelineHelper
   {
-//    using ImageViews  = std::vector<std::reference_wrapper<texture::ImageView>>;
-    using MaterialPtr = std::shared_ptr<Material>;
+    using MaterialPtr         = std::shared_ptr<Material>;
+    using ShaderStageInfoList = std::vector<pipeline::ShaderStageInfo>;
+    using DescLayoutList      = std::vector<descriptor::Layout>;
 
     public:
       void init(
@@ -31,21 +38,49 @@ namespace sdfRay4d
 
     public:
       void createCache();
-      void createWorkers(const std::vector<MaterialPtr> &_materials);
-      void createWorker(const MaterialPtr &_material);
+
+    /**
+     * Pipeline Worker Helpers/Overloads
+     * -------------------------------------------------
+     *
+     */
+    public:
+      void createWorkers                (const std::vector<MaterialPtr> &_materials);
+      void createWorker                 (const std::vector<MaterialPtr> &_materials);
+      void createWorker                 (const MaterialPtr &_material, bool _isHot = false);
 
     public:
       void waitForWorkersToFinish();
+      void waitForWorkerToFinish();
+      bool isWorkerFinished();
 
+    /**
+     * Destroy Pipeline Helpers
+     * -------------------------------------------------
+     *
+     */
     public:
+      void destroyDescriptorPool        (descriptor::Pool &_pool);
+      void destroyDescriptorSetLayout   (DescLayoutList &_setLayouts);
       void destroyDescriptors();
+      void destroyShaderModules();
+      void destroyShaderModule          (Shader &_shader);
+      void destroyTextures();
       void destroyPipelines();
       void destroyPipeline              (const MaterialPtr &_material);
       void destroyPipelineLayout        (const MaterialPtr &_material);
+      void destroyPipeline              (Pipeline &_pipeline);
+      void destroyPipelineLayout        (pipeline::Layout &_pipelineLayout);
+      void destroyRenderPass();
+
+      void swapSDFRPipelines(
+        const MaterialPtr &_oldMaterial,
+        const MaterialPtr &_newMaterial
+      );
 
     public:
-      RenderPass getRenderPass(bool _useDefault = true);
-      Framebuffer getFramebuffer(uint32_t _width, uint32_t _height);
+      RenderPass &getRenderPass         (bool _useDefault = true);
+      Framebuffer &getFramebuffer       (uint32_t _width = 0, uint32_t _height = 0);
 
     /**
      * Create Pipeline Helpers (on Worker Thread)
@@ -63,7 +98,7 @@ namespace sdfRay4d
       void createComputePipeline        (const MaterialPtr &_material);
       void createGraphicsPipeline       (const MaterialPtr &_material);
 
-      static void initShaderStages      (const MaterialPtr &_material);
+      void initShaderStages             (const MaterialPtr &_material);
 
       void createDescriptorSets         (const MaterialPtr &_material);
       void createDescriptorPool         (const MaterialPtr &_material);
@@ -89,23 +124,29 @@ namespace sdfRay4d
       void setMultisampleState          (const MaterialPtr &_material);
 
     private:
-      void createFramebuffer(uint32_t _width, uint32_t _height);
+      void createFramebuffer            (uint32_t _width, uint32_t _height);
 
     private:
+      QMutex m_pipeMutex;
+
       Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
+
+      pipeline::Cache m_pipelineCache = VK_NULL_HANDLE;
+
+      texture::ImageView *m_attachments = VK_NULL_HANDLE;
+      Framebuffer m_frameBuffer = VK_NULL_HANDLE;
+      RenderPass m_renderPass = VK_NULL_HANDLE;
 
       RenderPassHelper m_renderPassHelper;
       SampleCountFlags m_sampleCountFlags;
 
-      RenderPass m_renderPass = VK_NULL_HANDLE;
-
-      Framebuffer m_frameBuffer = VK_NULL_HANDLE;
-      pipeline::Cache m_pipelineCache = VK_NULL_HANDLE;
-
       std::vector<MaterialPtr> m_materials;
       std::vector<QFuture<void>> m_workers;
+      QFuture<void> m_inclusiveWorker;
+      QFuture<void> m_exclusiveWorker;
+      bool m_isHot = false; // for swapping old and new pipelines at runtime
 
-      texture::ImageView *m_attachments;
+      shader::Module m_currentShaderModule = VK_NULL_HANDLE;
   };
 }

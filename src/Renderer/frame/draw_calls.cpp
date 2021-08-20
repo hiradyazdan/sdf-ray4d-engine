@@ -22,7 +22,7 @@ using namespace sdfRay4d;
 //  uint32_t frameUniOffset = m_vkWindow->currentFrame() * (_material->vertUniSize + _material->fragUniSize);
 //  uint32_t frameUniOffsets[] = { frameUniOffset, frameUniOffset };
 //  m_deviceFuncs->vkCmdBindDescriptorSets(cb, VK_PIPELINE_BIND_POINT_GRAPHICS, _material->pipelineLayout, 0, 1,
-//                                         &_material->descSet, 2, frameUniOffsets);
+//                                         &_material->descSets, 2, frameUniOffsets);
 //
 //  if (m_animating)
 //    m_rotation += 0.5;
@@ -63,90 +63,87 @@ using namespace sdfRay4d;
 //  m_deviceFuncs->vkCmdDraw(cb, (m_useLogo ? m_logoMesh.data() : m_blockMesh.data())->vertexCount, m_instCount, 0, 0);
 //}
 
-void Renderer::createSDFRDrawCalls(
+void Renderer::createDepthDrawCalls(
   const MaterialPtr &_material,
-  CmdBuffer &_cmdBuffer,
-  float _extentWidth,
-  float _extentHeight
+  CmdBuffer &_cmdBuffer
 )
 {
+  auto &material = m_depthMaterial;
+
   m_deviceFuncs->vkCmdBindPipeline(
     _cmdBuffer,
-    VK_PIPELINE_BIND_POINT_GRAPHICS, // TODO: VK_PIPELINE_BIND_POINT_COMPUTE
-    _material->pipeline
+    VK_PIPELINE_BIND_POINT_GRAPHICS,
+    material->pipeline
   );
 
   device::Size vbOffset = 0;
   m_deviceFuncs->vkCmdBindVertexBuffers(
     _cmdBuffer,
-    0,1,
-    &m_sdfUniformBuffer, &vbOffset
+    0, 1,
+    &m_depthVertexBuffer,
+    &vbOffset
   );
 
-  auto mvp = m_proj * m_camera.viewMatrix();// * m_floorModel;
-
-  float fragmentConstants[5] = {
-    _extentWidth,
-    _extentHeight,
-
-    (float)1,
-    (float)1,
-
-    (float)1
-//      SDL_GetTicks() / 1000.0f
-  };
-
-//  qDebug("sizeof(QMatrix4x4): %u ", sizeof(mvp));
-
-//  m_deviceFuncs->vkCmdPushConstants(cmdBuffer, _material->pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(mvp), mvp.constData());
-
-//  float color[] = { 0.3f, 0.3f, 0.3f };
-
-//  qDebug("sizeof(mvp): %u ", sizeof(mvp));
-
-  m_deviceFuncs->vkCmdPushConstants(
-    _cmdBuffer,
-    _material->pipelineLayout,
-    VK_SHADER_STAGE_FRAGMENT_BIT,
-    0/*sizeof(mvp) - 4*/,
-    sizeof(fragmentConstants), fragmentConstants
-//    sizeof(mvp), mvp.constData()
-  );
-
-  uint32_t frameUniOffset = m_vkWindow->currentFrame() * (
-    m_sdfrMaterial->vertUniSize +
-    m_sdfrMaterial->fragUniSize
-  );
-  uint32_t frameUniOffsets[] = { frameUniOffset, frameUniOffset };
+  // the dynamic buffer points to the beginning of the vertex uniform data for the current frame.
+  uint32_t frameUniOffset = m_vkWindow->currentFrame() * material->vertUniSize;
+  uint32_t frameUniOffsets[] = { frameUniOffset };
   m_deviceFuncs->vkCmdBindDescriptorSets(
     _cmdBuffer,
     VK_PIPELINE_BIND_POINT_GRAPHICS,
-    m_sdfrMaterial->pipelineLayout,
-    0, 1,
-    &m_sdfrMaterial->descSet,
-    0,
+    material->pipelineLayout,
+    0, material->descSets.size(),
+    material->descSets.data(),
+    1,
     frameUniOffsets
   );
 
-//  uint32_t frameBufOffset = m_vkWindow->currentFrame() * (
-//    m_sdfrMaterial->vertUniSize +
-//    m_sdfrMaterial->fragUniSize
-//  );
-//  uint32_t frameBufOffsets[] = { frameBufOffset, frameBufOffset };
-//  m_deviceFuncs->vkCmdBindDescriptorSets(
-//    _cmdBuffer,
-//    VK_PIPELINE_BIND_POINT_GRAPHICS,
-//    m_sdfrMaterial->pipelineLayout,
-//    1, 1,
-//    &m_sdfrMaterial->descSets[1],
-//    1,
-//    frameBufOffsets
-//  );
+  /**
+   * Map memory only if there's a change in view projection
+   *
+   * TODO:
+   * better if map memory at the beginning and leave it mapped through the end
+   * no more need to unmap memory
+   */
+  if (m_vpDirty)
+  {
+    if (m_vpDirty) --m_vpDirty;
+
+    QMatrix4x4 vp, model;
+    QMatrix3x3 modelNormal;
+    QVector3D eyePos;
+    getMatrices(&vp, &model, &modelNormal, &eyePos);
+
+    // Map the uniform data for the current frame, ignore the geometry data at
+    // the beginning and the uniforms for other frames.
+    quint8 *p;
+    auto result = m_deviceFuncs->vkMapMemory(
+      m_device, m_bufferMemory,
+      material->uniMemStartOffset + frameUniOffset,
+      material->vertUniSize,
+      0, reinterpret_cast<void **>(&p)
+    );
+
+    if (result != VK_SUCCESS)
+    {
+      qFatal("Failed to map memory: %d", result);
+    }
+
+    // Vertex shader uniforms
+    memcpy(p, vp.constData(), 64);
+    memcpy(p + 64, model.constData(), 64);
+    const float *mnp = modelNormal.constData();
+    memcpy(p + 128, mnp, 12);
+    memcpy(p + 128 + 16, mnp + 3, 12);
+    memcpy(p + 128 + 32, mnp + 6, 12);
+
+    m_deviceFuncs->vkUnmapMemory(m_device, m_bufferMemory);
+  }
 
   m_deviceFuncs->vkCmdDraw(
     _cmdBuffer,
-    2 * 3,1,
-    0,0
+    m_actorMesh.data()->vertexCount, // TODO: FIX
+    1,
+    0, 0
   );
 }
 
@@ -168,12 +165,9 @@ void Renderer::createActorDrawCalls(
     &m_actorVertexBuffer,
     &vbOffset
   );
-//  m_deviceFuncs->vkCmdBindVertexBuffers(
-//    _cmdBuffer,
-//    1, 1, &m_instBuf, &vbOffset);
 
-  // Now provide offsets so that the two dynamic buffers point to the
-  // beginning of the vertex and fragment uniform data for the current frame.
+  // the dynamic buffer points to the beginning of the vertex and fragment
+  // uniform data for the current frame.
   uint32_t frameUniOffset = m_vkWindow->currentFrame() * (
     m_actorMaterial->vertUniSize +
     m_actorMaterial->fragUniSize
@@ -183,13 +177,14 @@ void Renderer::createActorDrawCalls(
     _cmdBuffer,
     VK_PIPELINE_BIND_POINT_GRAPHICS,
     m_actorMaterial->pipelineLayout,
-    0, 1,
-    &m_actorMaterial->descSet,
+    0, m_actorMaterial->descSets.size(),
+    &m_actorMaterial->descSets[0], // Dynamic UBOs
     2,
     frameUniOffsets
   );
 
-  if (m_vpDirty) {
+  if (m_vpDirty)
+  {
     if (m_vpDirty) --m_vpDirty;
 
     QMatrix4x4 vp, model;
@@ -205,7 +200,7 @@ void Renderer::createActorDrawCalls(
       m_actorMaterial->uniMemStartOffset + frameUniOffset,
       m_actorMaterial->vertUniSize + m_actorMaterial->fragUniSize,
       0, reinterpret_cast<void **>(&p)
-      );
+    );
     if (result != VK_SUCCESS)
     {
       qFatal("Failed to map memory: %d", result);
@@ -233,6 +228,109 @@ void Renderer::createActorDrawCalls(
     0, 0
   );
 }
+
+void Renderer::createSDFRDrawCalls(
+  const MaterialPtr &_material,
+  CmdBuffer &_cmdBuffer,
+  float _extentWidth,
+  float _extentHeight
+)
+{
+  m_deviceFuncs->vkCmdBindPipeline(
+    _cmdBuffer,
+    VK_PIPELINE_BIND_POINT_GRAPHICS, // TODO: VK_PIPELINE_BIND_POINT_COMPUTE
+    _material->pipeline
+  );
+
+  device::Size vbOffset = 0;
+  m_deviceFuncs->vkCmdBindVertexBuffers(
+    _cmdBuffer,
+    0,1,
+    &m_sdfUniformBuffer, &vbOffset
+  );
+
+  auto mvp = m_proj * m_camera.viewMatrix();
+
+  float fragmentConstants[7] = {
+    _extentWidth,
+    _extentHeight,
+
+    (float)1,
+    (float)1,
+
+    (float)1,
+
+    m_nearPlane,
+    m_farPlane
+
+//      SDL_GetTicks() / 1000.0f
+  };
+
+//  qDebug("sizeof(QMatrix4x4): %u ", sizeof(mvp));
+
+//  m_deviceFuncs->vkCmdPushConstants(cmdBuffer, _material->pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(mvp), mvp.constData());
+
+//  float color[] = { 0.3f, 0.3f, 0.3f };
+
+//  qDebug("sizeof(mvp): %u ", sizeof(mvp));
+
+  m_deviceFuncs->vkCmdPushConstants(
+    _cmdBuffer,
+    _material->pipelineLayout,
+    VK_SHADER_STAGE_FRAGMENT_BIT,
+    0/*sizeof(mvp) - 4*/,
+    sizeof(fragmentConstants), fragmentConstants
+//    sizeof(mvp), mvp.constData()
+  );
+
+//  uint32_t frameUniOffset = m_vkWindow->currentFrame() * (
+//    m_sdfrMaterial->vertUniSize +
+//    m_sdfrMaterial->fragUniSize
+//  );
+//  uint32_t frameUniOffsets[] = { frameUniOffset, frameUniOffset };
+  m_deviceFuncs->vkCmdBindDescriptorSets(
+    _cmdBuffer,
+    VK_PIPELINE_BIND_POINT_GRAPHICS,
+    m_sdfrMaterial->pipelineLayout,
+    0, m_sdfrMaterial->descSets.size(),
+    &m_sdfrMaterial->descSets[0], // Texture Sampler
+    0,
+    nullptr
+  );
+
+//  m_deviceFuncs->vkCmdBindDescriptorSets(
+//    _cmdBuffer,
+//    VK_PIPELINE_BIND_POINT_GRAPHICS,
+//    m_actorMaterial->pipelineLayout,
+//    1, m_actorMaterial->descSets.size(),
+//    &m_actorMaterial->descSets[1], // Texture Sampler
+//    0,
+//    nullptr
+//    );
+
+//  uint32_t frameBufOffset = m_vkWindow->currentFrame() * (
+//    m_sdfrMaterial->vertUniSize +
+//    m_sdfrMaterial->fragUniSize
+//  );
+//  uint32_t frameBufOffsets[] = { frameBufOffset, frameBufOffset };
+//  m_deviceFuncs->vkCmdBindDescriptorSets(
+//    _cmdBuffer,
+//    VK_PIPELINE_BIND_POINT_GRAPHICS,
+//    m_sdfrMaterial->pipelineLayout,
+//    1, 1,
+//    &m_sdfrMaterial->descSets[1],
+//    1,
+//    frameBufOffsets
+//  );
+
+  m_deviceFuncs->vkCmdDraw(
+    _cmdBuffer,
+    2 * 3,1,
+    0,0
+  );
+}
+
+
 
 
 
@@ -298,13 +396,5 @@ void Renderer::writeFragUni(
 
   float specularExp = 150.0f;
   memcpy(p, &specularExp, 4);
-  p += 4;
-
-//  auto nearPlane = m_nearPlane;
-  memcpy(p, &m_nearPlane, 4);
-  p += 4;
-
-//  auto farPlane = m_farPlane;
-  memcpy(p, &m_farPlane, 4);
   p += 4;
 }

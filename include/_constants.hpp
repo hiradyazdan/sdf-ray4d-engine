@@ -20,7 +20,9 @@ namespace sdfRay4d
    */
    struct Constants
    {
-     using str = const QString;
+     // Should not be const, otherwise any usage will cause
+     // implicit copy ctor deletion error
+     using str = QString;
 
      str assetsPath   = "../assets/";
 
@@ -29,13 +31,54 @@ namespace sdfRay4d
      str modelsRoot   = "models/";
      str texturesRoot = "textures/";
 
+     /**
+      * @struct Models
+      */
      struct
      {
        str actor = "block.buf";
      } modelsPaths;
 
+     /**
+      * @struct Shaders
+      */
      struct
      {
+       /**
+        * @struct Depth Shaders
+        */
+       struct
+       {
+         struct
+         {
+           str main = "Depth/depth_pass.vert";
+         } vert;
+
+         struct
+         {
+           str main = "Depth/depth_pass.frag";
+         } frag;
+       } depth;
+
+       /**
+        * @struct ACtor Shaders
+        */
+       struct
+       {
+         struct
+         {
+           str main = "Actor/color_phong.vert";
+         } vert;
+
+         struct
+         {
+           str main = "Actor/color_phong.frag";
+         } frag;
+       } actor;
+
+       /**
+        * @struct SDF Raymarch Shaders
+        */
        struct
        {
          struct
@@ -54,19 +97,6 @@ namespace sdfRay4d
            } partials;
          } frag;
        } raymarch;
-
-       struct
-       {
-         struct
-         {
-           str main = "Actor/color_phong.vert";
-         } vert;
-
-         struct
-         {
-           str main = "Actor/color_phong.frag";
-         } frag;
-       } actor;
      } shadersPaths;
    };
 }

@@ -17,7 +17,7 @@ namespace sdfRay4d
 
     public:
       SDFGraph(
-        std::shared_ptr<Material> &_material,
+        std::shared_ptr<Material> _material,
         QWidget *_scene
       );
 

@@ -50,13 +50,11 @@ void Renderer::createBuffer(
 void Renderer::allocateMemory()
 {
   // Allocate memory for everything at once.
-  m_sdfUniformStartOffset = setDynamicAlignmentOffset(
-    0 + m_actorVertexMemReq.size,
-    m_sdfUniformMemReq.alignment
+  m_sdfUniformStartOffset = setDynamicOffsetAlignment(
+    0 + m_actorVertexMemReq.size
   );
-  m_actorMaterial->uniMemStartOffset = setDynamicAlignmentOffset(
-    m_sdfUniformStartOffset + m_sdfUniformMemReq.size,
-    m_dynamicUniformMemReq.alignment
+  m_actorMaterial->uniMemStartOffset = setDynamicOffsetAlignment(
+    m_sdfUniformStartOffset + m_sdfUniformMemReq.size
   );
 
   memory::AllocInfo memAllocInfo = {
@@ -121,70 +119,71 @@ void Renderer::mapMemory(size_t _byteSize)
 
 void Renderer::updateDescriptorSets()
 {
-  descriptor::Write descWrite[3] = {}; // memset
+  const auto descWriteCount = 4;
+  descriptor::Write descWrite[descWriteCount] = {}; // memset
+
+  auto depthVertLayoutBindings = m_depthMaterial->layoutBindings[0];
+
+  // Write descriptors for the dynamic uniform buffer in the vertex shaders.
+  descriptor::BufferInfo depthVertexBuffer = {
+    m_depthVertexBuffer, // buffer
+    0, // offset
+    m_depthMaterial->vertUniSize // range
+  };
+
+  descriptor::ImageInfo imageInfo = {}; // memset
+  imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+  imageInfo.imageView = m_depthMaterial->texture.getImageView();
+  imageInfo.sampler = m_depthMaterial->texture.getSampler();
+
+  descWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  descWrite[0].dstSet = m_depthMaterial->descSets[0];
+  descWrite[0].dstBinding = depthVertLayoutBindings.binding;
+  descWrite[0].descriptorCount = depthVertLayoutBindings.descriptorCount;
+  descWrite[0].descriptorType = depthVertLayoutBindings.descriptorType;
+  descWrite[0].pBufferInfo = &depthVertexBuffer;
 
   auto actorVertLayoutBindings = m_actorMaterial->layoutBindings[0];
   auto actorFragLayoutBindings = m_actorMaterial->layoutBindings[1];
 
-  // Write descriptors for the dynamic uniform buffer in the vertex and fragment shaders.
-  descriptor::BufferInfo vertUni = {
+  // Descriptors for the dynamic uniform buffer in the vertex and fragment shaders.
+  descriptor::BufferInfo actorVertUni = {
     m_dynamicUniformBuffer, // buffer
     0, // offset
     m_actorMaterial->vertUniSize // range
   };
-  descriptor::BufferInfo fragUni = {
+  descriptor::BufferInfo actorFragUni = {
     m_dynamicUniformBuffer, // buffer
     m_actorMaterial->vertUniSize, // offset
     m_actorMaterial->fragUniSize // range
   };
 
-  descWrite[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-  descWrite[0].dstSet = m_actorMaterial->descSet;
-  descWrite[0].dstBinding = actorVertLayoutBindings.binding;
-  descWrite[0].descriptorCount = actorVertLayoutBindings.descriptorCount;
-  descWrite[0].descriptorType = actorVertLayoutBindings.descriptorType;
-  descWrite[0].pBufferInfo = &vertUni;
-
   descWrite[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-  descWrite[1].dstSet = m_actorMaterial->descSet;
-  descWrite[1].dstBinding = actorFragLayoutBindings.binding;
-  descWrite[1].descriptorCount = actorFragLayoutBindings.descriptorCount;
-  descWrite[1].descriptorType = actorFragLayoutBindings.descriptorType;
-  descWrite[1].pBufferInfo = &fragUni;
-
-//  auto sdfrVertLayoutBindings = m_sdfrMaterial->layoutBindings[0];
-  auto sdfrFragLayoutBindings = m_sdfrMaterial->layoutBindings[0];
-
-//  descriptor::BufferInfo sdfrVertUni = {
-//    m_sdfUniformBuffer, // buffer
-//    0, // offset
-//    m_sdfrMaterial->vertUniSize // range
-//  };
-
-  createDepthImageView();
-
-  descriptor::ImageInfo imageInfo = {};
-  imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-  imageInfo.imageView = m_imageView;
-  imageInfo.sampler = m_sdfrMaterial->depthTexture.getSampler();
-
-//  descWrite[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-//  descWrite[2].dstSet = m_sdfrMaterial->descSets[0];
-//  descWrite[2].dstBinding = sdfrVertLayoutBindings.binding;
-//  descWrite[2].descriptorCount = sdfrVertLayoutBindings.descriptorCount;
-//  descWrite[2].descriptorType = sdfrVertLayoutBindings.descriptorType;
-//  descWrite[2].pBufferInfo = &sdfrVertUni;
+  descWrite[1].dstSet = m_actorMaterial->descSets[0];
+  descWrite[1].dstBinding = actorVertLayoutBindings.binding;
+  descWrite[1].descriptorCount = actorVertLayoutBindings.descriptorCount;
+  descWrite[1].descriptorType = actorVertLayoutBindings.descriptorType;
+  descWrite[1].pBufferInfo = &actorVertUni;
 
   descWrite[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-  descWrite[2].dstSet = m_sdfrMaterial->descSet;
-  descWrite[2].dstBinding = sdfrFragLayoutBindings.binding;
-  descWrite[2].descriptorCount = sdfrFragLayoutBindings.descriptorCount;
-  descWrite[2].descriptorType = sdfrFragLayoutBindings.descriptorType;
-  descWrite[2].pImageInfo = &imageInfo;
+  descWrite[2].dstSet = m_actorMaterial->descSets[0];
+  descWrite[2].dstBinding = actorFragLayoutBindings.binding;
+  descWrite[2].descriptorCount = actorFragLayoutBindings.descriptorCount;
+  descWrite[2].descriptorType = actorFragLayoutBindings.descriptorType;
+  descWrite[2].pBufferInfo = &actorFragUni;
+
+  auto sdfrFragLayoutBindings = m_sdfrMaterial->layoutBindings[0];
+
+  descWrite[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  descWrite[3].dstSet = m_sdfrMaterial->descSets[0];
+  descWrite[3].dstBinding = sdfrFragLayoutBindings.binding;
+  descWrite[3].descriptorCount = sdfrFragLayoutBindings.descriptorCount;
+  descWrite[3].descriptorType = sdfrFragLayoutBindings.descriptorType;
+  descWrite[3].pImageInfo = &imageInfo;
 
   m_deviceFuncs->vkUpdateDescriptorSets(
     m_device,
-    3,
+    descWriteCount,
     descWrite,
     0,
     nullptr
@@ -193,12 +192,25 @@ void Renderer::updateDescriptorSets()
 
 void Renderer::createBuffers()
 {
-  if (m_actorVertexBuffer)
+  if (m_depthVertexBuffer)
   {
     return;
   }
 
   markViewProjDirty();
+
+  const auto depthBufferSize = m_actorMesh.data()->vertexCount * 8 * sizeof(float); // TODO: temp
+
+  /**
+   * Depth Vertex Buffer
+   */
+  createBuffer(
+    depthBufferSize,
+    VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
+    VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+    m_depthVertexBuffer,
+    m_depthVertexMemReq
+  );
 
   const auto actorBufferSize = m_actorMesh.data()->vertexCount * 8 * sizeof(float);
 
@@ -236,9 +248,8 @@ void Renderer::createBuffers()
    *
    * @note
    *
-   * Uniform buffer. Instead of using multiple descriptor sets, we take a
-   * different approach: have a single dynamic uniform buffer and specify the
-   * active-frame-specific offset at the time of binding the descriptor set.
+   * Instead of using multiple descriptor sets, a single dynamic uniform buffer is used
+   * and active frame offset is set at the time of binding the descriptor set.
    */
   createBuffer(
     (
@@ -252,7 +263,8 @@ void Renderer::createBuffers()
 
   allocateMemory();
 
-  bindBufferToMemory(m_actorVertexBuffer, 0);
+  bindBufferToMemory(m_depthVertexBuffer, 0);
+  bindBufferToMemory(m_actorVertexBuffer, m_depthMaterial->vertUniSize);
   bindBufferToMemory(m_sdfUniformBuffer, m_sdfUniformStartOffset);
   bindBufferToMemory(m_dynamicUniformBuffer, m_actorMaterial->uniMemStartOffset);
 

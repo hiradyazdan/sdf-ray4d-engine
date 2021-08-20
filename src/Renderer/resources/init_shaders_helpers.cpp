@@ -7,41 +7,28 @@
 
 using namespace sdfRay4d;
 
-void Renderer::initSDFRShaders()
+void Renderer::initDepthShaders()
 {
-  const auto &raymarchShaders = m_appConstants.shadersPaths.raymarch;
+  const auto &depthShaders = m_appConstants.shadersPaths.depth;
 
-  if (!m_sdfrMaterial->vertexShader.isValid())
+  if (!m_depthMaterial->vertexShader.isValid())
   {
-    m_sdfrMaterial->vertexShader.load(
-      raymarchShaders.vert.main, {}
+    m_depthMaterial->vertexShader.load(
+      depthShaders.vert.main, {}
       //      "static/screenQuad.vert", {}
     );
   }
 
-  if (!m_sdfrMaterial->fragmentShader.isValid())
+  if (!m_depthMaterial->fragmentShader.isValid())
   {
-    m_sdfrMaterial->fragmentShader.load(
-      raymarchShaders.frag.main,
-      {
-        raymarchShaders.frag.partials.distanceFuncs,
-        raymarchShaders.frag.partials.operations
-      }
-      //      "static/blank.frag", {}
+    m_depthMaterial->fragmentShader.load(
+      depthShaders.frag.main, {}
     );
   }
 }
 
 void Renderer::initActorShaders()
 {
-  //  PushConstantRange pushConstant;
-  //  pushConstant.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-  //  pushConstant.offset = 0;
-  //  pushConstant.size = 64;
-  //
-  //  m_actorMaterial->pushConstantRangeCount = 1;
-  //  m_actorMaterial->pushConstantRange = pushConstant;
-
   const auto &actorShaders = m_appConstants.shadersPaths.actor;
 
   if (!m_actorMaterial->vertexShader.isValid())
@@ -56,6 +43,31 @@ void Renderer::initActorShaders()
   {
     m_actorMaterial->fragmentShader.load(
       actorShaders.frag.main, {}
+    );
+  }
+}
+
+void Renderer::initSDFRShaders()
+{
+  const auto &sdfrShaders = m_appConstants.shadersPaths.raymarch;
+
+  if (!m_sdfrMaterial->vertexShader.isValid())
+  {
+    m_sdfrMaterial->vertexShader.load(
+      sdfrShaders.vert.main, {}
+      //      "static/screenQuad.vert", {}
+    );
+  }
+
+  if (!m_sdfrMaterial->fragmentShader.isValid())
+  {
+    m_sdfrMaterial->fragmentShader.load(
+      sdfrShaders.frag.main,
+      {
+        sdfrShaders.frag.partials.distanceFuncs,
+        sdfrShaders.frag.partials.operations
+      }
+      //      "static/blank.frag", {}
     );
   }
 }

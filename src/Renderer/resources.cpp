@@ -38,10 +38,7 @@ void Renderer::initResources()
   initShaders();
 
   m_pipelineHelper.createCache();
-  m_pipelineHelper.createWorkers({
-    m_sdfrMaterial,
-    m_actorMaterial
-  });
+  m_pipelineHelper.createWorkers(m_materials);
 }
 
 void Renderer::releaseResources()
@@ -58,7 +55,9 @@ void Renderer::releaseResources()
 
   m_pipelineHelper.destroyDescriptors();
   m_pipelineHelper.destroyPipelines();
+  m_pipelineHelper.destroyRenderPass();
+  m_pipelineHelper.destroyShaderModules();
+  m_pipelineHelper.destroyTextures();
 
   destroyBuffers();
-  destroyShaderModules();
 }

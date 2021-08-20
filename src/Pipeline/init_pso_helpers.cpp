@@ -55,13 +55,13 @@ void PipelineHelper::setVertexInputState(const MaterialPtr &_material)
       1, // location
       0, // binding
       VK_FORMAT_R32G32B32_SFLOAT, // format // VK_FORMAT_R8G8B8A8_UNORM
-      3 * sizeof(float) // offset
+      3 * sizeof(float) // offset (vec3)
     },
-    { // texCoords
+    { // texCoord
       2, // location
       0, // binding
       VK_FORMAT_R32G32B32_SFLOAT, // format
-      2 * sizeof(float) // offset
+      2 * sizeof(float) // offset (vec2)
     }
   };
 

@@ -88,7 +88,7 @@ void RenderPassHelper::createCustomRenderPass(
  * @note this method should only be available to PipelineHelper
  * as RenderPass instance should not be accessed independently.
  */
-RenderPass RenderPassHelper::getRenderPass()
+RenderPass &RenderPassHelper::getRenderPass()
 {
   if(!m_renderPass)
   {

@@ -18,18 +18,18 @@ void Renderer::initVkFunctions()
     m_deviceFuncs,
     m_isMSAA ? m_vkWindow->sampleCountFlagBits() : VK_SAMPLE_COUNT_1_BIT,
     m_vkWindow->defaultRenderPass(),
-    &m_imageView
+    &m_depthView // framebuffer depth attachment for custom renderPass
   );
 }
 
 void Renderer::initMaterials()
 {
-  auto *deviceLimits = &m_vkWindow->physicalDeviceProperties()->limits;
-
-  initActorMaterial(deviceLimits);
-  initSDFRMaterial(deviceLimits);
+  initDepthMaterial();
+  initActorMaterial();
+  initSDFRMaterial();
 
   m_materials = {
+    m_depthMaterial,
     m_actorMaterial,
     m_sdfrMaterial
   };
@@ -37,6 +37,21 @@ void Renderer::initMaterials()
 
 void Renderer::initShaders()
 {
+  initDepthShaders();
   initActorShaders();
   initSDFRShaders();
+}
+
+const VkPhysicalDeviceLimits *Renderer::getDeviceLimits() const
+{
+  return &m_vkWindow->physicalDeviceProperties()->limits;
+}
+
+device::Size Renderer::setDynamicOffsetAlignment(
+  device::Size _offset
+)
+{
+  const auto &minUBOAlignment = getDeviceLimits()->minUniformBufferOffsetAlignment;
+
+  return (_offset + minUBOAlignment - 1) & ~(minUBOAlignment - 1);
 }

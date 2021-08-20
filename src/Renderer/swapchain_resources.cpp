@@ -22,8 +22,8 @@ void Renderer::initSwapChainResources()
    * Y: up, front: CCW
    *
    */
-  auto windowSize = m_vkWindow->swapChainImageSize();
-  auto aspectRatio = (float) windowSize.width() / (float) windowSize.height();
+  m_windowSize = m_vkWindow->swapChainImageSize();
+  auto aspectRatio = (float) m_windowSize.width() / (float) m_windowSize.height();
 
   m_proj = m_vkWindow->clipCorrectionMatrix();
   m_proj.perspective(
@@ -32,6 +32,8 @@ void Renderer::initSwapChainResources()
     m_nearPlane, m_farPlane
   );
 //  m_proj.translate(0, 0, -4);
+
+  createDepthView();
 
   markViewProjDirty();
 }
@@ -43,6 +45,7 @@ void Renderer::releaseSwapChainResources()
   // It is important to finish the pending frame right here since this is the
   // last opportunity to act with all resources intact.
   m_frameWatcher.waitForFinished();
+
   // Cannot count on the finished() signal being emitted before returning
   // from here.
   if (m_isFramePending)

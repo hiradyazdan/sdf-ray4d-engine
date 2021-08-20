@@ -7,7 +7,7 @@
 
 using namespace sdfRay4d;
 
-Framebuffer PipelineHelper::getFramebuffer(uint32_t _width, uint32_t _height)
+Framebuffer &PipelineHelper::getFramebuffer(uint32_t _width, uint32_t _height)
 {
   /**
    * @note
@@ -29,7 +29,7 @@ void PipelineHelper::createFramebuffer(uint32_t _width, uint32_t _height)
   FramebufferInfo framebufferInfo = {};
   framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
   framebufferInfo.renderPass = getRenderPass(false);
-  framebufferInfo.attachmentCount = 1;
+  framebufferInfo.attachmentCount = 1; // depth pass attachment image view is only 1
   framebufferInfo.pAttachments = m_attachments;
   framebufferInfo.width = _width;
   framebufferInfo.height = _height;

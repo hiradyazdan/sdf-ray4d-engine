@@ -3,7 +3,7 @@
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
-layout(location = 2) in vec2 texCoords;
+layout(location = 2) in vec2 vECTexCoords;
 
 layout(binding = 0) uniform sampler2D depthTexture;
 
@@ -14,6 +14,9 @@ layout(push_constant) uniform FSConst
   vec2 resolution;
   vec2 mouse;
   float time;
+
+  float nearPlane;
+  float farPlane;
 } u_input;
 
 #define AA 1   // make this 1 is your machine is too slow
@@ -57,35 +60,33 @@ vec2 castRay( in vec3 ro, in vec3 rd, in float depth )
   float tmax = 20.0;
 
   #if 1
-  // bounding volume
-  float tp1 = (0.0-ro.y)/rd.y;
+    // bounding volume
+    float tp1 = (0.0-ro.y)/rd.y;
 
-  if( tp1>0.0 )
-  tmax = min( tmax, tp1 );
+    if( tp1>0.0 )
+    tmax = min( tmax, tp1 );
 
-  float tp2 = (1.6-ro.y)/rd.y;
+    float tp2 = (1.6-ro.y)/rd.y;
 
-  if( tp2>0.0 )
-  {
-    if( ro.y>1.6 )
-    tmin = max( tmin, tp2 );
-    else
-    tmax = min( tmax, tp2 );
-  }
-    #endif
+    if( tp2>0.0 )
+    {
+      if( ro.y>1.6 ) tmin = max( tmin, tp2 );
+      else tmax = min( tmax, tp2 );
+    }
+  #endif
 
-  float t = depth;//tmin;
+  float t = tmin;//depth;
   float m = -1.0;
-  for( int i=0; i<255;/*64;*/ i++ )
+  for( int i=0; i<64; i++ )
   {
-    float precis = 0.0005;//*t;
+    float precis = 0.0005*t;
     vec2 res = map( ro+rd*t );
+    if( res.x<precis || t>tmax ) break;
     t += res.x;
     m = res.y;
-    if( res.x<precis || t>tmax ) break;
   }
 
-//  if( t>tmax ) m=-1.0;
+  if( t>tmax ) m=-1.0;
   return vec2( t, m );
 }
 
@@ -195,6 +196,15 @@ mat3 setCamera( in vec3 ro, in vec3 ta, float cr )
   return mat3( cu, cv, cw );
 }
 
+float LinearizeDepth(float depth)
+{
+  float near = u_input.nearPlane;
+  float far = u_input.farPlane;
+  float z = depth * 2.0 - 1.0; // NDC (Normalized Device Coordinates)
+
+  return (2.0 * near * far) / (far + near - z * (far - near));
+}
+
 void main( )
 {
   vec2 mo = u_input.mouse/u_input.resolution;
@@ -221,7 +231,8 @@ void main( )
     // ray direction
     vec3 rd = ca * normalize( vec3(p.xy,2.0) );
 
-    float depth = texture(depthTexture, texCoords).r; // rasterized Depth
+//    vec2 texCoord = vec2(1, 1);
+    float depth = LinearizeDepth(texture(depthTexture, vECTexCoords).r); // rasterized Depth
 
     // render
     vec3 col = render( ro, rd, depth );

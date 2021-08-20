@@ -17,6 +17,7 @@ namespace sdfRay4d
   class Renderer : public QVulkanWindowRenderer, public QObject
   {
     using MaterialPtr = std::shared_ptr<Material>;
+//    using DescLayoutBindingList = std::vector<descriptor::LayoutBinding>;
 
     public:
       explicit Renderer(
@@ -54,9 +55,9 @@ namespace sdfRay4d
      * -------------------------------------------------
      */
     public:
-      void createSDFPipeline();
-      void destroySDFPipeline();
-      MaterialPtr &getSDFMaterial() { return m_sdfrMaterial; }
+      MaterialPtr &getSDFRMaterial(bool _isNew = false);
+      void createSDFRPipeline(const MaterialPtr &_newMaterial);
+      void swapSDFRPipelines();
 
     /**
      * Frame - User Input Helpers/Handlers
@@ -68,7 +69,7 @@ namespace sdfRay4d
       void walk(float amount);
       void strafe(float amount);
 
-      void createDepthImageView();
+      void createDepthView();
 
     /**
      * Resources: Init Helpers (General)
@@ -78,11 +79,26 @@ namespace sdfRay4d
     private:
       void initVkFunctions();
 
+    /**
+     * Resources: Init Materials Helpers
+     * -------------------------------------------------
+     *
+     */
+    private:
       void initMaterials();
-      void initActorMaterial(const PhysicalDeviceLimits *_limits);
-      void initSDFRMaterial(const PhysicalDeviceLimits *_limits);
+      void initDepthMaterial();
+      void initActorMaterial();
+      void initSDFRMaterial();
+      void initSDFRMaterial(const MaterialPtr &_material);
 
+    /**
+     * Resources: Init Shaders Helpers
+     * -------------------------------------------------
+     *
+     */
+    private:
       void initShaders();
+      void initDepthShaders();
       void initActorShaders();
       void initSDFRShaders();
 
@@ -97,8 +113,6 @@ namespace sdfRay4d
     private:
       void destroyBuffers();
       void destroyBuffer(Buffer &_buffer);
-      void destroyShaderModules();
-      void destroyShaderModule(Shader &_shader);
 
     /**
      * Frame Helpers (on Worker Thread)
@@ -142,26 +156,27 @@ namespace sdfRay4d
         uint32_t _extentWidth,
         uint32_t _extentHeight
       ); // TODO: Rename
+      void createDepthDrawCalls(
+        const MaterialPtr &_material,
+        CmdBuffer &_cmdBuffer
+      );
+      void createActorDrawCalls(
+        const MaterialPtr &_material,
+        CmdBuffer &_cmdBuffer
+      );
       void createSDFRDrawCalls(
         const MaterialPtr &_material,
         CmdBuffer &_cmdBuffer,
         float _extentWidth,
         float _extentHeight
       );
-      void createActorDrawCalls(
-        const MaterialPtr &_material,
-        CmdBuffer &_cmdBuffer
-      );
       void cmdRenderPass();
 
     private:
-      static device::Size setDynamicAlignmentOffset(
-        device::Size _offset,
-        device::Size _byteAlign
-      )
-      {
-        return (_offset + _byteAlign - 1) & ~(_byteAlign - 1);
-      }
+      const VkPhysicalDeviceLimits *getDeviceLimits() const;
+      device::Size setDynamicOffsetAlignment(
+        device::Size _offset
+      );
 
     private:
       Constants m_appConstants;
@@ -175,12 +190,14 @@ namespace sdfRay4d
     private:
       Device m_device = VK_NULL_HANDLE;
 
+      Buffer m_depthVertexBuffer = VK_NULL_HANDLE;
       Buffer m_actorVertexBuffer  = VK_NULL_HANDLE;
       Buffer m_sdfUniformBuffer   = VK_NULL_HANDLE;
       Buffer m_dynamicUniformBuffer = VK_NULL_HANDLE;
 
       std::vector<Buffer> m_buffers;
 
+      memory::Reqs m_depthVertexMemReq = {};
       memory::Reqs m_actorVertexMemReq = {};
       memory::Reqs m_sdfUniformMemReq = {};
       memory::Reqs m_dynamicUniformMemReq = {};
@@ -197,10 +214,8 @@ namespace sdfRay4d
       PipelineHelper m_pipelineHelper;
 
     private:
-      VkImageView m_imageView{};
-      VkImage m_image{};
-      memory::Reqs memReqs{};
-      device::Memory imageMem{};
+      texture::ImageView m_depthView = VK_NULL_HANDLE;
+      device::Memory m_imageBufferMemory = VK_NULL_HANDLE;
 
     /**
      * Qt Vulkan Members
@@ -230,13 +245,17 @@ namespace sdfRay4d
      * Materials
      */
     private:
-      MaterialPtr m_actorMaterial;
-      MaterialPtr m_sdfrMaterial;
+      MaterialPtr m_depthMaterial   = VK_NULL_HANDLE;
+      MaterialPtr m_actorMaterial   = VK_NULL_HANDLE;
+      MaterialPtr m_sdfrMaterial    = VK_NULL_HANDLE;
+      MaterialPtr m_newSDFRMaterial = VK_NULL_HANDLE;
 
       Mesh m_actorMesh;
 
       std::vector<MaterialPtr> m_materials;
 
       float m_rotation = 0.0f;
+
+      bool m_isNewWorker = false;
   };
 }

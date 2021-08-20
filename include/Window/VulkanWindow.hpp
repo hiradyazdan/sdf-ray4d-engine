@@ -37,9 +37,8 @@ namespace sdfRay4d
       QVulkanWindowRenderer *createRenderer() override;
 
     public:
-      void createSDFPipeline();
-      void destroySDFPipeline();
-      MaterialPtr getSDFMaterial();
+      MaterialPtr &getSDFRMaterial(bool _isNew = false);
+      void createSDFRPipeline(const MaterialPtr &_newMaterial);
 
     signals:
       /**

@@ -59,7 +59,7 @@ namespace sdfRay4d
       void cmdRenderPass();
 
     private:
-      RenderPass getRenderPass();
+      RenderPass &getRenderPass();
 
     private:
       Device m_device = VK_NULL_HANDLE;
