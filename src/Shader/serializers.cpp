@@ -11,7 +11,10 @@ using namespace sdfRay4d;
 
 void Shader::serialize(const QByteArray &_rawBytes)
 {
-  m_rawBytes.replace("/* ------ PLACEHOLDER ------ */", _rawBytes);
+  m_rawBytes.replace(
+    m_template.data(),
+    _rawBytes
+  );
 
   serializeVersionDirective(m_rawBytes);
 }

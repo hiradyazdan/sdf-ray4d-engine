@@ -130,12 +130,8 @@ void MainWindow::createMenus()
 
 void MainWindow::compileSDFGraph()
 {
-  // Signal
+  // Signal for compile SDF Graph (Slot = SDFGraph::compileGraph)
   emit m_vkWindow->sdfGraphChanged(m_sdfGraph->getNodes());
-
-  const auto &material = m_vkWindow->getSDFRMaterial();
-
-  m_vkWindow->createSDFRPipeline(material);
 }
 
 void MainWindow::autoCompileSDFGraph()
@@ -150,15 +146,12 @@ void MainWindow::saveSDFNodes()
 
 void MainWindow::loadSDFGraph()
 {
-  // creates and stores a fresh new SDFR Material
-  const auto &material = m_vkWindow->getSDFRMaterial(true);
-
   /**
    * @note
    * this will presets the shader's common instructions
    * that are not needed to change
    */
-  m_sdfGraph = new SDFGraph(material, this);
+  m_sdfGraph = new SDFGraph(m_vkWindow);
   m_sdfGraphWidget = new QDockWidget(tr("SDF Graph Editor"), this);
   m_sdfGraphWidget->setAllowedAreas(
       Qt::TopDockWidgetArea
@@ -231,7 +224,5 @@ void MainWindow::loadAboutDialog()
 
 void MainWindow::quitApp()
 {
-//  m_vkWindow->destroyPipeline();
-
   QApplication::exit(EXIT_SUCCESS);
 }

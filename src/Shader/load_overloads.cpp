@@ -176,7 +176,16 @@ void Shader::load(
 
   m_worker = QtConcurrent::run([_shaderData, this]()
   {
-    serialize(QByteArray(_shaderData.data()));
+    const auto &serializableData = _shaderData.data();
+
+    serialize(QByteArray(serializableData));
+
+    /**
+     * @note templates/placeholders should need to update per each
+     * shader re-compile/load to allow for updating the new
+     * shader instructions
+     */
+    m_template = serializableData;
 
     std::vector<uint32_t> spvBytes;
     std::string log;
@@ -214,7 +223,8 @@ void Shader::load(
    */
   m_worker.waitForFinished();
 
-//  std::cout << m_rawBytes.constData();
+// @note uncomment to debug shader code
+  qDebug() << m_rawBytes.constData();
 }
 
 /**

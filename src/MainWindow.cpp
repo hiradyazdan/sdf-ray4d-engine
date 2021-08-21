@@ -29,9 +29,6 @@ MainWindow::MainWindow()
 
   createActions();
   createMenus();
-
-//  connect(m_vkWindow, &VulkanWindow::vulkanInfoReceived, this, &MainWindow::onVulkanInfoReceived);
-//  connect(m_vkWindow, &VulkanWindow::frameQueued, this, &MainWindow::onFrameQueued);
 }
 
 

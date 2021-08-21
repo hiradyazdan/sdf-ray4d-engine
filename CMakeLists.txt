@@ -20,7 +20,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.16")
     message("Your CMake version is ${CMAKE_VERSION}. Update to at least 3.16 to enable unity_build to speed up incremental builds")
 else()
     # If UNITY BUILD causes compile or runtime issues (e.g. ODRs) turn this off.
-    # TODO: setting this messes up my IDE syntax error detections intermittently
+    # TODO: setting this may mess up the IDE syntax error detections intermittently
 #    set(CMAKE_UNITY_BUILD ON)
 endif()
 
@@ -63,11 +63,11 @@ file(
     ${PROJECT_SOURCE_DIR}/include/*.hpp
     ${PROJECT_SOURCE_DIR}/src/*.cpp
 
-    ${PROJECT_SOURCE_DIR}/externals/nodeEditor_old/*.hpp
-    ${PROJECT_SOURCE_DIR}/externals/nodeEditor_old/*.cpp
-
 #    ${PROJECT_SOURCE_DIR}/externals/nodeeditor/include/*
 #    ${PROJECT_SOURCE_DIR}/externals/nodeeditor/src/*
+
+#    ${PROJECT_SOURCE_DIR}/externals/nodeEditor_old/*.hpp
+#    ${PROJECT_SOURCE_DIR}/externals/nodeEditor_old/*.cpp
 )
 
 target_sources(${TARGET_NAME} PRIVATE ${${TARGET_NAME}_SOURCE})
@@ -87,6 +87,7 @@ target_link_libraries(${TARGET_NAME} PRIVATE glslang glslang-default-resource-li
 target_link_libraries(${TARGET_NAME} PRIVATE Vulkan::Vulkan)
 target_link_libraries(${TARGET_NAME} PRIVATE glm::glm)
 target_link_libraries(${TARGET_NAME} PRIVATE Qt5::Widgets Qt5::OpenGL Qt5::Concurrent)
+target_link_libraries(${TARGET_NAME} PRIVATE nodes)
 
 # Static Assets Pipeline
 #############################################################################

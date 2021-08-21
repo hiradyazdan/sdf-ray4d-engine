@@ -1,47 +1,57 @@
 #pragma once
 
-#include "nodeEditor_old/NodeDataModel.hpp"
-#include "SDFGraph/DistanceFieldData.hpp"
+#include <QtWidgets/QLineEdit>
 
-class CubePrimitiveDataModel : public NodeDataModel
+#include "SDFGraph/SDFGraphDataModel.hpp"
+
+namespace sdfRay4d::sdfGraph
 {
-  Q_OBJECT
+  class CubeDataModel : public SDFGraphDataModel
+  {
+    Q_OBJECT
 
-  public:
-    CubePrimitiveDataModel();
-    virtual ~CubePrimitiveDataModel() {}
+    public:
+      CubeDataModel();
+      virtual ~CubeDataModel() {}
 
-    QString caption() const override
-    {
-      return QString("Cube");
-    }
+      QString caption() const override { return QString("Cube"); }
+      bool captionVisible() const override { return false; }
+      QString name() const override { return QString("Cube"); }
 
-    static QString name()
-    {
-      return QString("Cube");
-    }
+      QJsonObject save() const override { return {}; };
+      void restore(QJsonObject const &p) override {};
 
-    void save(Properties &p) const override;
-    void restore(const Properties &p) override;
+      unsigned int nPorts(QtNodes::PortType portType) const override;
+      QtNodes::NodeDataType dataType(QtNodes::PortType portType, QtNodes::PortIndex portIndex) const override;
 
-    unsigned int nPorts(PortType portType) const override;
-    NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
+      std::shared_ptr<QtNodes::NodeData> outData(QtNodes::PortIndex port) override;
+      void setInData(std::shared_ptr<QtNodes::NodeData>, int) override;
 
-    std::shared_ptr<NodeData> outData(PortIndex port) override;
-    void setInData(std::shared_ptr<NodeData>, int) override;
+      QWidget *embeddedWidget() override;
 
-    void sizeEdit(QString const);
+//      DFNodeType getNodeType() const override { return DFNodeType::PRIMITIVE; }
+      QString getShaderCode() override;
+      QString getData() override;
+//      void setTransform(const Mat4f &_t) override;
 
-    std::vector<QWidget *> embeddedWidget() override;
+    private slots:
+      void onTextEdited(QString const &_string);
 
-    DFNodeType getNodeType() const override { return DFNodeType::PRIMITIVE; }
-    std::string getShaderCode() override;
-    void setTransform(const Mat4f &_t) override;
+//      void sizeEdit(QString const);
 
-  private:
-    Vec4f m_color;
-    Vec4f m_dimensions;
-    std::string m_transform;
-};
+    private:
+      QLineEdit *m_lineEdit;
+
+      std::string m_shaderData;
+
+      std::shared_ptr<MapData> m_data;
+
+      sdfGraph::vec4 m_color;
+//      QVector4D m_color;
+      sdfGraph::vec4 m_dimensions;
+//      QVector4D m_dimensions;
+//        std::string m_transform;
+  };
+}
 
 

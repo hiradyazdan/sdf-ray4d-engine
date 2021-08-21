@@ -115,5 +115,6 @@ namespace sdfRay4d
       QString m_shadersPath;
 
       QByteArray m_rawBytes;
+      std::string m_template;
   };
 }

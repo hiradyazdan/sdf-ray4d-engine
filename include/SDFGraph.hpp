@@ -1,8 +1,19 @@
 #pragma once
 
-#include "nodeEditor_old/FlowScene.hpp"
-#include "nodeEditor_old/FlowView.hpp"
-#include "nodeEditor_old/Node.hpp"
+#include <QDebug>
+
+#include <nodes/FlowScene>
+#include <nodes/FlowView>
+#include <nodes/Node>
+#include <nodes/NodeData>
+#include <nodes/ConnectionStyle>
+#include <nodes/Connection>
+#include <nodes/NodeGeometry>
+
+#include <nodes/DataModelRegistry>
+#include <nodes/internal/NodeGraphicsObject.hpp>
+
+#include <SDFGraph/SDFGraphDataModel.hpp>
 
 #include "Window/VulkanWindow.hpp"
 #include "Material.hpp"
@@ -13,50 +24,43 @@ namespace sdfRay4d
 
   class SDFGraph : public QWidget
   {
-    using NodePtrSet = std::unordered_map<QUuid, std::shared_ptr<Node>>;
+    using FlowScene = QtNodes::FlowScene;
+    using FlowView = QtNodes::FlowView;
+    using Connection = QtNodes::Connection;
+    using ConnectionStyle = QtNodes::ConnectionStyle;
+    using Node = QtNodes::Node;
+    using PortIndex = QtNodes::PortIndex;
+    using PortType = QtNodes::PortType;
+
+    using DataModelRegistry = QtNodes::DataModelRegistry;
+    using TypeConverter = QtNodes::TypeConverter;
+    using TypeConverterId = QtNodes::TypeConverterId;
+
+    using NodePtrSet = std::unordered_map<QUuid, std::unique_ptr<QtNodes::Node>>;
+    using NodePtrList = std::vector<Node*>;
 
     public:
-      SDFGraph(
-        std::shared_ptr<Material> _material,
-        QWidget *_scene
-      );
+      explicit SDFGraph(VulkanWindow *_vkWindow);
 
     public:
       FlowView *getView() { return m_graphView; }
-      NodePtrSet getNodes() { return m_graphScene->getNodes(); }
+      const NodePtrSet &getNodes() { return m_graphScene->nodes(); }
 
     public slots:
-      void compileGraph(const sdfRay4d::SDFGraph::NodePtrSet &_nodes);
+      void compileGraph(const SDFGraph::NodePtrSet &_nodes);
 
     private:
-      void registerModels();
-      void createMapNode();
-
-      std::string recurseNodeTree(
-        const std::shared_ptr<Node> &_node,
-        Mat4f _t,
-        PortIndex portIndex = 0,
-        unsigned int _cp = 0
-      );
-
-    /**
-     * Qt/Vulkan Members
-     */
-    private:
-//      VulkanWindow *m_vkWindow;
-//      Device m_device = VK_NULL_HANDLE;
-//      QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
+      static std::shared_ptr<DataModelRegistry> registerModels();
+      static void setStyle();
 
     private:
-      std::shared_ptr<Material> m_shapeMaterial;
-//      std::shared_ptr<Material> m_shapeMaterial;
+      Constants m_appConstants;
 
-    private:
+      VulkanWindow *m_vkWindow;
       FlowScene *m_graphScene;
       FlowView *m_graphView;
 
-      Node *m_outputNode;
-
-      Constants m_appConstants;
+    private:
+      std::shared_ptr<Material> m_shapeMaterial;
   };
 }

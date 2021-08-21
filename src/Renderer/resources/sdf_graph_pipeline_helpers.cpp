@@ -26,11 +26,13 @@ Renderer::MaterialPtr &Renderer::getSDFRMaterial(bool _isNew)
   return m_newSDFRMaterial;
 }
 
-void Renderer::createSDFRPipeline(const MaterialPtr &_newMaterial)
+void Renderer::createSDFRPipeline()
 {
+  const auto &newMaterial = getSDFRMaterial();
+
   m_isNewWorker = true;
   m_pipelineHelper.createWorker(
-    _newMaterial,
+    newMaterial,
     m_isNewWorker
   );
 }
@@ -60,7 +62,7 @@ void Renderer::swapSDFRPipelines()
    * and signals when the existing command buffers finished
    * their execution.
    *
-   * Although it stalls the pipeline, that is the only way
+   * Although it may stall the pipeline, that is the only way
    * Qt Vulkan seems to expose in this case. Otherwise, I could use
    * vkGetFenceStatus and pass the Fence to check every frame,
    * which is not available through Qt Vulkan public API.
@@ -69,19 +71,6 @@ void Renderer::swapSDFRPipelines()
    * design session for the user, than a game realtime/interactive
    * session, therefore the speed is not expected to be
    * very high.
-   *
-   * TODO:
-   * Fix the issue occurring on hitting the compile
-   * button within quite short intervals repeatedly, where
-   * seems to skip the destruction of the old pipeline.
-   * (Suspicious of race condition issue)
-   *
-   * Most possibly, the issue is due to the wait for the
-   * graphics queue to empty out at a later time which stalls
-   * the process.
-   *
-   * Introducing a delayed delete queue might solve the problem:
-   * https://vkguide.dev/docs/chapter-2/cleanup/
    */
 
   const auto &queue = m_vkWindow->graphicsQueue();

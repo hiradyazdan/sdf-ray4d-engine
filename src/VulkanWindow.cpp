@@ -55,7 +55,7 @@ VulkanWindow::MaterialPtr &VulkanWindow::getSDFRMaterial(bool _isNew)
   return m_renderer->getSDFRMaterial(_isNew);
 }
 
-void VulkanWindow::createSDFRPipeline(const MaterialPtr &_newMaterial)
+void VulkanWindow::createSDFRPipeline()
 {
-  m_renderer->createSDFRPipeline(_newMaterial);
+  m_renderer->createSDFRPipeline();
 }

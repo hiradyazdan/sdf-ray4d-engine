@@ -1,269 +1,135 @@
-#include <fstream>
-#include <utility>
-
-#include "nodeEditor_old/DataModelRegistry.hpp"
-#include "nodeEditor_old/NodeGraphicsObject.hpp"
+/*****************************************************
+ * Class: SDFGraph (General)
+ * Members: General Functions (Public)
+ * Partials: None
+ * There are however, Data Model Classes with inheritance used in this class
+ * which are located in SDFGraph directory
+ *****************************************************/
 
 #include "SDFGraph.hpp"
 
+#include "SDFGraph/DataModels/MapDataModel.hpp"
+#include "SDFGraph/DataModels/Operations/UnionDataModel.hpp"
 #include "SDFGraph/Primitives/CubePrimitiveDataModel.hpp"
-#include "SDFGraph/DistanceFieldOutputDataModel.hpp"
-#include "SDFGraph/CollapsedNodeDataModel.hpp"
 
 using namespace sdfRay4d;
+using namespace sdfGraph;
 
 SDFGraph::SDFGraph(
-  std::shared_ptr<Material> _material,
-  QWidget *_scene
+  VulkanWindow *_vkWindow
 ) :
-  m_shapeMaterial(std::move(_material))
-  , m_outputNode(nullptr)
+  m_vkWindow(_vkWindow)
+  , m_shapeMaterial(m_vkWindow->getSDFRMaterial(true)) // creates and stores a fresh new SDFR Material
+  , m_graphScene(new FlowScene(registerModels(), this))
+  , m_graphView(new FlowView(m_graphScene))
 {
-//  if (!m_shapeMaterial.vertexShader.isValid())
-//  {
-//    m_shapeMaterial.vertexShader.load(
-//      "static/fullscreentri.vert.spv"
-//    );
-//  }
-//
-//  if (!m_shapeMaterial.fragmentShader.isValid())
-//  {
-//    m_shapeMaterial.fragmentShader.load(
-//      "dynamic/rtprimitives.frag",
-//      {
-//        "_partials/distance_functions.partial.glsl",
-//        "_partials/operations.partial.glsl"
-//      }
-//    );
-//  }
+  setStyle();
 
-  registerModels();
+  const auto &sdfrShaders = m_appConstants.shadersPaths.raymarch;
 
-  m_graphScene = new FlowScene(_scene/*this*/);
-  m_graphView = new FlowView(m_graphScene);
-
-  createMapNode();
-
-  const auto &raymarchShaders = m_appConstants.shadersPaths.raymarch;
-
-  m_shapeMaterial->fragmentShader.preload(
-//    "",
-    {
-      raymarchShaders.frag.partials.distanceFuncs,
-      raymarchShaders.frag.partials.operations,
-//      "",
-      raymarchShaders.frag.main
-//      "dynamic/shader.begin.frag",
-//      "",
-//      "dynamic/shader.end.frag"
-    }
-  );
-
-//  std::ifstream s("shaders/shader.begin.frag");
-//  std::ifstream e("shaders/shader.end.frag");
-//  m_shaderStart = std::string((std::istreambuf_iterator<char>(s)), std::istreambuf_iterator<char>());
-//  m_shaderEnd = std::string((std::istreambuf_iterator<char>(e)), std::istreambuf_iterator<char>());
+  m_shapeMaterial->fragmentShader.preload({
+      sdfrShaders.frag.partials.distanceFuncs,
+      sdfrShaders.frag.partials.operations,
+      sdfrShaders.frag.main
+  });
 }
 
-void SDFGraph::registerModels()
-{
-  // Register the nodes
-  DataModelRegistry::registerModel<CubePrimitiveDataModel>("Shapes");
-//  DataModelRegistry::registerModel<TorusPrimitiveDataModel>("Primitives");
-//  DataModelRegistry::registerModel<SpherePrimitiveDataModel>("Shapes");
-//  DataModelRegistry::registerModel<CylinderPrimitiveDataModel>("Primitives");
-//  DataModelRegistry::registerModel<CapsulePrimitiveDataModel>("Primitives");
-//  DataModelRegistry::registerModel<PlanePrimitiveDataModel>("Primitives");
-//  DataModelRegistry::registerModel<ConePrimitiveDataModel>("Primitives");
-//  DataModelRegistry::registerModel<TriangularPrismPrimitiveDataModel>("Primitives");
-//  DataModelRegistry::registerModel<HexagonalPrismPrimitiveDataModel>("Primitives");
-
-//	DataModelRegistry::registerModel<UnionDataModel>("Transformations");
-//  DataModelRegistry::registerModel<SubtractionOpDataModel>("Transformations");
-//  DataModelRegistry::registerModel<IntersectionDataModel>("Operations");
-//  DataModelRegistry::registerModel<BlendDataModel>("Operations");
-//
-//	DataModelRegistry::registerModel<TranslateDataModel>("Transforms");
-//	DataModelRegistry::registerModel<ScaleDataModel>("Transforms");
-//  DataModelRegistry::registerModel<RotateDataModel>("Transforms");
-//
-//	DataModelRegistry::registerModel<VectorDataModel>("Maths");
-//  DataModelRegistry::registerModel<ScalarDataModel>("Maths");
-//  DataModelRegistry::registerModel<SineDataModel>("Maths");
-//  DataModelRegistry::registerModel<CosineDataModel>("Maths");
-//  DataModelRegistry::registerModel<MultiplyDataModel>("Maths");
-//  DataModelRegistry::registerModel<DivideDataModel>("Maths");
-//	DataModelRegistry::registerModel<AdditionDataModel>("Maths");
-//	DataModelRegistry::registerModel<SubtractionDataModel>("Maths");
-
-//	DataModelRegistry::registerModel<TimeDataModel>("Misc");
-//	DataModelRegistry::registerModel<ColorPickerDataModel>("Color");
-//  DataModelRegistry::registerModel<OutputDataModel>("Generic");
-//	DataModelRegistry::registerModel<InputDataModel>("Generic");
-//	DataModelRegistry::registerModel<CopyDataModel>("Generic");
-//	DataModelRegistry::registerModel<CopyNumDataModel>("Generic");
-//	DataModelRegistry::registerModel<CollapsedNodeDataModel>("Generic");
-}
-
-void SDFGraph::createMapNode()
-{
-  // Create the static distance field output node
-  auto node = m_graphScene->createNode(
-    std::make_unique<DistanceFieldOutputDataModel>(),
-    false,
-    QUuid("ffffffff-ffff-ffff-ffff-ffffffffffff")
-  );
-  QRectF geom = m_graphView->sceneRect();
-
-  QPoint pos;
-  QRectF box = node->nodeGraphicsObject()->boundingRect();
-  qreal x, y, w, h;
-  geom.getRect(&x, &y, &w, &h);
-  std::cout << w << " " << h << "\n";
-  pos.setX(w/2 + box.width());
-  pos.setY(h/2 + box.height());
-  QPointF posView = m_graphView->mapToScene(pos);
-
-  QFont f;
-  f.setPixelSize(36);
-  node->nodeGeometry().setSpacing(5);
-  node->nodeGeometry().recalculateSize(QFontMetrics(f));
-  node->nodeGraphicsObject()->setPos(posView);
-
-  m_graphView->centerOn(node->nodeGraphicsObject().get());
-}
-
+/**
+ *
+ * @note Qt SLOT
+ *
+ * @param[in] _nodes
+ */
 void SDFGraph::compileGraph(const NodePtrSet &_nodes)
 {
-  if(m_outputNode == nullptr)
+  std::vector<MapDataModel*> mapNodes;
+
+  for (const auto &node : _nodes)
   {
-    for(const auto &node : _nodes)
+    /**
+     * @note this seems to be the only way to detect the map node
+     * as the nodes order is based on their order of construction
+     * at runtime by the user, than static/pre-defined order.
+     *
+     * as the shader compilation at runtime is naturally expected
+     * to have some minor pause/stalling, semi-reflection approach
+     * (no reflection in c++) to dynamically check for runtime data,
+     * does not cause any major performance cost for the user.
+     */
+    const auto &mapNode = dynamic_cast<MapDataModel*>(node.second->nodeDataModel());
+    if(mapNode)
     {
-      if(node.second->nodeDataModel()->getShaderCode() == "final")
-      {
-        m_outputNode = node.second.get();
-        break;
-      }
+      qDebug() << "Map NODE shader data: " << mapNode->getData();
+      mapNodes.push_back(mapNode);
     }
-  }
-
-  if(m_outputNode != nullptr)
-  {
-    std::string shaderData;
-    Mat4f translation;
-    hsitho::Expressions::flushUnknowns();
-    for(const auto &connection : m_outputNode->nodeState().connection(PortType::In, 0))
-    {
-      if(connection.get() && connection->getNode(PortType::Out).lock())
-      {
-        shaderData += recurseNodeTree(connection->getNode(PortType::Out).lock(), translation);
-      }
-    }
-
-    if(!shaderData.empty())
-    {
-      std::string fragmentShader;// = m_shaderStart;
-
-//      fragmentShader += hsitho::Expressions::getUnknowns();
-//      fragmentShader += "vec2 map(in vec3 pos)";
-//      fragmentShader += "vec4 map(vec3 _position)";
-//      fragmentShader += "\n{";
-        fragmentShader += "res = opU( res, vec2( sdBox(pos-vec3( 1.0,0.25, 0.0), vec3(0.25) ), 3.0 ) );";
-//      fragmentShader += "\n\tvec4 pos = ";
-//      fragmentShader += hsitho::Expressions::replaceUnknowns(shaderData);
-//      fragmentShader += ";";
-//      fragmentShader += "\n\treturn res;";
-//      fragmentShader += "\n\treturn pos;";
-//      fragmentShader += "\n}";
-
-      //fragmentShader += m_shaderEnd;
-
-//      m_shapeMaterial->vertexShader = ;
-if (!m_shapeMaterial->fragmentShader.isValid())
-{
-  m_shapeMaterial->fragmentShader.load(
-    fragmentShader
-  );
-}
 //
-//      m_shaderMan->updateShader(fragmentShader.c_str());
-    }
+//    const auto &cubeNode = dynamic_cast<CubeDataModel*>(node.second->nodeDataModel());
+//    if(cubeNode)
+//    {
+////      qDebug() << "cube NODE name: " << cubeNode->name();
+////      qDebug() << "cube NODE caption: " << cubeNode->caption();
+//      qDebug() << "cube NODE shader data: " << cubeNode->getData();
+//    }
+
+//    const auto &opNode = dynamic_cast<OperationDataModel*>(node.second->nodeDataModel());
+//    if(opNode)
+//    {
+//      qDebug() << "op NODE shader data: " << opNode->getData();
+//    }
   }
+
+  std::string shaderData;
+
+  for(const auto &mapNode : mapNodes)
+  {
+    shaderData += "res = ";
+    shaderData += mapNode->getData().toStdString();
+    shaderData += "\n  ";
+  }
+
+  if (m_shapeMaterial->fragmentShader.isValid()) return;
+
+  m_shapeMaterial->fragmentShader.load(shaderData);
+
+  /**
+   * @note to avoid any race condition creating
+   * a new pipeline needs to be done inside this function
+   * after the shader load thread has finished its execution.
+   * Because this function is a Qt Slot handling event queues
+   * with IPC method on a separate thread.
+   */
+  m_vkWindow->createSDFRPipeline();
 }
 
-std::string SDFGraph::recurseNodeTree(
-  const std::shared_ptr<Node> &_node,
-  Mat4f _t, PortIndex portIndex,
-  unsigned int _cp
-)
+std::shared_ptr<QtNodes::DataModelRegistry> SDFGraph::registerModels()
 {
-  unsigned int iter = 1;
-  std::string shadercode;
-  _t.setCpn(_cp);
-  _node->nodeDataModel()->setCopyNum(_cp);
+  const auto &registry = std::make_shared<DataModelRegistry>();
 
-  if(_node->nodeDataModel()->getNodeType() == DFNodeType::TRANSFORM)
-  {
-    _t = _t * _node->nodeDataModel()->getTransform();
-  }
-  else if(_node->nodeDataModel()->getNodeType() == DFNodeType::PRIMITIVE)
-  {
-    _node->nodeDataModel()->setTransform(_t);
-    shadercode += _node->nodeDataModel()->getShaderCode();
-  }
-  else if(_node->nodeDataModel()->getNodeType() == DFNodeType::MIX)
-  {
-    shadercode += _node->nodeDataModel()->getShaderCode();
-  }
-  else if(_node->nodeDataModel()->getNodeType() == DFNodeType::COPY)
-  {
-    iter = boost::lexical_cast<unsigned int>(_node->nodeDataModel()->getShaderCode());
-  }
+  registry->registerModel<CubeDataModel>("SDF Shapes");
+  registry->registerModel<MapDataModel>("Maps");
+  registry->registerModel<UnionDataModel>("Operations");
 
-  for(unsigned int it = 0; it < iter; ++it)
-  {
-    if(iter > 1)
+  return registry;
+}
+
+void SDFGraph::setStyle()
+{
+  ConnectionStyle::setConnectionStyle(
+    R"(
     {
-      _cp = it;
-      if(iter - it > 1)
-      {
-        shadercode += "opUnion(";
+      "ConnectionStyle": {
+        "ConstructionColor": "gray",
+        "NormalColor": "black",
+        "SelectedColor": "gray",
+        "SelectedHaloColor": "deepskyblue",
+        "HoveredColor": "deepskyblue",
+
+        "LineWidth": 3.0,
+        "ConstructionLineWidth": 2.0,
+        "PointDiameter": 10.0,
+
+        "UseDataDefinedColors": true
       }
     }
-    std::vector<std::shared_ptr<Connection>> inConns = _node->nodeState().connection(PortType::In);
-    if(_node->nodeDataModel()->getNodeType() == DFNodeType::COLLAPSED) {
-      std::vector<std::shared_ptr<Connection>> inConnsTmp;
-      std::shared_ptr<Node> o = dynamic_cast<CollapsedNodeDataModel *>(_node->nodeDataModel().get())->getOutputs()[portIndex];
-      for(auto &c : o->nodeState().connection(PortType::In)) {
-        inConnsTmp.push_back(c);
-      }
-      inConns.swap(inConnsTmp);
-      inConnsTmp.clear();
-    }
-
-    unsigned int i = 0;
-    for(auto connection : inConns)
-    {
-      if(connection.get() && connection->getNode(PortType::Out).lock()) {
-        ++i;
-        shadercode += recurseNodeTree(connection->getNode(PortType::Out).lock(), _t, connection->getPortIndex(PortType::Out), _cp);
-        if(_node->nodeDataModel()->getNodeType() == DFNodeType::MIX) {
-          if(i < inConns.size())
-            shadercode += ",";
-          else
-            shadercode += _node->nodeDataModel()->getExtraParams() + ")";
-        }
-      }
-    }
-    if(iter > 1 && iter - it > 1)
-    {
-      shadercode += ",";
-    }
-  }
-  if(iter > 1)
-  {
-    for(unsigned int it = 0; it < iter - 1; ++it)
-      shadercode += ")";
-  }
-  return shadercode;
+  )");
 }

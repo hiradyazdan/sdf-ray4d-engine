@@ -2,11 +2,7 @@
 
 #include <QVulkanWindow>
 
-#include "nodeEditor_old/FlowScene.hpp"
-#include "nodeEditor_old/FlowView.hpp"
-#include "nodeEditor_old/Node.hpp"
-
-#include "SDFGraph/DistanceFieldData.hpp"
+#include <nodes/Node>
 
 #include "Renderer.hpp"
 
@@ -19,11 +15,7 @@ namespace sdfRay4d
   {
     Q_OBJECT
 
-    using NodePtrSet = std::unordered_map
-    <
-      QUuid,
-      std::shared_ptr<Node>
-    >;
+    using NodePtrSet = std::unordered_map <QUuid, std::unique_ptr<QtNodes::Node>>;
     using MaterialPtr = std::shared_ptr<Material>;
 
     public:
@@ -38,14 +30,14 @@ namespace sdfRay4d
 
     public:
       MaterialPtr &getSDFRMaterial(bool _isNew = false);
-      void createSDFRPipeline(const MaterialPtr &_newMaterial);
+      void createSDFRPipeline();
 
     signals:
       /**
        *
-       * @param _nodes
+       * @param[in] _nodes
        */
-      void sdfGraphChanged(sdfRay4d::VulkanWindow::NodePtrSet _nodes);
+      void sdfGraphChanged(const sdfRay4d::VulkanWindow::NodePtrSet &_nodes);
 
     private:
       void mousePressEvent    (QMouseEvent *_event) override;

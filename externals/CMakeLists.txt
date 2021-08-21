@@ -42,3 +42,6 @@ set_property(TARGET glslang     PROPERTY FOLDER "externals")
 set_property(TARGET OGLCompiler PROPERTY FOLDER "externals")
 set_property(TARGET OSDependent PROPERTY FOLDER "externals")
 set_property(TARGET SPIRV       PROPERTY FOLDER "externals")
+
+# nodeeditor
+add_subdirectory(nodeeditor)

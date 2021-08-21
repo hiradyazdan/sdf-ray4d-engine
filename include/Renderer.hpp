@@ -56,7 +56,7 @@ namespace sdfRay4d
      */
     public:
       MaterialPtr &getSDFRMaterial(bool _isNew = false);
-      void createSDFRPipeline(const MaterialPtr &_newMaterial);
+      void createSDFRPipeline();
       void swapSDFRPipelines();
 
     /**

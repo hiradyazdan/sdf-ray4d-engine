@@ -29,6 +29,7 @@ Shader::Shader(
   , m_deviceFuncs(_deviceFuncs)
   , m_version(_version)
   , m_shadersPath(m_appConstants.assetsPath + _shadersPath)
+  , m_template("/* ------ PLACEHOLDER ------ */")
 {}
 
 Shader::Data *Shader::getData()

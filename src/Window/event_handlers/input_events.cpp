@@ -41,7 +41,7 @@ void VulkanWindow::mouseMoveEvent(QMouseEvent *_event)
 void VulkanWindow::wheelEvent(QWheelEvent *_event)
 {
   /**
-   * TODO: fix this
+   * FIXME
    */
 
 //  int numDegrees = _event->angleDelta().y() / 8;
@@ -104,10 +104,11 @@ void MainWindow::keyPressEvent(QKeyEvent *_event)
     case Qt::Key_Space:
     case Qt::Key_Return:
     {
-//			if(_event->modifiers() == Qt::ShiftModifier)
-//			{
-      emit m_vkWindow->sdfGraphChanged(m_sdfGraph->getNodes());
-//			}
+			if(_event->modifiers() == Qt::ShiftModifier)
+			{
+			  // Signal for compile SDF Graph (Slot = SDFGraph::compileGraph)
+			  emit m_vkWindow->sdfGraphChanged(m_sdfGraph->getNodes());
+			}
     }
       break;
 //    case Qt::Key_S : m_nodes->save(); break;
