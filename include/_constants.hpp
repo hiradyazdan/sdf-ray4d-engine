@@ -16,15 +16,14 @@ namespace sdfRay4d
    *
    * TODO:
    * Should replace this with a json-based manifest file
-   * to be consumed by JSONParser
+   * to be consumed by JSONParser, than consuming runtime memory
+   * for constants
    */
    struct Constants
    {
-     // Should not be const, otherwise any usage will cause
-     // implicit copy ctor deletion error
      using str = QString;
 
-     str assetsPath   = "../assets/";
+     str assetsPath   = "assets/";
 
      // TODO: make these available
      str shadersRoot  = "shaders/";
@@ -83,12 +82,14 @@ namespace sdfRay4d
        {
          struct
          {
-           str main = "Raymarch/static/fullscreentri.vert";
+           str main = "Raymarch/static/sdfr_pass.vert";
+           str mainSPV = "Raymarch/static/sdfr_pass.vert.spv";
          } vert;
 
          struct
          {
-           str main = "Raymarch/dynamic/rtprimitives.frag";
+           str main = "Raymarch/dynamic/sdfr_pass.frag";
+           str mainSPV = "Raymarch/static/sdfr_pass.frag.spv";
 
            struct
            {

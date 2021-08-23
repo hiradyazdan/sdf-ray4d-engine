@@ -4,22 +4,13 @@
 #include <QtCore/QJsonObject>
 #include <QtWidgets/QLabel>
 
-#include "SDFGraph/SDFGraphDataModel.hpp"
+#include "BaseDataModel.hpp"
 
 #include <iostream>
 
-class DecimalData;
-
-using QtNodes::PortType;
-using QtNodes::PortIndex;
-using QtNodes::NodeData;
-using QtNodes::NodeDataType;
-using QtNodes::NodeDataModel;
-using QtNodes::NodeValidationState;
-
 namespace sdfRay4d::sdfGraph
 {
-  class OperationDataModel : public SDFGraphDataModel
+  class OperationDataModel : public BaseDataModel
   {
     Q_OBJECT
 
@@ -33,40 +24,28 @@ namespace sdfRay4d::sdfGraph
       unsigned int
       nPorts(PortType portType) const override;
 
-    NodeDataType
-    dataType(PortType portType,
-             PortIndex portIndex) const override;
+      NodeDataType
+      dataType(PortType portType,
+               PortIndex portIndex) const override;
 
-    std::shared_ptr<NodeData>
-    outData(PortIndex port) override;
+      std::shared_ptr<NodeData>
+      outData(PortIndex port) override;
 
-    void
-    setInData(std::shared_ptr<NodeData> data, PortIndex portIndex) override;
+      void
+      setInData(std::shared_ptr<NodeData> _data, PortIndex portIndex) override;
 
-    QWidget *
-    embeddedWidget() override { return nullptr; }
+      QWidget *
+      embeddedWidget() override { return nullptr; }
 
-    NodeValidationState
-    validationState() const override;
-
-    QString
-    validationMessage() const override;
-
-    QString getShaderCode() override;
-    QString getData() override;
+      QString getData() override;
 
     protected:
-
       virtual void applyOperation() = 0;
 
     protected:
-
       std::weak_ptr<MapData> m_shape1;
       std::weak_ptr<MapData> m_shape2;
 
       std::shared_ptr<MapData> m_opData;
-
-      NodeValidationState modelValidationState = NodeValidationState::Warning;
-      QString modelValidationError = QString("Missing or incorrect inputs");
   };
 }

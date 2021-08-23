@@ -33,11 +33,7 @@ namespace sdfRay4d
       void createSDFRPipeline();
 
     signals:
-      /**
-       *
-       * @param[in] _nodes
-       */
-      void sdfGraphChanged(const sdfRay4d::VulkanWindow::NodePtrSet &_nodes);
+      void sdfGraphChanged();
 
     private:
       void mousePressEvent    (QMouseEvent *_event) override;

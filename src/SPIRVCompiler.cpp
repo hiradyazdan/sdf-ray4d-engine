@@ -72,11 +72,6 @@ bool SPIRVCompiler::compile(
       return false;
     }
 
-    /**
-     * @note since TProgram copy ctor is implicitly deleted,
-     * if it's used as a class member it affects all child classes and any
-     * class that injects/initializes it, implicitly.
-     */
     glslang::TProgram program;
 
     // Add shader to new program object.

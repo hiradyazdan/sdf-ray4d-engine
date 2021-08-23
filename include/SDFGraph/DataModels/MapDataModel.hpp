@@ -5,21 +5,14 @@
 
 #include <nodes/NodeDataModel>
 
-#include "SDFGraph/SDFGraphDataModel.hpp"
 #include "SDFGraph/MapData.hpp"
+#include "BaseDataModel.hpp"
 
 #include <iostream>
 
-using QtNodes::PortType;
-using QtNodes::PortIndex;
-using QtNodes::NodeData;
-using QtNodes::NodeDataType;
-using QtNodes::NodeDataModel;
-using QtNodes::NodeValidationState;
-
 namespace sdfRay4d::sdfGraph
 {
-  class MapDataModel : public SDFGraphDataModel
+  class MapDataModel : public BaseDataModel
   {
     Q_OBJECT
 
@@ -28,11 +21,8 @@ namespace sdfRay4d::sdfGraph
       ~MapDataModel() = default;
 
     public:
-      QString caption() const override { return QStringLiteral("Map"); }
-
-      bool captionVisible() const override { return false; }
-
-      QString name() const override { return QStringLiteral("Map"); }
+      QString caption() const override { return { "Map" }; }
+      QString name() const override { return { "Map" }; }
 
     public:
       unsigned int nPorts(PortType portType) const override;
@@ -41,21 +31,13 @@ namespace sdfRay4d::sdfGraph
 
       std::shared_ptr<NodeData> outData(PortIndex port) override;
 
-      void setInData(std::shared_ptr<NodeData> data, int) override;
+      void setInData(std::shared_ptr<NodeData> _data, int) override;
 
       QWidget *embeddedWidget() override { return _label; }
 
-      NodeValidationState validationState() const override;
-
-      QString validationMessage() const override;
-
-      QString getShaderCode() override;
       QString getData() override;
 
     private:
-      NodeValidationState modelValidationState = NodeValidationState::Warning;
-      QString modelValidationError = QStringLiteral("Missing or incorrect inputs");
-
       QLabel * _label;
 
       std::shared_ptr<MapData> m_mapData;

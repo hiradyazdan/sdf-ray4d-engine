@@ -54,20 +54,14 @@ void Renderer::initSDFRShaders()
   if (!m_sdfrMaterial->vertexShader.isValid())
   {
     m_sdfrMaterial->vertexShader.load(
-      sdfrShaders.vert.main, {}
-      //      "static/screenQuad.vert", {}
+      sdfrShaders.vert.mainSPV, {}
     );
   }
 
   if (!m_sdfrMaterial->fragmentShader.isValid())
   {
     m_sdfrMaterial->fragmentShader.load(
-      sdfrShaders.frag.main,
-      {
-        sdfrShaders.frag.partials.distanceFuncs,
-        sdfrShaders.frag.partials.operations
-      }
-      //      "static/blank.frag", {}
+      sdfrShaders.frag.mainSPV, {}
     );
   }
 }

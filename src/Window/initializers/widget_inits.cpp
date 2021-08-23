@@ -13,19 +13,6 @@ void MainWindow::initWidgets()
   m_wrapperWidget->setFocusPolicy(Qt::StrongFocus);
   m_wrapperWidget->setFocus();
 
-//  m_grabBtn->setFocusPolicy(Qt::NoFocus);
-//  connect(m_grabBtn, &QPushButton::clicked, this, &MainWindow::onGrabRequested);
-//
-//  m_quitBtn = new QPushButton(tr("&Quit"));
-//  m_quitBtn->setFocusPolicy(Qt::NoFocus);
-//  connect(m_quitBtn, &QPushButton::clicked, qApp, &QCoreApplication::quit);
-//
-//  m_info = new QPlainTextEdit();
-//  m_info->setReadOnly(true);
-//  m_infoTab = new QTabWidget(this);
-//  m_infoTab->addTab(m_info, tr("Vulkan Info"));
-//  m_infoTab->addTab(messageLogWidget.data(), tr("Debug Log"));
-
   m_vpWidget = new QWidget();
 
   setCentralWidget(m_vpWidget);
@@ -40,10 +27,8 @@ void MainWindow::initLayouts()
   m_mainLayout = new QVBoxLayout();
   m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
-//  m_mainLayout->addWidget(m_infoTab, 2);
   m_mainLayout->addWidget(m_wrapperWidget);
   m_mainLayout->addWidget(m_mainMenuBar);
-//  m_mainLayout->addWidget(m_quitBtn, 1);
 
   m_vpWidget->setLayout(m_mainLayout);
 }
@@ -51,8 +36,6 @@ void MainWindow::initLayouts()
 void MainWindow::createActions()
 {
   m_loadSDFGraphAction = new QAction(tr("Open"), this);
-//  m_loadSDFGraphAction->setShortcuts(QKeySequence::Open);
-//  m_loadSDFGraphAction->setStatusTip(tr("Open an existing file"));
   connect(
     m_loadSDFGraphAction, &QAction::triggered,
     this, &MainWindow::loadSDFGraph
@@ -61,7 +44,6 @@ void MainWindow::createActions()
   m_toggleSDFGraphAction = new QAction(tr("Hide"), this);
   m_toggleSDFGraphAction->setEnabled(false);
 //  m_toggleSDFGraphAction->setShortcuts(QKeySequence::Open);
-//  m_toggleSDFGraphAction->setStatusTip(tr("Open an existing file"));
   connect(
     m_toggleSDFGraphAction, &QAction::triggered,
     this, &MainWindow::toggleSDFGraph
@@ -69,7 +51,6 @@ void MainWindow::createActions()
 
   m_quitAction = new QAction(tr("Quit"), this);
   m_quitAction->setShortcuts(QKeySequence::Close);
-//  openAct->setStatusTip(tr("Open an existing file"));
   connect(
     m_quitAction, &QAction::triggered,
     this, &MainWindow::quitApp
@@ -78,18 +59,14 @@ void MainWindow::createActions()
 
   m_aboutAction = new QAction(tr("About"), this);
 //  m_aboutAction->setShortcuts(QKeySequence::Open);
-//  m_aboutAction->setStatusTip(tr("Open an existing file"));
   connect(
     m_aboutAction, &QAction::triggered,
     this, &MainWindow::loadAboutDialog
   );
 
-
-//  auto actionGroup = new QActionGroup(this);
   m_autoCompileAction = new QAction(tr("Auto"), this);
   m_autoCompileAction->setCheckable(true);
   //  m_compileAction->setShortcuts(QKeySequence::Open);
-  //  m_compileAction->setStatusTip(tr("Open an existing file"));
   connect(
     m_autoCompileAction, &QAction::toggled,
     this, &MainWindow::autoCompileSDFGraph
@@ -98,7 +75,6 @@ void MainWindow::createActions()
 
   m_compileAction = new QAction(tr("Compile"), this);
 //  m_compileAction->setShortcuts(QKeySequence::Open);
-//  m_compileAction->setStatusTip(tr("Open an existing file"));
   connect(
     m_compileAction, &QAction::triggered,
     this, &MainWindow::compileSDFGraph
@@ -107,7 +83,6 @@ void MainWindow::createActions()
 
   m_saveAction = new QAction(tr("Save"), this);
 //  m_compileAction->setShortcuts(QKeySequence::Open);
-//  m_compileAction->setStatusTip(tr("Open an existing file"));
   connect(
     m_saveAction, &QAction::triggered,
     this, &MainWindow::saveSDFNodes
@@ -131,12 +106,14 @@ void MainWindow::createMenus()
 void MainWindow::compileSDFGraph()
 {
   // Signal for compile SDF Graph (Slot = SDFGraph::compileGraph)
-  emit m_vkWindow->sdfGraphChanged(m_sdfGraph->getNodes());
+  emit m_vkWindow->sdfGraphChanged();
 }
 
 void MainWindow::autoCompileSDFGraph()
 {
-  m_compileAction->setEnabled(!m_autoCompileAction->isChecked());
+  const auto &isAutoCompile = m_autoCompileAction->isChecked();
+  m_compileAction->setEnabled(!isAutoCompile);
+  m_sdfGraph->autoCompile(isAutoCompile);
 }
 
 void MainWindow::saveSDFNodes()

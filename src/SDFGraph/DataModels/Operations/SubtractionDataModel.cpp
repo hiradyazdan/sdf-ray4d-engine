@@ -1,8 +1,8 @@
-#include "SDFGraph/DataModels/Operations/UnionDataModel.hpp"
+#include "SDFGraph/DataModels/Operations/SubtractionDataModel.hpp"
 
 using namespace sdfRay4d::sdfGraph;
 
-void UnionDataModel::applyOperation()
+void SubtractionDataModel::applyOperation()
 {
   PortIndex outPortIndex = 0;
 
@@ -12,7 +12,7 @@ void UnionDataModel::applyOperation()
   auto shape1Data = /*shape1 ? shape1->getData() :*/ "res";
   auto shape2Data = shape2 ? shape2->getData() : "";
 
-  auto data = operation + "(" + shape1Data + ", " + shape2Data + ");";
+  auto data = operation + shape1Data + ", vec2( " + shape2Data + ", 3.0));";
 
   if(/*shape1 &&*/ shape2)
   {

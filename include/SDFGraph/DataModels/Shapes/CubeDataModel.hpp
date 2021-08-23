@@ -1,12 +1,13 @@
 #pragma once
 
-#include <QtWidgets/QLineEdit>
-
-#include "SDFGraph/SDFGraphDataModel.hpp"
+#include <QSlider>
+#include <QLabel>
+#include <QGridLayout>
+#include "SDFGraph/DataModels/BaseDataModel.hpp"
 
 namespace sdfRay4d::sdfGraph
 {
-  class CubeDataModel : public SDFGraphDataModel
+  class CubeDataModel : public BaseDataModel
   {
     Q_OBJECT
 
@@ -15,11 +16,7 @@ namespace sdfRay4d::sdfGraph
       virtual ~CubeDataModel() {}
 
       QString caption() const override { return QString("Cube"); }
-      bool captionVisible() const override { return false; }
       QString name() const override { return QString("Cube"); }
-
-      QJsonObject save() const override { return {}; };
-      void restore(QJsonObject const &p) override {};
 
       unsigned int nPorts(QtNodes::PortType portType) const override;
       QtNodes::NodeDataType dataType(QtNodes::PortType portType, QtNodes::PortIndex portIndex) const override;
@@ -30,28 +27,31 @@ namespace sdfRay4d::sdfGraph
       QWidget *embeddedWidget() override;
 
 //      DFNodeType getNodeType() const override { return DFNodeType::PRIMITIVE; }
-      QString getShaderCode() override;
+//      QString getShaderCode() override;
       QString getData() override;
 //      void setTransform(const Mat4f &_t) override;
 
     private slots:
-      void onTextEdited(QString const &_string);
+      void onScale(float _value);
+      void onTransform(float _value);
 
 //      void sizeEdit(QString const);
 
     private:
-      QLineEdit *m_lineEdit;
-
-      std::string m_shaderData;
+      QSlider *m_scale;
+      QSlider *m_transform;
+      QGridLayout *m_layout;
+      QLabel *m_scaleLabel;
+      QLabel *m_transLabel;
+      QWidget *m_widget;
 
       std::shared_ptr<MapData> m_data;
 
       sdfGraph::vec4 m_color;
 //      QVector4D m_color;
       sdfGraph::vec4 m_dimensions;
+      sdfGraph::vec4 m_position;
 //      QVector4D m_dimensions;
 //        std::string m_transform;
   };
 }
-
-

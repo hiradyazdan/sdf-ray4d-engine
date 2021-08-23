@@ -33,41 +33,22 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 set(CMAKE_AUTOMOC ON) # Qt's extensions handler - Meta Object Compiler (moc)
 set(CMAKE_AUTORCC ON)
-# uncomment below if ui layout created with Qt creator
-#set(CMAKE_AUTOUIC ON) # UIC tools
-#set(CMAKE_AUTOUIC_SEARCH_PATHS ${PROJECT_SOURCE_DIR}/ui)
 
 include_directories(include)
 include_directories(externals)
 
-#include_directories(./externals/nodeeditor/include)
-#include_directories(./externals/nodeeditor/include/nodes/internal)
-
-#find_package(PkgConfig REQUIRED)
 #find_package(glslang CONFIG REQUIRED) # vcpkg port is broken
 find_package(Vulkan REQUIRED)
 find_package(glm REQUIRED)
-find_package(Qt5 COMPONENTS Widgets OpenGL Concurrent)
-#find_package(Boost REQUIRED)
-
-#qt5_add_resources(RESOURCES ${PROJECT_SOURCE_DIR}/externals/nodeeditor/resources/resources.qrc)
+find_package(Qt5 COMPONENTS Widgets Concurrent)
 
 add_executable(${TARGET_NAME})
-
-#add_compile_definitions(NODE_EDITOR_SHARED NODE_EDITOR_EXPORTS)
-target_compile_definitions(${TARGET_NAME} PRIVATE NODE_EDITOR_SHARED NODE_EDITOR_EXPORTS)
 
 file(
     GLOB_RECURSE ${TARGET_NAME}_SOURCE
 
     ${PROJECT_SOURCE_DIR}/include/*.hpp
     ${PROJECT_SOURCE_DIR}/src/*.cpp
-
-#    ${PROJECT_SOURCE_DIR}/externals/nodeeditor/include/*
-#    ${PROJECT_SOURCE_DIR}/externals/nodeeditor/src/*
-
-#    ${PROJECT_SOURCE_DIR}/externals/nodeEditor_old/*.hpp
-#    ${PROJECT_SOURCE_DIR}/externals/nodeEditor_old/*.cpp
 )
 
 target_sources(${TARGET_NAME} PRIVATE ${${TARGET_NAME}_SOURCE})
@@ -86,16 +67,21 @@ target_sources(${TARGET_NAME} PRIVATE ${${TARGET_NAME}_SOURCE})
 target_link_libraries(${TARGET_NAME} PRIVATE glslang glslang-default-resource-limits SPIRV)
 target_link_libraries(${TARGET_NAME} PRIVATE Vulkan::Vulkan)
 target_link_libraries(${TARGET_NAME} PRIVATE glm::glm)
-target_link_libraries(${TARGET_NAME} PRIVATE Qt5::Widgets Qt5::OpenGL Qt5::Concurrent)
+target_link_libraries(${TARGET_NAME} PRIVATE Qt5::Widgets Qt5::Concurrent)
 target_link_libraries(${TARGET_NAME} PRIVATE nodes)
 
 # Static Assets Pipeline
 #############################################################################
 
 find_program(SHELL bash HINTS /bin)
-set(SHADERS_PATH assets/shaders/Raymarch) # TODO: Pass this as a compile definition or env var to code
-set(STATIC_SHADERS_PATH ${SHADERS_PATH}/static)
+set(SHADERS_PATH assets/shaders)
+set(SDFR_SHADERS_PATH ${SHADERS_PATH}/Raymarch) # TODO: Pass this as a compile definition or env var to code
+set(DEPTH_SHADERS_PATH ${SHADERS_PATH}/Depth)
+set(ACTOR_SHADERS_PATH ${SHADERS_PATH}/Actor)
+set(STATIC_SHADERS_PATH ${SDFR_SHADERS_PATH}/static)
+set(PARTS_SHADERS_PATH ${SDFR_SHADERS_PATH}/_partials)
 set(SPV_COMPILE_SCRIPT spirv_static_compile.sh)
+set(SPV_PARTS_COMPILE_SCRIPT spirv_partials_compile.sh)
 
 if(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
@@ -122,12 +108,28 @@ add_custom_target(
     ${CMAKE_CURRENT_SOURCE_DIR}/${SPV_COMPILE_SCRIPT}
     $<TARGET_FILE_DIR:${TARGET_NAME}>
 
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ${CMAKE_CURRENT_SOURCE_DIR}/${SPV_PARTS_COMPILE_SCRIPT}
+    $<TARGET_FILE_DIR:${TARGET_NAME}>
+
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/assets
     $<TARGET_FILE_DIR:${TARGET_NAME}>/assets
 
+    # Depth Pass Shaders
+    COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
+    "STATIC_SHADERS_PATH=${RELATIVE_TARGET_DIR}/${DEPTH_SHADERS_PATH} ${RELATIVE_TARGET_DIR}/${SPV_COMPILE_SCRIPT}"
+
+    # Rasterization Pass Shaders
+    COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
+    "STATIC_SHADERS_PATH=${RELATIVE_TARGET_DIR}/${ACTOR_SHADERS_PATH} ${RELATIVE_TARGET_DIR}/${SPV_COMPILE_SCRIPT}"
+
+    # SDFR (Raymarch) Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
     "STATIC_SHADERS_PATH=${RELATIVE_TARGET_DIR}/${STATIC_SHADERS_PATH} ${RELATIVE_TARGET_DIR}/${SPV_COMPILE_SCRIPT}"
+
+    COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
+    "PARTS_SHADERS_PATH=${RELATIVE_TARGET_DIR}/${PARTS_SHADERS_PATH} ${RELATIVE_TARGET_DIR}/${SPV_PARTS_COMPILE_SCRIPT}"
 
     COMMENT "Copying Assets, Compiling Shaders & Removing Redundant files."
 )

@@ -6,11 +6,17 @@
  * which are located in SDFGraph directory
  *****************************************************/
 
+#include <chrono>
+#include <thread>
+
 #include "SDFGraph.hpp"
 
-#include "SDFGraph/DataModels/MapDataModel.hpp"
 #include "SDFGraph/DataModels/Operations/UnionDataModel.hpp"
-#include "SDFGraph/Primitives/CubePrimitiveDataModel.hpp"
+#include "SDFGraph/DataModels/Operations/SubtractionDataModel.hpp"
+
+#include "SDFGraph/DataModels/Shapes/CubeDataModel.hpp"
+#include "SDFGraph/DataModels/Shapes/SphereDataModel.hpp"
+#include "SDFGraph/DataModels/Shapes/TorusDataModel.hpp"
 
 using namespace sdfRay4d;
 using namespace sdfGraph;
@@ -22,6 +28,7 @@ SDFGraph::SDFGraph(
   , m_shapeMaterial(m_vkWindow->getSDFRMaterial(true)) // creates and stores a fresh new SDFR Material
   , m_graphScene(new FlowScene(registerModels(), this))
   , m_graphView(new FlowView(m_graphScene))
+  , m_isAutoCompile(false)
 {
   setStyle();
 
@@ -34,17 +41,22 @@ SDFGraph::SDFGraph(
   });
 }
 
+void SDFGraph::autoCompile(bool _isAutoCompile)
+{
+  if(!_isAutoCompile) return;
+
+  // TODO: perhaps to work out queue watcher multi-threaded solution
+}
+
 /**
  *
  * @note Qt SLOT
  *
  * @param[in] _nodes
  */
-void SDFGraph::compileGraph(const NodePtrSet &_nodes)
+void SDFGraph::compileGraph()
 {
-  std::vector<MapDataModel*> mapNodes;
-
-  for (const auto &node : _nodes)
+  for (const auto &node : getNodes())
   {
     /**
      * @note this seems to be the only way to detect the map node
@@ -59,28 +71,26 @@ void SDFGraph::compileGraph(const NodePtrSet &_nodes)
     const auto &mapNode = dynamic_cast<MapDataModel*>(node.second->nodeDataModel());
     if(mapNode)
     {
-      qDebug() << "Map NODE shader data: " << mapNode->getData();
-      mapNodes.push_back(mapNode);
+      qDebug() << "Map Data: " << mapNode->getData();
+      m_mapNodes.push_back(mapNode);
     }
-//
-//    const auto &cubeNode = dynamic_cast<CubeDataModel*>(node.second->nodeDataModel());
-//    if(cubeNode)
-//    {
-////      qDebug() << "cube NODE name: " << cubeNode->name();
-////      qDebug() << "cube NODE caption: " << cubeNode->caption();
-//      qDebug() << "cube NODE shader data: " << cubeNode->getData();
-//    }
 
-//    const auto &opNode = dynamic_cast<OperationDataModel*>(node.second->nodeDataModel());
-//    if(opNode)
-//    {
-//      qDebug() << "op NODE shader data: " << opNode->getData();
-//    }
+    const auto &cubeNode = dynamic_cast<CubeDataModel*>(node.second->nodeDataModel());
+    if(cubeNode)
+    {
+      qDebug() << "cube NODE shader data: " << cubeNode->getData();
+    }
+
+    const auto &opNode = dynamic_cast<OperationDataModel*>(node.second->nodeDataModel());
+    if(opNode)
+    {
+      qDebug() << "op NODE shader data: " << opNode->getData();
+    }
   }
 
   std::string shaderData;
 
-  for(const auto &mapNode : mapNodes)
+  for(const auto &mapNode : m_mapNodes)
   {
     shaderData += "res = ";
     shaderData += mapNode->getData().toStdString();
@@ -106,8 +116,13 @@ std::shared_ptr<QtNodes::DataModelRegistry> SDFGraph::registerModels()
   const auto &registry = std::make_shared<DataModelRegistry>();
 
   registry->registerModel<CubeDataModel>("SDF Shapes");
-  registry->registerModel<MapDataModel>("Maps");
+  registry->registerModel<SphereDataModel>("SDF Shapes");
+  registry->registerModel<TorusDataModel>("SDF Shapes");
+
   registry->registerModel<UnionDataModel>("Operations");
+  registry->registerModel<SubtractionDataModel>("Operations");
+
+  registry->registerModel<MapDataModel>("Maps");
 
   return registry;
 }

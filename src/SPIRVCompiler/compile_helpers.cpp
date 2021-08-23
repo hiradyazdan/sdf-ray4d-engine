@@ -34,11 +34,4 @@ EShLanguage SPIRVCompiler::getShaderLang(
   }
 }
 
-//bool SPIRVCompiler::parseShader()
-//{
-//
-//}
-
-
-
 

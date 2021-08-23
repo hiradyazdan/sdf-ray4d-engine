@@ -13,7 +13,7 @@
 #include <nodes/DataModelRegistry>
 #include <nodes/internal/NodeGraphicsObject.hpp>
 
-#include <SDFGraph/SDFGraphDataModel.hpp>
+#include "SDFGraph/DataModels/MapDataModel.hpp"
 
 #include "Window/VulkanWindow.hpp"
 #include "Material.hpp"
@@ -34,24 +34,25 @@ namespace sdfRay4d
 
     using DataModelRegistry = QtNodes::DataModelRegistry;
     using TypeConverter = QtNodes::TypeConverter;
-    using TypeConverterId = QtNodes::TypeConverterId;
 
     using NodePtrSet = std::unordered_map<QUuid, std::unique_ptr<QtNodes::Node>>;
-    using NodePtrList = std::vector<Node*>;
 
     public:
       explicit SDFGraph(VulkanWindow *_vkWindow);
 
     public:
       FlowView *getView() { return m_graphView; }
-      const NodePtrSet &getNodes() { return m_graphScene->nodes(); }
+      void autoCompile(bool _isAutoCompile = false);
 
     public slots:
-      void compileGraph(const SDFGraph::NodePtrSet &_nodes);
+      void compileGraph();
 
     private:
       static std::shared_ptr<DataModelRegistry> registerModels();
       static void setStyle();
+
+    private:
+      const NodePtrSet &getNodes() { return m_graphScene->nodes(); }
 
     private:
       Constants m_appConstants;
@@ -62,5 +63,8 @@ namespace sdfRay4d
 
     private:
       std::shared_ptr<Material> m_shapeMaterial;
+      bool m_isAutoCompile;
+
+      std::vector<sdfGraph::MapDataModel*> m_mapNodes;
   };
 }

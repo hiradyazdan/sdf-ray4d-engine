@@ -14,7 +14,16 @@ clone repository with its submodules:
 
 - glslang (***Note*** The latest pull (09 Aug) from `glslang` has a typo in its cmake config.
   Please modify its `CMakeLists.txt` at line `144` to `endif(MSVC AND OVERRIDE_MSVCCRT)`.)
-- nodeeditor
+- nodeeditor also has a conflict with vcpkg that have to manually remove a snippet of code from
+  the CmakeLists.txt in `nodeeditor/external/CMakeLists.txt` as below:
+
+```cmake
+  macro(find_package pkg)
+    if(NOT TARGET "${pkg}")
+      _find_package(${ARGV})
+    endif()
+  endmacro()
+```
 
 ```shell
 git clone --recursive https://github.com/hiradyazdan/masters-project

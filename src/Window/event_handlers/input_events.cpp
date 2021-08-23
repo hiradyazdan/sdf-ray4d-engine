@@ -107,7 +107,7 @@ void MainWindow::keyPressEvent(QKeyEvent *_event)
 			if(_event->modifiers() == Qt::ShiftModifier)
 			{
 			  // Signal for compile SDF Graph (Slot = SDFGraph::compileGraph)
-			  emit m_vkWindow->sdfGraphChanged(m_sdfGraph->getNodes());
+			  emit m_vkWindow->sdfGraphChanged();
 			}
     }
       break;

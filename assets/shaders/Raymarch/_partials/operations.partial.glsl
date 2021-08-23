@@ -1,17 +1,17 @@
 /*****************************************************
  * Partial Shader: Fragment
  * Boolean Operations
- *
+ * Modified from Inigo Quilez
  *****************************************************/
 
 #version 450
 
-float opS( float d1, float d2 )
+float opSubtraction( float d1, float d2 )
 {
     return max(-d2,d1);
 }
 
-vec2 opU( vec2 d1, vec2 d2 )
+vec2 opUnion( vec2 d1, vec2 d2 )
 {
     return (d1.x<d2.x) ? d1 : d2;
 }

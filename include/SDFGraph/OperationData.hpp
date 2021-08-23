@@ -6,12 +6,12 @@ namespace sdfRay4d::sdfGraph
 {
   using namespace QtNodes;
 
-  class MapData : public NodeData
+  class OperationData : public NodeData
   {
     public:
-      MapData() = default;
+      OperationData() = default;
 
-      explicit MapData(QString &_data)
+      explicit OperationData(QString &_data)
       : m_data(_data) {}
 
     public:
@@ -19,8 +19,8 @@ namespace sdfRay4d::sdfGraph
       {
         return NodeDataType
         {
-          "MapData",
-          "Map"
+          "OperationData",
+          "Operation"
         };
       }
 

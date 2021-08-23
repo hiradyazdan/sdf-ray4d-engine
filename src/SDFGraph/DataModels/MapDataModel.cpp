@@ -1,7 +1,5 @@
 #include "SDFGraph/DataModels/MapDataModel.hpp"
 
-//#include "SDFGraph/Test/DecimalData.hpp"
-
 using namespace sdfRay4d::sdfGraph;
 
 MapDataModel::MapDataModel()
@@ -13,11 +11,6 @@ MapDataModel::MapDataModel()
 QString MapDataModel::getData()
 {
   return m_mapData ? m_mapData->getData() : "";
-}
-
-QString MapDataModel::getShaderCode()
-{
-  return "";
 }
 
 unsigned int MapDataModel::nPorts(PortType portType) const
@@ -40,7 +33,9 @@ unsigned int MapDataModel::nPorts(PortType portType) const
   return result;
 }
 
-NodeDataType MapDataModel::dataType(PortType, PortIndex) const
+NodeDataType MapDataModel::dataType(
+  PortType portType, PortIndex portIndex
+) const
 {
   return MapData().type();
 }
@@ -51,16 +46,20 @@ std::shared_ptr<NodeData> MapDataModel::outData(PortIndex)
   return ptr;
 }
 
-void MapDataModel::setInData(std::shared_ptr<NodeData> data, int)
+void MapDataModel::setInData(std::shared_ptr<NodeData> _data, int)
 {
-  auto mapData = std::dynamic_pointer_cast<MapData>(data);
+  auto mapData = std::dynamic_pointer_cast<MapData>(_data);
+
+//  if(mapData && !mapData->getData().contains("op"))
+//  {
+//    mapData = nullptr;
+//  }
 
   if (mapData)
   {
     modelValidationState = NodeValidationState::Valid;
     modelValidationError = QString();
     m_mapData = mapData;
-//    _label->setText(numberData->numberAsText());
   }
   else
   {
@@ -70,14 +69,4 @@ void MapDataModel::setInData(std::shared_ptr<NodeData> data, int)
   }
 
   _label->adjustSize();
-}
-
-NodeValidationState MapDataModel::validationState() const
-{
-  return modelValidationState;
-}
-
-QString MapDataModel::validationMessage() const
-{
-  return modelValidationError;
 }

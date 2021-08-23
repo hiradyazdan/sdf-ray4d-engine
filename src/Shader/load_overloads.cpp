@@ -130,6 +130,9 @@ void Shader::load(
  * PUBLIC
  *
  * @brief
+ * @note this function may need rethinking since
+ * currently the order of file paths determining the
+ * success of the function
  * @param[in] _partialFilePaths
  */
 void Shader::preload(
@@ -140,24 +143,9 @@ void Shader::preload(
   for (auto i = 0; i < _partialFilePaths.size(); i++)
   {
     auto filePath = _partialFilePaths[i];
-//
-//    if(filePath.isEmpty())
-//    {
-//      m_rawBytes.append(QByteArray("PLACEHOLDER\n"));
-//
-//      continue;
-//    }
 
     m_rawBytes.append(getFileBytes(m_shadersPath + filePath));
   }
-
-//  for(auto &filePath : _partialFilePaths)
-//  {
-//    if(filePath.isEmpty())
-//    {
-//
-//    }
-//  }
 }
 
 /**
@@ -224,7 +212,7 @@ void Shader::load(
   m_worker.waitForFinished();
 
 // @note uncomment to debug shader code
-  qDebug() << m_rawBytes.constData();
+//  qDebug() << m_rawBytes.constData();
 }
 
 /**

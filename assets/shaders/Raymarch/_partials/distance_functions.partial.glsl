@@ -1,7 +1,7 @@
 /*****************************************************
  * Partial Shader: Fragment
  * Distance Functions (Fields)
- *
+ * Modified from Inigo Quilez
  *****************************************************/
 
 #version 450
@@ -34,9 +34,9 @@ float sdPlane( vec3 p )
     return p.y;
 }
 
-float sdSphere( vec3 p, float s )
+float sdSphere( vec3 p, vec3 s )
 {
-    return length(p)-s;
+    return float(length(p)-s);
 }
 
 float sdBox( vec3 p, vec3 b )

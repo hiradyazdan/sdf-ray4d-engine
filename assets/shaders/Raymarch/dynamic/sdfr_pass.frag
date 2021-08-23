@@ -29,7 +29,7 @@ vec2 map( in vec3 pos )
 
   /* ------ PLACEHOLDER ------ */
 
-//  res = opU( res, vec2(sdSphere(pos-vec3( 0.0,0.25, 0.0), 0.25 ), 46.9));
+//  res = opU( res, vec2(sdSphere(     pos-vec3( 0.0,0.25, 0.0), 0.25 ), 46.9));
 //  res = opU( res, vec2( sdBox(       pos-vec3( 1.0,0.25, 0.0), vec3(0.25) ), 3.0 ) );
 //  res = opU( res, vec2( udRoundBox(  pos-vec3( 1.0,0.25, 1.0), vec3(0.15), 0.1 ), 41.0 ) );
 //  res = opU( res, vec2( sdTorus(     pos-vec3( 0.0,0.25, 1.0), vec2(0.20,0.05) ), 25.0 ) );

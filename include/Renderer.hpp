@@ -17,7 +17,6 @@ namespace sdfRay4d
   class Renderer : public QVulkanWindowRenderer, public QObject
   {
     using MaterialPtr = std::shared_ptr<Material>;
-//    using DescLayoutBindingList = std::vector<descriptor::LayoutBinding>;
 
     public:
       explicit Renderer(

@@ -1,18 +1,6 @@
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtWidgets/QLabel>
-
 #include "SDFGraph/DataModels/OperationDataModel.hpp"
-
-#include <iostream>
-
-using QtNodes::PortType;
-using QtNodes::PortIndex;
-using QtNodes::NodeData;
-using QtNodes::NodeDataType;
-using QtNodes::NodeDataModel;
-using QtNodes::NodeValidationState;
 
 namespace sdfRay4d::sdfGraph
 {
@@ -23,17 +11,10 @@ namespace sdfRay4d::sdfGraph
     public:
       virtual ~UnionDataModel() { }
 
-      QString caption() const override
-      {
-      return QString("Union");
-      }
+      QString caption() const override { return { "Union" }; }
+      QString name()    const override { return { "Union" }; }
+      QString getData() override { return { "opUnion" }; }
 
-      QString name() const
-      {
-      return QString("Union");
-      }
-
-      QString getShaderCode() override { return "opU("; }
       void applyOperation() override;
   };
 }
