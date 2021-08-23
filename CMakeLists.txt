@@ -21,7 +21,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.16")
 else()
     # If UNITY BUILD causes compile or runtime issues (e.g. ODRs) turn this off.
     # TODO: setting this may mess up the IDE syntax error detections intermittently
-#    set(CMAKE_UNITY_BUILD ON)
+    set(CMAKE_UNITY_BUILD ON)
 endif()
 
 set(CMAKE_CXX_STANDARD 17)

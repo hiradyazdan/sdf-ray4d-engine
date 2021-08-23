@@ -51,11 +51,13 @@ namespace sdfRay4d
          struct
          {
            str main = "Depth/depth_pass.vert";
+           str mainSPV = "Depth/depth_pass.vert.spv";
          } vert;
 
          struct
          {
            str main = "Depth/depth_pass.frag";
+           str mainSPV = "Depth/depth_pass.frag.spv";
          } frag;
        } depth;
 
@@ -66,12 +68,14 @@ namespace sdfRay4d
        {
          struct
          {
-           str main = "Actor/color_phong.vert";
+           str main = "Actor/rasterized_mesh_pass.vert";
+           str mainSPV = "Actor/rasterized_mesh_pass.vert.spv";
          } vert;
 
          struct
          {
-           str main = "Actor/color_phong.frag";
+           str main = "Actor/rasterized_mesh_pass.frag";
+           str mainSPV = "Actor/rasterized_mesh_pass.frag.spv";
          } frag;
        } actor;
 

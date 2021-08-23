@@ -49,6 +49,8 @@ namespace sdfRay4d
       using ImageView           = VkImageView;
       using ImageViewInfo       = VkImageViewCreateInfo;
       using ImageAspect         = VkImageAspectFlags;
+      using ImageMemoryBarrier  = VkImageMemoryBarrier;
+
       using Sampler             = VkSampler;
       using SamplerInfo         = VkSamplerCreateInfo;
     }
@@ -117,6 +119,8 @@ namespace sdfRay4d
       using DynamicInfo           = VkPipelineDynamicStateCreateInfo;
 
       using ColorBlendAttachment  = VkPipelineColorBlendAttachmentState;
+
+      using StageFlags            = VkPipelineStageFlags;
 
       // Pipelines Info
       using GraphicsPipelineInfo  = VkGraphicsPipelineCreateInfo;
