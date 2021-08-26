@@ -98,7 +98,7 @@ NodeDataType CubeDataModel::dataType(
   switch (portType)
   {
     case PortType::Out:
-      return MapData().type();
+      return ShapeData().type();
     case PortType::In:
     case PortType::None:
       return MapData().type();
@@ -109,6 +109,9 @@ std::shared_ptr<NodeData> CubeDataModel::outData(PortIndex port)
 {
   auto shaderData = getData();
   m_data = std::make_shared<MapData>(shaderData);
+
+  modelValidationState = NodeValidationState::Valid;
+  modelValidationError = QString();
 
   return m_data;
 }

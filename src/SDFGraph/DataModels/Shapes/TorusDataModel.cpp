@@ -29,11 +29,11 @@ unsigned int TorusDataModel::nPorts(QtNodes::PortType portType) const
       result = 0;
       break;
 
-      case QtNodes::PortType::Out:
-        result = 1;
+    case QtNodes::PortType::Out:
+      result = 1;
 
-        default:
-          break;
+    default:
+      break;
   }
 
   return result;
@@ -49,10 +49,10 @@ void TorusDataModel::onTextEdited(QString const &_string)
 
   if (ok)
   {
-    m_dimensions.x *= number;
-    m_dimensions.y *= number;
-    m_dimensions.z *= number;
-//    m_dimensions.w *= number;
+    m_dimensions.x = number * .025f;
+    m_dimensions.y = number * .025f;
+    m_dimensions.z = number * .025f;
+    //    m_dimensions.w = number * .025f;
 
     auto shaderData = getData();
 
@@ -70,19 +70,22 @@ QtNodes::NodeDataType TorusDataModel::dataType(
   QtNodes::PortType portType, QtNodes::PortIndex portIndex
 ) const
 {
-//  switch (portType)
-//  {
-//    case PortType::Out:
-//      return MapData().type();
-//    case PortType::In:
-//    case PortType::None:
+  switch (portType)
+  {
+    case PortType::Out:
+      return ShapeData().type();
+    case PortType::In:
+    case PortType::None:
       return MapData().type();
-//  }
+  }
 }
 
 std::shared_ptr<NodeData> TorusDataModel::outData(PortIndex port)
 {
-return m_data;
+  modelValidationState = NodeValidationState::Valid;
+  modelValidationError = QString();
+
+  return m_data;
 }
 
 void TorusDataModel::setInData(std::shared_ptr<NodeData> _data, int)

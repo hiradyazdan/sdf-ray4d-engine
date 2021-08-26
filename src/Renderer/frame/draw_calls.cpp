@@ -229,6 +229,7 @@ void Renderer::createSDFRDrawCalls(
     2 * 3,1,
     0,0
   );
+}
 
 
 // TODO: modify these two below methods

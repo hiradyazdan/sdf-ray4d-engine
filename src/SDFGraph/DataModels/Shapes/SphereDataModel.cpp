@@ -16,7 +16,7 @@ m_dimensions(sdfGraph::vec4(0.0,0.25, 1.0, 1.0))
     this, &SphereDataModel::onTextEdited
     );
 
-  m_scale->setText("0.0");
+  m_scale->setText("1.0");
 }
 
 unsigned int SphereDataModel::nPorts(QtNodes::PortType portType) const
@@ -28,12 +28,10 @@ unsigned int SphereDataModel::nPorts(QtNodes::PortType portType) const
     case QtNodes::PortType::In:
       result = 0;
       break;
-
-      case QtNodes::PortType::Out:
-        result = 1;
-
-        default:
-          break;
+    case QtNodes::PortType::Out:
+      result = 1;
+    default:
+      break;
   }
 
   return result;
@@ -43,18 +41,21 @@ QtNodes::NodeDataType SphereDataModel::dataType(
   QtNodes::PortType portType, QtNodes::PortIndex portIndex
   ) const
   {
-//  switch (portType)
-//  {
-//    case PortType::Out:
-//      return MapData().type();
-//      case PortType::In:
-//        case PortType::None:
-          return MapData().type();
-//  }
+  switch (portType)
+  {
+    case PortType::Out:
+      return ShapeData().type();
+    case PortType::In:
+    case PortType::None:
+      return MapData().type();
+  }
 }
 
 std::shared_ptr<NodeData> SphereDataModel::outData(PortIndex port)
 {
+  modelValidationState = NodeValidationState::Valid;
+  modelValidationError = QString();
+
   return m_data;
 }
 
@@ -74,10 +75,10 @@ void SphereDataModel::onTextEdited(QString const &_string)
 
   if (ok)
   {
-    m_dimensions.x *= number;
-    m_dimensions.y *= number;
-    m_dimensions.z *= number;
-    //    m_dimensions.w *= number;
+    m_dimensions.x = number * .025f;
+    m_dimensions.y = number * .025f;
+    m_dimensions.z = number * .025f;
+    //    m_dimensions.w = number * .025f;
 
     auto shaderData = getData();
 

@@ -35,9 +35,9 @@ SDFGraph::SDFGraph(
   const auto &sdfrShaders = m_appConstants.shadersPaths.raymarch;
 
   m_shapeMaterial->fragmentShader.preload({
-      sdfrShaders.frag.partials.distanceFuncs,
-      sdfrShaders.frag.partials.operations,
-      sdfrShaders.frag.main
+    sdfrShaders.frag.partials.distanceFuncs,
+    sdfrShaders.frag.partials.operations,
+    sdfrShaders.frag.main
   });
 }
 
@@ -51,8 +51,6 @@ void SDFGraph::autoCompile(bool _isAutoCompile)
 /**
  *
  * @note Qt SLOT
- *
- * @param[in] _nodes
  */
 void SDFGraph::compileGraph()
 {

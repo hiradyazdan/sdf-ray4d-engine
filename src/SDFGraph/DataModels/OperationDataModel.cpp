@@ -22,14 +22,14 @@ unsigned int OperationDataModel::nPorts(PortType portType) const
 
 NodeDataType OperationDataModel::dataType(PortType portType, PortIndex portIndex) const
 {
-//  switch (portType)
-//  {
-//    case PortType::In:
-//      return MapData().type();
-//    case PortType::Out:
-//    case PortType::None:
+  switch (portType)
+  {
+    case PortType::In:
+      return ShapeData().type();
+    case PortType::Out:
+    case PortType::None:
       return MapData().type();
-//  }
+  }
 }
 
 std::shared_ptr<NodeData> OperationDataModel::outData(PortIndex)

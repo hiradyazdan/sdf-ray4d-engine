@@ -14,14 +14,14 @@ void Renderer::initDepthShaders()
   if (!m_depthMaterial->vertexShader.isValid())
   {
     m_depthMaterial->vertexShader.load(
-      depthShaders.vert.mainSPV, {}
+      depthShaders.vert.mainSPV
     );
   }
 
   if (!m_depthMaterial->fragmentShader.isValid())
   {
     m_depthMaterial->fragmentShader.load(
-      depthShaders.frag.mainSPV, {}
+      depthShaders.frag.mainSPV
     );
   }
 }
@@ -33,14 +33,14 @@ void Renderer::initActorShaders()
   if (!m_actorMaterial->vertexShader.isValid())
   {
     m_actorMaterial->vertexShader.load(
-      actorShaders.vert.mainSPV, {}
+      actorShaders.vert.mainSPV
     );
   }
 
   if (!m_actorMaterial->fragmentShader.isValid())
   {
     m_actorMaterial->fragmentShader.load(
-      actorShaders.frag.mainSPV, {}
+      actorShaders.frag.mainSPV
     );
   }
 }
@@ -52,14 +52,14 @@ void Renderer::initSDFRShaders()
   if (!m_sdfrMaterial->vertexShader.isValid())
   {
     m_sdfrMaterial->vertexShader.load(
-      sdfrShaders.vert.mainSPV, {}
+      sdfrShaders.vert.mainSPV
     );
   }
 
   if (!m_sdfrMaterial->fragmentShader.isValid())
   {
     m_sdfrMaterial->fragmentShader.load(
-      sdfrShaders.frag.mainSPV, {}
+      sdfrShaders.frag.mainSPV
     );
   }
 }

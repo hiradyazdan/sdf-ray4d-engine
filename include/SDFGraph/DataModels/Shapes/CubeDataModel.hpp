@@ -25,17 +25,11 @@ namespace sdfRay4d::sdfGraph
       void setInData(std::shared_ptr<QtNodes::NodeData>, int) override;
 
       QWidget *embeddedWidget() override;
-
-//      DFNodeType getNodeType() const override { return DFNodeType::PRIMITIVE; }
-//      QString getShaderCode() override;
       QString getData() override;
-//      void setTransform(const Mat4f &_t) override;
 
     private slots:
       void onScale(float _value);
       void onTransform(float _value);
-
-//      void sizeEdit(QString const);
 
     private:
       QSlider *m_scale;
@@ -48,10 +42,7 @@ namespace sdfRay4d::sdfGraph
       std::shared_ptr<MapData> m_data;
 
       sdfGraph::vec4 m_color;
-//      QVector4D m_color;
       sdfGraph::vec4 m_dimensions;
       sdfGraph::vec4 m_position;
-//      QVector4D m_dimensions;
-//        std::string m_transform;
   };
 }
