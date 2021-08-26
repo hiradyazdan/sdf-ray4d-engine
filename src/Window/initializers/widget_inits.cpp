@@ -169,6 +169,11 @@ void MainWindow::loadSDFGraph()
     this, &MainWindow::toggleSDFGraphMenu // slot/receiver (event handler)
   );
   connect(
+    m_sdfGraphWidget, &QDockWidget::topLevelChanged, // signal/sender (event)
+    this, &MainWindow::toggleSDFGraphTopLevel // slot/receiver (event handler)
+  );
+
+  connect(
     m_vkWindow, &VulkanWindow::sdfGraphChanged, // signal/sender (event)
     m_sdfGraph, &SDFGraph::compileGraph // slot/receiver (event handler)
   );
@@ -186,9 +191,23 @@ void MainWindow::toggleSDFGraphMenu(bool _isVisible)
   m_toggleSDFGraphAction->setText(_isVisible ? "Hide" : "Show");
 }
 
+void MainWindow::toggleSDFGraphTopLevel()
+{
+  if (m_sdfGraphWidget->isFloating())
+  {
+    m_sdfGraphWidget->setWindowFlags(
+        Qt::CustomizeWindowHint
+      | Qt::Window
+      | Qt::WindowMinimizeButtonHint
+      | Qt::WindowMaximizeButtonHint
+      | Qt::WindowCloseButtonHint
+    );
+    m_sdfGraphWidget->show();
+  }
+}
+
 void MainWindow::loadAboutDialog()
 {
-//  infoLabel->setText(tr("Invoked <b>Help|About</b>"));
   QMessageBox::about(
     this,
     tr("About Menu"),

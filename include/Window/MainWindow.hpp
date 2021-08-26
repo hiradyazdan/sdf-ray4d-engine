@@ -22,10 +22,15 @@ namespace sdfRay4d
       void resizeSDFGraph(Qt::DockWidgetArea _area);
       void toggleSDFGraph();
       void toggleSDFGraphMenu(bool _isVisible);
-      void loadAboutDialog();
+      void toggleSDFGraphTopLevel();
+
+    private slots:
       void autoCompileSDFGraph();
       void compileSDFGraph();
       void saveSDFNodes();
+
+    private slots:
+      void loadAboutDialog();
       void quitApp();
 
     private:
@@ -52,45 +57,45 @@ namespace sdfRay4d
      */
     private:
       QVulkanInstance *m_vkInstance = VK_NULL_HANDLE;
-      VulkanWindow *m_vkWindow;
+      VulkanWindow *m_vkWindow = VK_NULL_HANDLE;
 
     /**
      * SDF Graph
      */
     private:
-      SDFGraph *m_sdfGraph;
+      SDFGraph *m_sdfGraph = nullptr;
 
     /**
      * Qt Widgets
      */
     private:
-      QWidget *m_vpWidget;
-      QWidget *m_wrapperWidget;
-      QWidget *m_mainMenuBar;
+      QWidget *m_vpWidget = nullptr;
+      QWidget *m_wrapperWidget = nullptr;
+      QWidget *m_mainMenuBar = nullptr;
 
-      QToolBar *m_sdfGraphToolbar;
-      QDockWidget *m_sdfGraphWidget;
-      QVBoxLayout *m_mainLayout;
+      QToolBar *m_sdfGraphToolbar = nullptr;
+      QDockWidget *m_sdfGraphWidget = nullptr;
+      QVBoxLayout *m_mainLayout = nullptr;
 
     /**
      * Qt Widget Menus
      */
     private:
-      QMenu *m_windowMenu;
-      QMenu *m_sdfGraphMenu;
-      QMenu *m_helpMenu;
+      QMenu *m_windowMenu = nullptr;
+      QMenu *m_sdfGraphMenu = nullptr;
+      QMenu *m_helpMenu = nullptr;
 
     /**
      * Qt Widget Actions
      */
     private:
-      QAction *m_loadSDFGraphAction;
-      QAction *m_toggleSDFGraphAction;
-      QAction *m_aboutAction;
-      QAction *m_quitAction;
-      QAction *m_autoCompileAction;
-      QAction *m_compileAction;
-      QAction *m_saveAction;
+      QAction *m_loadSDFGraphAction = nullptr;
+      QAction *m_toggleSDFGraphAction = nullptr;
+      QAction *m_aboutAction = nullptr;
+      QAction *m_quitAction = nullptr;
+      QAction *m_autoCompileAction = nullptr;
+      QAction *m_compileAction = nullptr;
+      QAction *m_saveAction = nullptr;
 
       QSize m_windowSize;
   };

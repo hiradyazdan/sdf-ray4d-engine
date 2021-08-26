@@ -121,26 +121,35 @@ void MainWindow::resizeEvent(QResizeEvent *_event)
 {
   m_windowSize = _event->size();
 
+  if(m_sdfGraphWidget == nullptr) return;
+
   resizeSDFGraph(dockWidgetArea(m_sdfGraphWidget));
 }
 
 void MainWindow::resizeSDFGraph(Qt::DockWidgetArea _area)
 {
-  if(
-    _area == Qt::TopDockWidgetArea ||
-    _area == Qt::BottomDockWidgetArea
-  )
+  auto isTopBottom = _area == Qt::TopDockWidgetArea  || _area == Qt::BottomDockWidgetArea;
+  auto isLeftRight = _area == Qt::LeftDockWidgetArea || _area == Qt::RightDockWidgetArea;
+  auto isUndocked = !isTopBottom && !isLeftRight;
+
+  auto width = m_windowSize.width();
+  auto height = m_windowSize.height();
+
+  if(isTopBottom)
   {
-    m_sdfGraphWidget->setMaximumSize(m_windowSize.width(), m_windowSize.height() / 2);
-    m_sdfGraphWidget->setMinimumSize(m_windowSize.width(), m_windowSize.height() / 3);
+    m_sdfGraphWidget->setMaximumSize(width, height / 2);
+    m_sdfGraphWidget->setMinimumSize(width, height / 3);
   }
 
-  if(
-    _area == Qt::LeftDockWidgetArea ||
-    _area == Qt::RightDockWidgetArea
-  )
+  if(isLeftRight)
   {
-    m_sdfGraphWidget->setMaximumSize(m_windowSize.width() / 2, m_windowSize.height());
-    m_sdfGraphWidget->setMinimumSize(m_windowSize.width() / 3, m_windowSize.height());
+    m_sdfGraphWidget->setMaximumSize(width / 2, height);
+    m_sdfGraphWidget->setMinimumSize(width / 3, height);
+  }
+
+  if(isUndocked)
+  {
+    m_sdfGraphWidget->setFixedSize(int(width / 1.5), int(height / 1.5));
+    m_sdfGraphWidget->setMaximumSize(width, height);
   }
 }
