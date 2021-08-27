@@ -3,14 +3,14 @@
 using namespace sdfRay4d::sdfGraph;
 
 ShapeDataModel::ShapeDataModel()
-:	m_widget(new QWidget())
-, m_layout(new QGridLayout())
+:	m_widget      (new QWidget())
+, m_layout      (new QGridLayout())
 
-, m_scaleLabel(new QLabel("Scale"))
-, m_transLabel(new QLabel("Transform"))
+, m_scaleLabel  (new QLabel("Scale"))
+, m_transLabel  (new QLabel("Transform"))
 
-, m_scale(new QSlider(Qt::Horizontal))
-, m_transform(new QSlider(Qt::Horizontal))
+, m_scale       (new QSlider(Qt::Horizontal))
+, m_transform   (new QSlider(Qt::Horizontal))
 
 , m_color(sdfGraph::vec4(0.6, 0.6, 0.6, 1.0))
 , m_dimensions(sdfGraph::vec4(0.25,0.25, 0.25, 1.0))
