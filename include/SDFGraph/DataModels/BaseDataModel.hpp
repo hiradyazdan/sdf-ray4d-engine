@@ -27,19 +27,25 @@ namespace sdfRay4d::sdfGraph
   {
     Q_OBJECT
 
-    using NodePtrSet = std::unordered_map <QUuid, std::unique_ptr<QtNodes::Node>>;
+    using NodePtr    = std::unique_ptr<Node>;
+    using NodePtrSet = std::unordered_map<QUuid, NodePtr>;
 
     /**
-     * Abstract Class Members
+     * Abstract Class Members (Overrides)
      * -------------------------------------------------
      *
      */
     public:
-      bool captionVisible() const override { return true; }
+      [[nodiscard]] bool captionVisible() const override { return true; }
+      [[nodiscard]] NodeValidationState validationState() const override { return modelValidationState; }
+      [[nodiscard]] QString validationMessage() const override { return modelValidationError; }
 
-      NodeValidationState validationState() const override;
-
-      QString validationMessage() const override;
+    /**
+     * Abstract Class Members (Virtual)
+     * -------------------------------------------------
+     *
+     */
+    public:
 
     /**
      * Interface Members (explicit abstract member functions)

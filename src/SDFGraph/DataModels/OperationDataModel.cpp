@@ -19,7 +19,6 @@ unsigned int OperationDataModel::nPorts(PortType portType) const
   return result;
 }
 
-
 NodeDataType OperationDataModel::dataType(PortType portType, PortIndex portIndex) const
 {
   switch (portType)
