@@ -1,32 +1,26 @@
 #pragma once
 
-#include <nodes/NodeData>
+#include "SDFGraph/Interfaces/IData.hpp"
 
 namespace sdfRay4d::sdfGraph
 {
-  using namespace QtNodes;
-
-  class MapData : public NodeData
+  /**
+   * @struct MapData
+   */
+  struct MapData : public NodeData, public IData
   {
-    public:
-      MapData() = default;
+    QString shaderData;
 
-      explicit MapData(QString &_data)
-      : m_data(_data) {}
+    MapData() = default;
+    explicit MapData(QString &_shaderData) : shaderData(_shaderData) {}
 
-    public:
-      NodeDataType type() const override
+    [[nodiscard]] NodeDataType type() const override
+    {
+      return NodeDataType
       {
-        return NodeDataType
-        {
-          "MapData",
-          "Map"
-        };
-      }
-
-      QString &getData() { return m_data; }
-
-    private:
-      QString m_data;
+        "MapData",
+        "Map"
+      };
+    }
   };
 }

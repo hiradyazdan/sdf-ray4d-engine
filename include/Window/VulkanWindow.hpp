@@ -15,7 +15,6 @@ namespace sdfRay4d
   {
     Q_OBJECT
 
-    using NodePtrSet = std::unordered_map <QUuid, std::unique_ptr<QtNodes::Node>>;
     using MaterialPtr = std::shared_ptr<Material>;
 
     public:

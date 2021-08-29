@@ -4,10 +4,10 @@ using namespace sdfRay4d::sdfGraph;
 
 QString OperationDataModel::getData()
 {
-  return  m_opData->getData();// : "opUnion";
+  return  m_data->shaderData;// : "opUnion";
 }
 
-unsigned int OperationDataModel::nPorts(PortType portType) const
+unsigned int OperationDataModel::nPorts(PortType _portType) const
 {
   unsigned int result;
 
@@ -19,9 +19,12 @@ unsigned int OperationDataModel::nPorts(PortType portType) const
   return result;
 }
 
-NodeDataType OperationDataModel::dataType(PortType portType, PortIndex portIndex) const
+NodeDataType OperationDataModel::dataType(
+  PortType _portType,
+  PortIndex _portIndex
+) const
 {
-  switch (portType)
+  switch (_portType)
   {
     case PortType::In:
       return ShapeData().type();
@@ -31,14 +34,17 @@ NodeDataType OperationDataModel::dataType(PortType portType, PortIndex portIndex
   }
 }
 
-std::shared_ptr<NodeData> OperationDataModel::outData(PortIndex)
+NodeDataPtr OperationDataModel::outData(PortIndex _portIndex)
 {
-  return std::static_pointer_cast<NodeData>(m_opData);
+  return m_data;
 }
 
-void OperationDataModel::setInData(std::shared_ptr<NodeData> _data, PortIndex portIndex)
+void OperationDataModel::setInData(
+  NodeDataPtr _data,
+  PortIndex _portIndex
+)
 {
-  auto shaderData = std::dynamic_pointer_cast<MapData>(_data);
+  auto shaderData = std::dynamic_pointer_cast<ShapeData>(_data);
 
 //  if(portIndex == 0)
 //  {

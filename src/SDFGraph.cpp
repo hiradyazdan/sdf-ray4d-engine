@@ -24,11 +24,11 @@ using namespace sdfGraph;
 SDFGraph::SDFGraph(
   VulkanWindow *_vkWindow
 ) :
-  m_vkWindow(_vkWindow)
-  , m_shapeMaterial(m_vkWindow->getSDFRMaterial(true)) // creates and stores a fresh new SDFR Material
-  , m_graphScene(new FlowScene(registerModels(), this))
-  , m_graphView(new FlowView(m_graphScene))
-  , m_isAutoCompile(false)
+  m_vkWindow      (_vkWindow)
+, m_shapeMaterial (m_vkWindow->getSDFRMaterial(true)) // creates and stores a fresh new SDFR Material
+, m_graphScene    (new FlowScene(registerModels(), this))
+, m_graphView     (new FlowView(m_graphScene))
+, m_isAutoCompile (false)
 {
   setStyle();
 
@@ -69,20 +69,20 @@ void SDFGraph::compileGraph()
     const auto &mapNode = dynamic_cast<MapDataModel*>(node.second->nodeDataModel());
     if(mapNode)
     {
-      qDebug() << "Map Data: " << mapNode->getData();
+      qDebug() << "Map NODE data: " << mapNode->getData();
       m_mapNodes.push_back(mapNode);
     }
 
-    const auto &cubeNode = dynamic_cast<CubeDataModel*>(node.second->nodeDataModel());
-    if(cubeNode)
+    const auto &shapeNode = dynamic_cast<ShapeDataModel*>(node.second->nodeDataModel());
+    if(shapeNode)
     {
-      qDebug() << "cube NODE shader data: " << cubeNode->getData();
+      qDebug() << "shape NODE data: " << shapeNode->getData();
     }
 
     const auto &opNode = dynamic_cast<OperationDataModel*>(node.second->nodeDataModel());
     if(opNode)
     {
-      qDebug() << "op NODE shader data: " << opNode->getData();
+      qDebug() << "operation NODE data: " << opNode->getData();
     }
   }
 
@@ -109,18 +109,22 @@ void SDFGraph::compileGraph()
   m_vkWindow->createSDFRPipeline();
 }
 
-std::shared_ptr<QtNodes::DataModelRegistry> SDFGraph::registerModels()
+SDFGraph::DataModelRegistryPtr SDFGraph::registerModels()
 {
-  const auto &registry = std::make_shared<DataModelRegistry>();
+  const auto &registry      = std::make_shared<DataModelRegistry>();
 
-  registry->registerModel<CubeDataModel>("SDF Shapes");
-  registry->registerModel<SphereDataModel>("SDF Shapes");
-  registry->registerModel<TorusDataModel>("SDF Shapes");
+  const auto &shapeCatName  = "a) Shapes";
+  const auto &opCatName     = "b) Operations";
+  const auto &mapCatName    = "c) Final Outputs";
 
-  registry->registerModel<UnionDataModel>("Operations");
-  registry->registerModel<SubtractionDataModel>("Operations");
+  registry->registerModel<CubeDataModel>(shapeCatName);
+  registry->registerModel<SphereDataModel>(shapeCatName);
+  registry->registerModel<TorusDataModel>(shapeCatName);
 
-  registry->registerModel<MapDataModel>("Maps");
+  registry->registerModel<UnionDataModel>(opCatName);
+  registry->registerModel<SubtractionDataModel>(opCatName);
+
+  registry->registerModel<MapDataModel>(mapCatName);
 
   return registry;
 }

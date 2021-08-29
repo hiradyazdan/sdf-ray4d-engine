@@ -5,13 +5,8 @@
 #include <nodes/FlowScene>
 #include <nodes/FlowView>
 #include <nodes/Node>
-#include <nodes/NodeData>
-#include <nodes/ConnectionStyle>
-#include <nodes/Connection>
-#include <nodes/NodeGeometry>
-
 #include <nodes/DataModelRegistry>
-#include <nodes/internal/NodeGraphicsObject.hpp>
+#include <nodes/ConnectionStyle>
 
 #include "SDFGraph/DataModels/MapDataModel.hpp"
 
@@ -24,18 +19,15 @@ namespace sdfRay4d
 
   class SDFGraph : public QWidget
   {
-    using FlowScene = QtNodes::FlowScene;
-    using FlowView = QtNodes::FlowView;
-    using Connection = QtNodes::Connection;
-    using ConnectionStyle = QtNodes::ConnectionStyle;
-    using Node = QtNodes::Node;
-    using PortIndex = QtNodes::PortIndex;
-    using PortType = QtNodes::PortType;
+    using FlowScene         = QtNodes::FlowScene;
+    using FlowView          = QtNodes::FlowView;
 
-    using DataModelRegistry = QtNodes::DataModelRegistry;
-    using TypeConverter = QtNodes::TypeConverter;
+    using DataModelRegistryPtr  = std::shared_ptr<QtNodes::DataModelRegistry>;
+    using NodePtr               = std::unique_ptr<QtNodes::Node>;
+    using NodePtrSet            = std::unordered_map<QUuid, NodePtr>;
 
-    using NodePtrSet = std::unordered_map<QUuid, std::unique_ptr<QtNodes::Node>>;
+    using MaterialPtr       = std::shared_ptr<Material>;
+    using MapDataModelList  = std::vector<sdfGraph::MapDataModel*>;
 
     public:
       explicit SDFGraph(VulkanWindow *_vkWindow);
@@ -48,7 +40,7 @@ namespace sdfRay4d
       void compileGraph();
 
     private:
-      static std::shared_ptr<DataModelRegistry> registerModels();
+      static DataModelRegistryPtr registerModels();
       static void setStyle();
 
     private:
@@ -62,9 +54,9 @@ namespace sdfRay4d
       FlowView *m_graphView;
 
     private:
-      std::shared_ptr<Material> m_shapeMaterial;
-      bool m_isAutoCompile;
+      MaterialPtr m_shapeMaterial;
+      MapDataModelList m_mapNodes;
 
-      std::vector<sdfGraph::MapDataModel*> m_mapNodes;
+      bool m_isAutoCompile;
   };
 }

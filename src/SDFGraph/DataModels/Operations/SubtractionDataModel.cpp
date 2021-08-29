@@ -9,23 +9,21 @@ void SubtractionDataModel::applyOperation()
   auto operation = getData();
   auto shape1 = m_shape1.lock();
   auto shape2 = m_shape2.lock();
-  auto shape1Data = /*shape1 ? shape1->getData() :*/ "res";
-  auto shape2Data = shape2 ? shape2->getData() : "";
+  auto shape1Data = /*shape1 ? shape1->shaderData :*/ "res";
+  auto shape2Data = shape2 ? shape2->shaderData : "";
 
   auto data = operation + shape1Data + ", vec2( " + shape2Data + ", 3.0));";
 
   if(/*shape1 &&*/ shape2)
   {
-    modelValidationState = NodeValidationState::Valid;
-    modelValidationError = QString();
-    m_opData = std::make_shared<MapData>(data);
+    m_validationState = NodeValidationState::Valid;
+    m_validationError = QString();
+    m_data = std::make_shared<MapData>(data);
   }
   else
   {
-    modelValidationState = NodeValidationState::Warning;
-    modelValidationError = QStringLiteral("Missing or incorrect inputs");
-    m_opData.reset();
+    m_data.reset();
   }
 
-  Q_EMIT dataUpdated(outPortIndex);
+  emit dataUpdated(outPortIndex);
 }

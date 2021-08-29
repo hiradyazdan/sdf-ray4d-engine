@@ -5,28 +5,29 @@
 #include <QtWidgets/QLabel>
 
 #include "BaseDataModel.hpp"
-#include "SDFGraph/Interfaces/IOperationDataModel.hpp"
 
 #include <iostream>
 
 namespace sdfRay4d::sdfGraph
 {
-  class OperationDataModel : public BaseDataModel, public IOperationDataModel
+  class MaterialDataModel : public BaseDataModel
   {
     public:
-      [[nodiscard]] unsigned int nPorts(PortType _portType) const override;
-      [[nodiscard]] NodeDataType dataType(PortType _portType, PortIndex _portIndex) const override;
+      unsigned int nPorts(PortType _portType) const override;
+
+      NodeDataType dataType(PortType _portType, PortIndex _portIndex) const override;
 
       NodeDataPtr outData(PortIndex _portIndex) override;
+
       void setInData(NodeDataPtr _data, PortIndex _portIndex) override;
+
       QWidget *embeddedWidget() override { return nullptr; }
 
       QString getData() override;
 
     protected:
-      std::weak_ptr<ShapeData> m_shape1;
-      std::weak_ptr<ShapeData> m_shape2;
+      std::weak_ptr<MapData> m_shape;
 
-      std::shared_ptr<MapData> m_data;
+      std::shared_ptr<MapData> m_matData;
   };
 }

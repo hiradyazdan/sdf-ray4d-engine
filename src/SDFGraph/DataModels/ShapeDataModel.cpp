@@ -12,9 +12,9 @@ ShapeDataModel::ShapeDataModel()
 , m_scale       (new QSlider(Qt::Horizontal))
 , m_transform   (new QSlider(Qt::Horizontal))
 
-, m_color(sdfGraph::vec4(0.6, 0.6, 0.6, 1.0))
-, m_dimensions(sdfGraph::vec4(0.25,0.25, 0.25, 1.0))
-, m_position(sdfGraph::vec4(1.0, 0.25, 0.0, 1.0))
+, m_color       (sdfGraph::vec4(0.6, 0.6, 0.6, 1.0)) // origin color
+, m_dimensions  (sdfGraph::vec4(0.25,0.25, 0.25, 1.0)) // origin dimensions
+, m_position    (sdfGraph::vec4(1.0, 0.25, 0.0, 1.0)) // origin position
 {
   m_scale->setFocusPolicy(Qt::StrongFocus);
   m_scale->setTickPosition(QSlider::TicksBothSides);;
@@ -49,29 +49,26 @@ void ShapeDataModel::createConnections()
   );
 }
 
-unsigned int ShapeDataModel::nPorts(PortType portType) const
+unsigned int ShapeDataModel::nPorts(PortType _portType) const
 {
   unsigned int result = 1;
 
-  switch(portType)
+  switch(_portType)
   {
-    case PortType::In:
-      result = 0;
-      break;
-    case PortType::Out:
-      result = 1;
-    default:
-      break;
+    case PortType::In:  result = 0; break; // NO input port
+    case PortType::Out: result = 1; break; // 1 output port
+    default: break;
   }
 
   return result;
 }
 
 NodeDataType ShapeDataModel::dataType(
-  PortType portType, PortIndex portIndex
+  PortType _portType,
+  PortIndex _portIndex
 ) const
 {
-  switch (portType)
+  switch (_portType)
   {
     case PortType::Out:
       return ShapeData().type();
@@ -81,18 +78,18 @@ NodeDataType ShapeDataModel::dataType(
   }
 }
 
-std::shared_ptr<NodeData> ShapeDataModel::outData(PortIndex port)
+NodeDataPtr ShapeDataModel::outData(PortIndex _portIndex)
 {
   auto shaderData = getData();
-  m_data = std::make_shared<MapData>(shaderData);
+  m_data = std::make_shared<ShapeData>(shaderData);
 
-  modelValidationState = NodeValidationState::Valid;
-  modelValidationError = QString();
+  m_validationState = NodeValidationState::Valid;
+  m_validationError = QString();
 
   return m_data;
 }
 
-void ShapeDataModel::setInData(std::shared_ptr<NodeData> _data, int)
+void ShapeDataModel::setInData(NodeDataPtr _data, PortIndex _portIndex)
 {
 }
 
@@ -102,13 +99,13 @@ void ShapeDataModel::onScale(float _value)
 {
   Q_UNUSED(_value);
 
-  m_dimensions.x = _value * .025f;
-  m_dimensions.y = _value * .025f;
-  m_dimensions.z = _value * .025f;
-  //  m_dimensions.w = _value * .025f;
+  m_dimensions.x = std::to_string(_value * .025f);
+  m_dimensions.y = std::to_string(_value * .025f);
+  m_dimensions.z = std::to_string(_value * .025f);
+  //  m_dimensions.w = std::to_string(_value * .025f);
 
   auto shaderData = getData();
-  m_data = std::make_shared<MapData>(shaderData);
+  m_data = std::make_shared<ShapeData>(shaderData);
 
   emit dataUpdated(0);
 }
@@ -117,13 +114,13 @@ void ShapeDataModel::onTransform(float _value)
 {
   Q_UNUSED(_value);
 
-  m_position.x = _value * .025f;
-  m_position.y = _value * .025f;
-  m_position.z = _value * .025f;
-  //  m_position.w = _value * .025f;
+  m_position.x = std::to_string(_value * .025f);
+  m_position.y = std::to_string(_value * .025f);
+  m_position.z = std::to_string(_value * .025f);
+  //  m_position.w = std::to_string(_value * .025f);
 
   auto shaderData = getData();
-  m_data = std::make_shared<MapData>(shaderData);
+  m_data = std::make_shared<ShapeData>(shaderData);
 
   emit dataUpdated(0);
 }

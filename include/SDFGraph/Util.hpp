@@ -4,10 +4,10 @@ namespace sdfRay4d::sdfGraph
 {
   struct vec4
   {
-    float x = 0.0;
-    float y = 0.0;
-    float z = 0.0;
-    float w = 1.0;
+    std::string x = "0.0000";
+    std::string y = "0.0000";
+    std::string z = "0.0000";
+    std::string w = "1.0000";
 
     vec4(
       float _x,
@@ -15,9 +15,9 @@ namespace sdfRay4d::sdfGraph
       float _z,
       float _w
     ) :
-    x(_x),
-    y(_y),
-    z(_z),
-    w(_w) {}
+    x(std::to_string(_x)),
+    y(std::to_string(_y)),
+    z(std::to_string(_z)),
+    w(std::to_string(_w)) {}
   };
 }

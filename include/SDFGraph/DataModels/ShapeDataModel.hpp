@@ -13,14 +13,20 @@ namespace sdfRay4d::sdfGraph
     public:
       ShapeDataModel();
 
+    /**
+     * Abstract Class & Interface Implementations/Overrides
+     * -------------------------------------------------
+     *
+     */
     private:
       [[nodiscard]] unsigned int nPorts(PortType _portType) const override;
       [[nodiscard]] NodeDataType dataType(PortType _portType, PortIndex _portIndex) const override;
 
-      std::shared_ptr<NodeData> outData(PortIndex _port) override;
-      void setInData(std::shared_ptr<NodeData>, int) override;
-
+      NodeDataPtr outData(PortIndex _portIndex) override;
+      void setInData(NodeDataPtr _data, PortIndex _portIndex) override;
       QWidget *embeddedWidget() override;
+
+    private:
       void createConnections();
 
     private slots:
@@ -35,7 +41,7 @@ namespace sdfRay4d::sdfGraph
       QLabel *m_transLabel;
       QWidget *m_widget;
 
-      std::shared_ptr<MapData> m_data;
+      std::shared_ptr<ShapeData> m_data;
 
     protected:
       sdfGraph::vec4 m_color;
