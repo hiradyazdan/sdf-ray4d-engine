@@ -37,7 +37,7 @@ void Renderer::buildFrame()
 
   m_pipelineHelper.waitForWorkersToFinish();
 
-  cmdRenderPass();
+  executeCommands();
 }
 
 void Renderer::updateFrame()

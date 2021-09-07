@@ -8,10 +8,9 @@
 #include <nodes/DataModelRegistry>
 #include <nodes/ConnectionStyle>
 
-#include "SDFGraph/DataModels/MapDataModel.hpp"
-
 #include "Window/VulkanWindow.hpp"
-#include "Material.hpp"
+
+#include "SDFGraph/DataModels/MapDataModel.hpp"
 
 namespace sdfRay4d
 {
@@ -19,15 +18,15 @@ namespace sdfRay4d
 
   class SDFGraph : public QWidget
   {
-    using FlowScene         = QtNodes::FlowScene;
-    using FlowView          = QtNodes::FlowView;
+    using FlowScene             = QtNodes::FlowScene;
+    using FlowView              = QtNodes::FlowView;
 
     using DataModelRegistryPtr  = std::shared_ptr<QtNodes::DataModelRegistry>;
     using NodePtr               = std::unique_ptr<QtNodes::Node>;
     using NodePtrSet            = std::unordered_map<QUuid, NodePtr>;
 
-    using MaterialPtr       = std::shared_ptr<Material>;
-    using MapDataModelList  = std::vector<sdfGraph::MapDataModel*>;
+    using MaterialPtr           = std::shared_ptr<Material<float>>;
+    using MapDataModelList      = std::vector<sdfGraph::MapDataModel*>;
 
     public:
       explicit SDFGraph(VulkanWindow *_vkWindow);
@@ -49,14 +48,14 @@ namespace sdfRay4d
     private:
       Constants m_appConstants;
 
-      VulkanWindow *m_vkWindow;
-      FlowScene *m_graphScene;
-      FlowView *m_graphView;
+      VulkanWindow *m_vkWindow = VK_NULL_HANDLE;
+      FlowScene *m_graphScene = nullptr;
+      FlowView *m_graphView = nullptr;
 
     private:
-      MaterialPtr m_shapeMaterial;
+      MaterialPtr m_shapeMaterial = VK_NULL_HANDLE;
       MapDataModelList m_mapNodes;
 
-      bool m_isAutoCompile;
+      bool m_isAutoCompile = false;
   };
 }

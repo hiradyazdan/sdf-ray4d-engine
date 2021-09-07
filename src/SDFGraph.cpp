@@ -1,9 +1,19 @@
 /*****************************************************
  * Class: SDFGraph (General)
- * Members: General Functions (Public)
+ * Members: General Functions (Public/Private)
  * Partials: None
  * There are however, Data Model Classes with inheritance used in this class
- * which are located in SDFGraph directory
+ * which are located in SDFGraph directory:
+ * - Data Models
+ *      - Operations
+ *          - UnionDataModel
+ *      - Shapes
+ *          - CubeDataModel
+ *          - SphereDataModel
+ *          - TorusDataModel
+ * - MapDataModel
+ * - OperationDataModel
+ * - ShapeDataModel
  *****************************************************/
 
 #include <chrono>
@@ -21,14 +31,17 @@
 using namespace sdfRay4d;
 using namespace sdfGraph;
 
+/**
+ *
+ * @param[in] _vkWindow
+ */
 SDFGraph::SDFGraph(
   VulkanWindow *_vkWindow
 ) :
   m_vkWindow      (_vkWindow)
-, m_shapeMaterial (m_vkWindow->getSDFRMaterial(true)) // creates and stores a fresh new SDFR Material
+, m_shapeMaterial (_vkWindow->getSDFRMaterial(true)) // creates and stores a fresh new SDFR Material
 , m_graphScene    (new FlowScene(registerModels(), this))
 , m_graphView     (new FlowView(m_graphScene))
-, m_isAutoCompile (false)
 {
   setStyle();
 
@@ -41,6 +54,10 @@ SDFGraph::SDFGraph(
   });
 }
 
+/**
+ *
+ * @param[in] _isAutoCompile
+ */
 void SDFGraph::autoCompile(bool _isAutoCompile)
 {
   if(!_isAutoCompile) return;
@@ -61,7 +78,7 @@ void SDFGraph::compileGraph()
      * as the nodes order is based on their order of construction
      * at runtime by the user, than static/pre-defined order.
      *
-     * as the shader compilation at runtime is naturally expected
+     * @note as the shader compilation at runtime is naturally expected
      * to have some minor pause/stalling, semi-reflection approach
      * (no reflection in c++) to dynamically check for runtime data,
      * does not cause any major performance cost for the user.
@@ -109,6 +126,10 @@ void SDFGraph::compileGraph()
   m_vkWindow->createSDFRPipeline();
 }
 
+/**
+ *
+ * @return DataModelRegistryPtr instance
+ */
 SDFGraph::DataModelRegistryPtr SDFGraph::registerModels()
 {
   const auto &registry      = std::make_shared<DataModelRegistry>();

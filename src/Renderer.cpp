@@ -18,24 +18,31 @@
  *      - sdf_graph_pipeline_helpers.cpp
  * - frame (frame.cpp)
  *      - buffers.cpp
- *      - draw_calls.cpp
- *      - render_pass.cpp
- *      - user_input_helpers.cpp
+ *      - command_exec_helpers.cpp
  * - swapchain_resources.cpp
+ * - user_input_helpers.cpp
  *****************************************************/
 
 #include "Renderer.hpp"
 
 using namespace sdfRay4d;
 
+/**
+ *
+ * @param[in] _vkWindow
+ * @param[in] _isMSAA
+ */
 Renderer::Renderer(
   VulkanWindow *_vkWindow,
   bool _isMSAA
 ) :
   m_vkWindow(_vkWindow)
-  , m_isMSAA(_isMSAA)
+, m_isMSAA(_isMSAA)
 {
-  m_actorMesh.load(m_appConstants.assetsPath + "models/" + m_appConstants.modelsPaths.actor);
+  m_actorMesh.load(
+    m_appConstants.modelsPath
+    + m_appConstants.modelsPaths.actor
+  );
 
   connect(
     &m_frameWatcher, &QFutureWatcherBase::finished,
@@ -57,6 +64,7 @@ void Renderer::createDepthView()
   if(m_depthView) return;
 
   auto &depthTexture = m_depthMaterial->texture;
+  const auto &aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
 
   depthTexture.createImage(
     m_windowSize.width(),
@@ -68,8 +76,15 @@ void Renderer::createDepthView()
     m_vkWindow->deviceLocalMemoryIndex(),
     m_imageBufferMemory
   );
+  depthTexture.createImageMemoryBarrier(
+    VK_IMAGE_LAYOUT_UNDEFINED,
+    VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+    aspectMask,
+    VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+    VK_ACCESS_SHADER_READ_BIT
+  );
   depthTexture.createImageView(
-    VK_IMAGE_ASPECT_DEPTH_BIT,
+    aspectMask,
     &m_depthView
   );
 }

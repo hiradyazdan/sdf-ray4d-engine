@@ -1,11 +1,11 @@
 /*****************************************************
- * Partial Class: Pipeline
+ * Partial Class: PipelineHelper
  * Members: Init PSO (Pipeline State Objects) Helpers (Private)
  *****************************************************/
 
-#include "Pipeline.hpp"
+#include "Helpers/Pipeline.hpp"
 
-using namespace sdfRay4d;
+using namespace sdfRay4d::helpers;
 
 void PipelineHelper::initPSOs(const MaterialPtr &_material)
 {

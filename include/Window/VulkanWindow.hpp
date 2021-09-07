@@ -9,22 +9,17 @@
 namespace sdfRay4d
 {
   class Renderer;
-  struct Material;
 
   class VulkanWindow : public QVulkanWindow
   {
     Q_OBJECT
 
-    using MaterialPtr = std::shared_ptr<Material>;
+    using MaterialPtr = std::shared_ptr<Material<float>>;
 
     public:
       explicit VulkanWindow(bool _isDebug = false);
 
     public:
-      /**
-       * @brief
-       * @return
-       */
       QVulkanWindowRenderer *createRenderer() override;
 
     public:
@@ -42,8 +37,8 @@ namespace sdfRay4d
       void keyPressEvent      (QKeyEvent   *_event) override;
 
     private:
-      Renderer *m_renderer;
-      bool m_isDebug;
+      Renderer *m_renderer = nullptr;
+      bool m_isDebug = false;
 
       bool m_pressed = false;
       QPoint m_lastPos;

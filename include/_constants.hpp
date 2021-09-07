@@ -25,10 +25,9 @@ namespace sdfRay4d
 
      str assetsPath   = "assets/";
 
-     // TODO: make these available
-     str shadersRoot  = "shaders/";
-     str modelsRoot   = "models/";
-     str texturesRoot = "textures/";
+     str shadersPath  = assetsPath + "shaders/";
+     str modelsPath   = assetsPath + "models/";
+     str texturesPath = assetsPath + "textures/";
 
      /**
       * @struct Models

@@ -32,6 +32,13 @@ namespace sdfRay4d
         uint32_t _deviceMemIndex,
         device::Memory &_bufferMemory
       );
+      void createImageMemoryBarrier(
+        const texture::ImageLayout &_oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+        const texture::ImageLayout &_newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        const texture::ImageAspect &_aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+        const texture::AccessFlags &_srcAccessMask = VK_ACCESS_NONE_KHR,
+        const texture::AccessFlags &_destAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT
+      );
       void createImageView(
         texture::ImageAspect _aspectMask = VK_IMAGE_ASPECT_COLOR_BIT
       );
@@ -41,12 +48,13 @@ namespace sdfRay4d
       );
       void createSampler(
         const float &_maxAnisotropy = 1.0f,
-        bool enableAnisotropy = false
+        bool _enableAnisotropy = false
       );
 
     public:
       texture::Image &getImage() { return m_image; }
       texture::ImageView &getImageView() { return m_imageView; }
+      texture::ImageMemoryBarrier &getImageMemoryBarrier() { return m_imageMemBarrier; }
       texture::Sampler &getSampler() { return m_sampler; }
 
     public:
@@ -62,7 +70,8 @@ namespace sdfRay4d
       texture::Image m_image = VK_NULL_HANDLE;
       texture::ImageView m_imageView = VK_NULL_HANDLE;
       texture::Sampler m_sampler = VK_NULL_HANDLE;
+      texture::ImageMemoryBarrier m_imageMemBarrier = {};
 
-      device::Memory m_imageMem;
+      device::Memory m_imageMem = VK_NULL_HANDLE;
   };
 }

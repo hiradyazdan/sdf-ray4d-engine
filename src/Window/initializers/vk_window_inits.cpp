@@ -1,6 +1,6 @@
 /*****************************************************
  * Partial Class: MainWindow
- * Members: Constructor Vulkan Window init helpers (Private)
+ * Members: Constructor Vulkan Window initializers (Private)
  *****************************************************/
 
 #include <QLoggingCategory>

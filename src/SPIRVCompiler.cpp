@@ -29,7 +29,7 @@ using namespace sdfRay4d;
  * @return boolean
  */
 bool SPIRVCompiler::compile(
-  shader::StageFlags _stage,
+  shader::StageFlag _stage,
   const QByteArray &_glslSource,
   std::vector<std::uint32_t> &_spvBytes,
   std::string &_log,

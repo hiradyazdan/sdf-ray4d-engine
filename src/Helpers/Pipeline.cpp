@@ -1,5 +1,5 @@
 /*****************************************************
- * Partial Class: Pipeline (Ctor & General)
+ * Partial Class: PipelineHelper (Ctor & General)
  * Members: General Functions (Public)
  *
  * This Class is split into partials to categorize
@@ -14,13 +14,12 @@
  * - create_pipeline_helpers.cpp
  * - create_pipeline_workers.cpp
  * - destroy_helpers.cpp
- * - framebuffer_helpers.cpp
  * - init_pso_helpers.cpp
  *****************************************************/
 
-#include "Pipeline.hpp"
+#include "Helpers/Pipeline.hpp"
 
-using namespace sdfRay4d;
+using namespace sdfRay4d::helpers;
 
 /**
  *
@@ -32,8 +31,8 @@ using namespace sdfRay4d;
  * after Renderer constructor and within QVulkanRenderer's initResources().
  *
  * @note
- * As attachments is populated later in the frame loop it should
- * be reference, so that its reference value gets used here directly
+ * As attachments (depthView) is populated later in initSwapchainResources,
+ * it should be a pointer, so that its reference value gets used here directly
  * and as they could be multiple attachments/image views later on,
  * it should be either a vector of references which is not directly
  * available in C++ except by using std::reference_wrapper or just pass
@@ -44,35 +43,43 @@ using namespace sdfRay4d;
  * @param[in] _deviceFuncs
  * @param[in] _sampleCountFlags
  * @param[in] _defaultRenderPass
- * @param[in] _attachments
- * @param[in] _swapChainImageSize
- * @param[in] _useDefaultRenderPass
+ * @param[in] _fbAttachments framebuffer attachments
  */
 void PipelineHelper::init(
   const Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs,
   const SampleCountFlags &_sampleCountFlags,
   const RenderPass &_defaultRenderPass,
-  texture::ImageView *_attachments
+  texture::ImageView *_fbAttachments
 )
 {
-  m_device = _device;
-  m_deviceFuncs = _deviceFuncs;
-  m_sampleCountFlags = _sampleCountFlags;
-  m_renderPassHelper = RenderPassHelper(
+  m_device            = _device;
+  m_deviceFuncs       = _deviceFuncs;
+  m_sampleCountFlags  = _sampleCountFlags;
+
+  m_framebufferHelper = FramebufferHelper(
+    _device, _deviceFuncs,
+    _fbAttachments
+  );
+  m_renderPassHelper  = RenderPassHelper(
     _device, _deviceFuncs,
     _sampleCountFlags,
     _defaultRenderPass
   );
-  m_renderPass = _defaultRenderPass;
-  m_attachments = _attachments; // framebuffer attachments
+  command             = CommandHelper(_device, _deviceFuncs);
+
+  m_renderPassHelper.setFramebufferHelper(m_framebufferHelper);
+  command.setRenderPassHelper(m_renderPassHelper);
 }
 
+/**
+ *
+ * @param[in] _useDefault
+ * @return RenderPass instance
+ */
 RenderPass &PipelineHelper::getRenderPass(bool _useDefault)
 {
-  return _useDefault
-  ? m_renderPass
-  : m_renderPassHelper.getRenderPass();
+  return m_renderPassHelper.getRenderPass(_useDefault);
 }
 
 void PipelineHelper::waitForWorkersToFinish()

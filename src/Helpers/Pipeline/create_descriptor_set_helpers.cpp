@@ -1,11 +1,11 @@
 /*****************************************************
- * Partial Class: Pipeline
+ * Partial Class: PipelineHelper
  * Members: Create Descriptor Set Helpers (Private)
  *****************************************************/
 
-#include "Pipeline.hpp"
+#include "Helpers/Pipeline.hpp"
 
-using namespace sdfRay4d;
+using namespace sdfRay4d::helpers;
 
 /**
  *
@@ -23,9 +23,10 @@ void PipelineHelper::createDescriptorPool(
       2
     }
   };
-  descriptor::PoolInfo descPoolInfo = {};
+  descriptor::PoolInfo descPoolInfo = {}; // memset
   descPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
   /**
+   * @note
    * a single set if dynamic uniform buffer is used
    * multiple set if texture sampler needed along with other descriptors (one set per texture/sampler)
    */
@@ -69,11 +70,11 @@ void PipelineHelper::createDescriptorSetLayout(
 
   for(auto i = 0; i < layoutCount; i++)
   {
-    descriptor::LayoutInfo descLayoutInfo = {};
+    descriptor::LayoutInfo descLayoutInfo = {}; // memset
     descLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     descLayoutInfo.pNext = nullptr;
     descLayoutInfo.flags = 0;
-    descLayoutInfo.bindingCount = uint32_t(layoutBindings.size()); //sizeof(layoutBindings) / sizeof(layoutBindings[0])
+    descLayoutInfo.bindingCount = layoutBindings.size();
     descLayoutInfo.pBindings = layoutBindings.data();
 
     auto result = m_deviceFuncs->vkCreateDescriptorSetLayout(
@@ -112,7 +113,7 @@ void PipelineHelper::allocateDescriptorSets(
 
   for(auto i = 0; i < layoutCount; i++)
   {
-    descriptor::AllocInfo descSetInfo = {};
+    descriptor::AllocInfo descSetInfo = {}; // memset
     descSetInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     descSetInfo.pNext = nullptr;
     descSetInfo.descriptorPool = _material->descPool;

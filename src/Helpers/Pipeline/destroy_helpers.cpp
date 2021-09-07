@@ -1,11 +1,11 @@
 /*****************************************************
- * Partial Class: Pipeline
+ * Partial Class: PipelineHelper
  * Members: Destroy Helpers (Public)
  *****************************************************/
 
-#include "Pipeline.hpp"
+#include "Helpers/Pipeline.hpp"
 
-using namespace sdfRay4d;
+using namespace sdfRay4d::helpers;
 
 void PipelineHelper::destroyPipeline(Pipeline &_pipeline)
 {
@@ -142,25 +142,29 @@ void PipelineHelper::destroyTextures()
 
 void PipelineHelper::destroyRenderPass()
 {
-  auto &renderPass = getRenderPass(false);
-
-  if(m_frameBuffer)
+  for (const auto &material : m_materials)
   {
-    m_deviceFuncs->vkDestroyFramebuffer(
-      m_device,
-      m_frameBuffer,
-      nullptr
-    );
-    m_frameBuffer = VK_NULL_HANDLE;
-  }
+    auto &framebuffer = material->framebuffer;
+    auto &renderPass = material->renderPass;
 
-  if(renderPass)
-  {
-    m_deviceFuncs->vkDestroyRenderPass(
-      m_device,
-      renderPass,
-      nullptr
-    );
-    renderPass = VK_NULL_HANDLE;
+    if(framebuffer && !material->isDefault)
+    {
+      m_deviceFuncs->vkDestroyFramebuffer(
+        m_device,
+        framebuffer,
+        nullptr
+      );
+      framebuffer = VK_NULL_HANDLE;
+    }
+
+    if(renderPass && !material->isDefault)
+    {
+      m_deviceFuncs->vkDestroyRenderPass(
+        m_device,
+        renderPass,
+        nullptr
+      );
+      renderPass = VK_NULL_HANDLE;
+    }
   }
 }

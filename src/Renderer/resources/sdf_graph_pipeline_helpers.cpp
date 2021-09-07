@@ -10,6 +10,7 @@ using namespace sdfRay4d;
 /**
  * @brief creates and passes a fresh new material
  * to be consumed by the SDF Graph
+ * @param[in] _isNew
  * @return MaterialPtr
  */
 Renderer::MaterialPtr &Renderer::getSDFRMaterial(bool _isNew)
@@ -28,6 +29,10 @@ Renderer::MaterialPtr &Renderer::getSDFRMaterial(bool _isNew)
 
 void Renderer::createSDFRPipeline()
 {
+  /**
+   * @note at this point, new SDFR Material, should've been created
+   * so, will reuse the same new material for every compile
+   */
   const auto &newMaterial = getSDFRMaterial();
 
   m_isNewWorker = true;
@@ -62,12 +67,12 @@ void Renderer::swapSDFRPipelines()
    * and signals when the existing command buffers finished
    * their execution.
    *
-   * Although it may stall the pipeline, that is the only way
+   * @note Although it may stall the pipeline, that is the only way
    * Qt Vulkan seems to expose in this case. Otherwise, I could use
    * vkGetFenceStatus and pass the Fence to check every frame,
    * which is not available through Qt Vulkan public API.
    *
-   * Since the shader compilation is expected to be a one-off
+   * @note Since the shader compilation is expected to be a one-off
    * design session for the user, than a game realtime/interactive
    * session, therefore the speed is not expected to be
    * very high.

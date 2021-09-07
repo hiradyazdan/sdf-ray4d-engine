@@ -27,7 +27,7 @@ vec2 map( in vec3 pos )
 {
   vec2 res = vec2(sdPlane(pos), 1.0);
 
-  /* ------ PLACEHOLDER ------ */
+  /* ------ PLACEHOLDER (DO NOT CHANGE) ------ */
 
 //  res = opU( res, vec2(sdSphere(     pos-vec3( 0.0,0.25, 0.0), 0.25 ), 46.9));
 //  res = opU( res, vec2( sdBox(       pos-vec3( 1.0,0.25, 0.0), vec3(0.25) ), 3.0 ) );

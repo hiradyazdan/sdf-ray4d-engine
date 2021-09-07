@@ -1,16 +1,16 @@
 /*****************************************************
- * Partial Class: Pipeline
+ * Partial Class: PipelineHelper
  * Members: Create Pipeline Workers (Public)
  *****************************************************/
 
-#include "Pipeline.hpp"
+#include "Helpers/Pipeline.hpp"
 
-using namespace sdfRay4d;
+using namespace sdfRay4d::helpers;
 
 /**
  * @brief creates a single worker for each pipeline
  * i.e. multiple async pipelines
- * @param _materials
+ * @param[in] _materials
  */
 void PipelineHelper::createWorkers(
   const std::vector<MaterialPtr> &_materials
@@ -32,7 +32,7 @@ void PipelineHelper::createWorkers(
 
 /**
  * @brief creates a single worker for all pipelines
- * @param _materials
+ * @param[in] _materials
  */
 void PipelineHelper::createWorker(
   const std::vector<MaterialPtr> &_materials
@@ -48,7 +48,8 @@ void PipelineHelper::createWorker(
 
 /**
  * @brief creates a single worker for only one pipeline
- * @param _material
+ * @param[in] _material
+ * @param[in] _isHot
  */
 void PipelineHelper::createWorker(
   const MaterialPtr &_material,

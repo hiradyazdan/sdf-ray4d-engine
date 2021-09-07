@@ -12,10 +12,16 @@
 
 clone repository with its submodules:
 
+```shell
+git clone --recursive https://github.com/hiradyazdan/masters-project
+```
+
+***Note:***
+
 - glslang (***Note*** The latest pull (09 Aug) from `glslang` has a typo in its cmake config.
   Please modify its `CMakeLists.txt` at line `144` to `endif(MSVC AND OVERRIDE_MSVCCRT)`.)
 - nodeeditor also has a conflict with vcpkg that have to manually remove a snippet of code from
-  the CmakeLists.txt in `nodeeditor/external/CMakeLists.txt` as below:
+  the CMakeLists.txt in `nodeeditor/external/CMakeLists.txt` as below:
 
 ```cmake
   macro(find_package pkg)
@@ -23,10 +29,6 @@ clone repository with its submodules:
       _find_package(${ARGV})
     endif()
   endmacro()
-```
-
-```shell
-git clone --recursive https://github.com/hiradyazdan/masters-project
 ```
 
 ## Build
@@ -62,17 +64,14 @@ there's no `Module Header units` support for C++17 which is used in this project
 
 #### SDF Raymarched Objects Interaction with Mesh-based (Rasterized Geometry) Objects - Depth Calculation
 
-![SDF Raymarching Architecture](./docs/design/sdf-raymarching-architecture.svg)
+![Depth buffer Multi-pass Transfer Model](./docs/design/depth-buffer-multi-pass-transfer.svg)
 
 In order to be able to render rasterized objects on top of the raymarched objects
 depth buffer calculation is required. In doing so, an extra rendering pass is introduced
 to pass the depth buffer to the next rendering pass and use it.
 
-
-
 - https://www.iquilezles.org/www/articles/raypolys/raypolys.htm
 - https://computergraphics.stackexchange.com/questions/7674/how-to-align-ray-marching-on-top-of-traditional-3d-rasterization
--
 
 ### Vulkan vs. DirectX vs. OpenGL
 

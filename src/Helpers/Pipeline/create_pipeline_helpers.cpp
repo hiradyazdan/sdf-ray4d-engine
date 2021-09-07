@@ -1,11 +1,11 @@
 /*****************************************************
- * Partial Class: Pipeline
+ * Partial Class: PipelineHelper
  * Members: Create Pipeline Helpers (Public/Private)
  *****************************************************/
 
-#include "Pipeline.hpp"
+#include "Helpers/Pipeline.hpp"
 
-using namespace sdfRay4d;
+using namespace sdfRay4d::helpers;
 
 void PipelineHelper::createCache()
 {
@@ -42,6 +42,9 @@ void PipelineHelper::createPipelines()
   }
 }
 
+/**
+ * @param[in] _material
+ */
 void PipelineHelper::createPipeline(const MaterialPtr &_material)
 {
   /**
@@ -74,7 +77,6 @@ void PipelineHelper::createPipeline(const MaterialPtr &_material)
        * when swapping old with new pipeline, once SDF Graph
        * compiled and created new pipeline.
        */
-//       _material->fragmentShader.getData()->shaderModule
       shaderData->shaderModule = m_currentShaderModule;
     }
   }
@@ -113,6 +115,10 @@ void PipelineHelper::swapSDFRPipelines(
   _oldMaterial->pipeline        = _newMaterial->pipeline;
 }
 
+/**
+ *
+ * @param[in] _material
+ */
 void PipelineHelper::createLayout(const MaterialPtr &_material)
 {
   pipeline::LayoutInfo pipelineLayoutInfo = {}; // memset
@@ -149,7 +155,7 @@ void PipelineHelper::createComputePipeline(
 
   auto &pso = _material->pso;
 
-  pipeline::ComputePipelineInfo pipelineInfo = {};
+  pipeline::ComputePipelineInfo pipelineInfo = {}; // memset
 
   pipelineInfo.sType                = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
   //  pipelineInfo.stage                = m_actorMaterial->shaderStages.data();
@@ -172,6 +178,7 @@ void PipelineHelper::createComputePipeline(
 
 /**
  * per Material Pipeline
+ * @param[in] _material
  */
 void PipelineHelper::createGraphicsPipeline(
   const MaterialPtr &_material
@@ -180,12 +187,13 @@ void PipelineHelper::createGraphicsPipeline(
   initShaderStages(_material);
   initPSOs(_material);
 
-  auto &pso = _material->pso;
+  auto &&shaderStages = _material->shaderStages;
+  auto &&pso = _material->pso;
 
   pipeline::GraphicsPipelineInfo pipelineInfo = {}; // memset
   pipelineInfo.sType                = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-  pipelineInfo.stageCount           = _material->shaderStages.size();
-  pipelineInfo.pStages              = _material->shaderStages.data();
+  pipelineInfo.stageCount           = shaderStages.size();
+  pipelineInfo.pStages              = shaderStages.data();
 
   // Set Pipeline State Objects (PSOs)
   pipelineInfo.pDynamicState        = &pso.dynamicState;
@@ -223,17 +231,20 @@ void PipelineHelper::createGraphicsPipeline(
    * as the usage of the heap memory on PSOs for the renderer is very minimal
    * and CPU performance is not a big concern here
    */
-  _material->pso = {}; // memset
+  pso = {}; // memset
 }
 
 /**
  * per Material Pipeline
+ * @param[in] _material
  */
 void PipelineHelper::initShaderStages(const MaterialPtr &_material)
 {
+  const auto &structureType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+
   _material->shaderStages = {
     {
-      VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, // sType
+      structureType, // sType
       nullptr, // pNext
       0, // flags
       VK_SHADER_STAGE_VERTEX_BIT, // stage
@@ -242,7 +253,7 @@ void PipelineHelper::initShaderStages(const MaterialPtr &_material)
       nullptr // pSpecializationInfo
     },
     {
-      VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, // sType
+      structureType, // sType
       nullptr, // pNext
       0, // flags
       VK_SHADER_STAGE_FRAGMENT_BIT, // stage

@@ -9,7 +9,7 @@
 
 using namespace sdfRay4d;
 
-shader::StageFlags Shader::getShaderStage(
+shader::StageFlag Shader::getShaderStage(
   const std::string &_fileExtension
 )
 {

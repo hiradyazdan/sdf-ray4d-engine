@@ -22,7 +22,9 @@ namespace sdfRay4d
     using Device                = VkDevice;
     using Pipeline              = VkPipeline;
 
+    using CmdPool               = VkCommandPool;
     using CmdBuffer             = VkCommandBuffer;
+
     using ClearColor            = VkClearColorValue;
     using ClearDepthStencil     = VkClearDepthStencilValue;
     using Clear                 = VkClearValue;
@@ -38,6 +40,7 @@ namespace sdfRay4d
     using RenderPass            = VkRenderPass;
     using RenderPassInfo        = VkRenderPassCreateInfo;
     using RenderPassBeginInfo   = VkRenderPassBeginInfo;
+
     using Framebuffer           = VkFramebuffer;
     using FramebufferInfo       = VkFramebufferCreateInfo;
 
@@ -49,7 +52,10 @@ namespace sdfRay4d
       using ImageView           = VkImageView;
       using ImageViewInfo       = VkImageViewCreateInfo;
       using ImageAspect         = VkImageAspectFlags;
+      using ImageLayout         = VkImageLayout;
       using ImageMemoryBarrier  = VkImageMemoryBarrier;
+
+      using AccessFlags         = VkAccessFlags;
 
       using Sampler             = VkSampler;
       using SamplerInfo         = VkSamplerCreateInfo;
@@ -95,7 +101,8 @@ namespace sdfRay4d
     {
       using Module      = VkShaderModule;
       using Info        = VkShaderModuleCreateInfo;
-      using StageFlags  = VkShaderStageFlagBits;
+      using StageFlag   = VkShaderStageFlagBits;
+      using StageFlags  = VkShaderStageFlags;
     }
 
     namespace pipeline

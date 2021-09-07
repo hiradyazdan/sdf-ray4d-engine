@@ -20,7 +20,6 @@
 using namespace sdfRay4d;
 
 MainWindow::MainWindow()
-: m_vkWindow(nullptr)
 {
   initVkWindow();
 

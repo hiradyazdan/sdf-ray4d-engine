@@ -21,7 +21,7 @@ namespace sdfRay4d
   {
     public:
       bool compile(
-        shader::StageFlags _stage,
+        shader::StageFlag _stage,
         const QByteArray &_glslSource,
         std::vector<std::uint32_t> &_spvBytes,
         std::string &_log,
@@ -29,6 +29,6 @@ namespace sdfRay4d
       ) noexcept;
 
     private:
-      static EShLanguage getShaderLang(const shader::StageFlags &_stage) noexcept;
+      static EShLanguage getShaderLang(const shader::StageFlag &_stage) noexcept;
   };
 }

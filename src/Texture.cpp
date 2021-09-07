@@ -9,16 +9,27 @@
 using namespace sdfRay4d;
 using namespace texture;
 
+/**
+ *
+ * @param[in] _device
+ * @param[in] _deviceFuncs
+ */
 Texture::Texture(
   Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs
 //  const QString &_texturesPath
   ) :
   m_device(_device)
-  , m_deviceFuncs(_deviceFuncs)
-//  , m_texturesPath(m_appConstants.assetsPath + _texturesPath)
+, m_deviceFuncs(_deviceFuncs)
+//, m_texturesPath(m_appConstants.assetsPath + _texturesPath)
 {}
 
+/**
+ *
+ * @param[in] _width
+ * @param[in] _height
+ * @param[in] _usage
+ */
 void Texture::createImage(
   uint32_t _width,
   uint32_t _height,
@@ -77,7 +88,7 @@ void Texture::createImageMemory(
     &memReqs
   );
 
-  memory::AllocInfo memAllocInfo = {};
+  memory::AllocInfo memAllocInfo = {}; // memset
   memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
   memAllocInfo.pNext = nullptr;
   memAllocInfo.allocationSize = memReqs.size;
@@ -98,6 +109,43 @@ void Texture::createImageMemory(
   );
 }
 
+/**
+ *
+ * @param[in] _oldLayout
+ * @param[in] _newLayout
+ * @param[in] _aspectMask
+ * @param[in] _srcAccessMask
+ * @param[in] _destAccessMask
+ */
+void Texture::createImageMemoryBarrier(
+  const ImageLayout &_oldLayout,
+  const ImageLayout &_newLayout,
+  const ImageAspect &_aspectMask,
+  const AccessFlags &_srcAccessMask,
+  const AccessFlags &_destAccessMask
+)
+{
+  m_imageMemBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+  m_imageMemBarrier.oldLayout = _oldLayout;
+  m_imageMemBarrier.newLayout = _newLayout;
+  m_imageMemBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+  m_imageMemBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+  m_imageMemBarrier.image = m_image;
+  m_imageMemBarrier.subresourceRange.aspectMask = _aspectMask;
+  m_imageMemBarrier.subresourceRange.baseMipLevel = 0;
+  m_imageMemBarrier.subresourceRange.levelCount = 1;
+  m_imageMemBarrier.subresourceRange.baseArrayLayer = 0;
+  m_imageMemBarrier.subresourceRange.layerCount = 1;
+  m_imageMemBarrier.srcAccessMask = 0;
+  m_imageMemBarrier.dstAccessMask = 0;
+  m_imageMemBarrier.srcAccessMask = _srcAccessMask;
+  m_imageMemBarrier.dstAccessMask = _destAccessMask;
+}
+
+/**
+ *
+ * @param[in] _aspectMask
+ */
 void Texture::createImageView(
   ImageAspect _aspectMask
 )
@@ -150,9 +198,14 @@ void Texture::createImageView(
   m_imageView = *_imageView;
 }
 
+/**
+ *
+ * @param[in] _maxAnisotropy
+ * @param[in] _enableAnisotropy
+ */
 void Texture::createSampler(
   const float &_maxAnisotropy,
-  bool enableAnisotropy
+  bool _enableAnisotropy
 )
 {
   SamplerInfo samplerInfo = {}; // memset
@@ -166,7 +219,7 @@ void Texture::createSampler(
   samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
   samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
-  samplerInfo.anisotropyEnable = enableAnisotropy ? VK_TRUE : VK_FALSE;
+  samplerInfo.anisotropyEnable = _enableAnisotropy ? VK_TRUE : VK_FALSE;
   samplerInfo.maxAnisotropy = _maxAnisotropy;
 
   samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;

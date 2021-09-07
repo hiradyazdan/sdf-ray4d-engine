@@ -131,12 +131,11 @@ void Shader::load(
  *
  * @brief
  * @note this function may need rethinking since
- * currently the order of file paths determining the
+ * currently the order of file paths determines the
  * success of the function
  * @param[in] _partialFilePaths
  */
 void Shader::preload(
-//  const QString &_replaceItem,
   const QStringList &_partialFilePaths
 )
 {
@@ -232,7 +231,7 @@ Shader::Data Shader::load(
 {
   Data data;
 
-  shader::Info shaderInfo = {};
+  shader::Info shaderInfo = {}; // memset
   shaderInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
   shaderInfo.codeSize = !_isPrecompiled
                         ? _spvBytes.size() * sizeof(uint32_t)

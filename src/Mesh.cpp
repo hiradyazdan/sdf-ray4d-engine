@@ -11,6 +11,10 @@
 
 using namespace sdfRay4d;
 
+/**
+ *
+ * @param[in] fn
+ */
 void Mesh::load(const QString &fn)
 {
   reset();
@@ -47,6 +51,10 @@ void Mesh::load(const QString &fn)
   });
 }
 
+/**
+ *
+ * @return Mesh::Data instance
+ */
 Mesh::Data *Mesh::data()
 {
   if (m_isLoading && !m_data.isValid())

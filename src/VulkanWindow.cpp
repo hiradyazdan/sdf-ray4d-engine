@@ -16,11 +16,14 @@
 
 using namespace sdfRay4d;
 
+/**
+ *
+ * @param[in] _isDebug
+ */
 VulkanWindow::VulkanWindow(
   bool _isDebug
 ) :
-  m_isDebug(_isDebug),
-  m_renderer(nullptr)
+  m_isDebug(_isDebug)
 {}
 
 QVulkanWindowRenderer *VulkanWindow::createRenderer()
@@ -50,6 +53,11 @@ QVulkanWindowRenderer *VulkanWindow::createRenderer()
   return m_renderer;
 }
 
+/**
+ *
+ * @param[in] _isNew
+ * @return MaterialPtr instance
+ */
 VulkanWindow::MaterialPtr &VulkanWindow::getSDFRMaterial(bool _isNew)
 {
   return m_renderer->getSDFRMaterial(_isNew);

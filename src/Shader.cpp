@@ -19,19 +19,28 @@
 
 using namespace sdfRay4d;
 
+/**
+ *
+ * @param[in] _device
+ * @param[in] _deviceFuncs
+ * @param[in] _version
+ */
 Shader::Shader(
   Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs,
-  const QString &_shadersPath,
   int _version
 ) :
   m_device(_device)
-  , m_deviceFuncs(_deviceFuncs)
-  , m_version(_version)
-  , m_shadersPath(m_appConstants.assetsPath + _shadersPath)
-  , m_template("/* ------ PLACEHOLDER ------ */")
+, m_deviceFuncs(_deviceFuncs)
+, m_version(_version)
+, m_shadersPath(m_appConstants.shadersPath)
+, m_template("/* ------ PLACEHOLDER (DO NOT CHANGE) ------ */")
 {}
 
+/**
+ *
+ * @return Shader::Data instance
+ */
 Shader::Data *Shader::getData()
 {
   if (m_isLoading && !m_data.isValid())

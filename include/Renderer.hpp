@@ -2,11 +2,11 @@
 
 #include <QFutureWatcher>
 
+#include "Helpers/Pipeline.hpp"
 #include "Window/VulkanWindow.hpp"
 #include "Mesh.hpp"
 #include "Camera.hpp"
 #include "SDFGraph.hpp"
-#include "Pipeline.hpp"
 
 namespace sdfRay4d
 {
@@ -16,6 +16,7 @@ namespace sdfRay4d
 
   class Renderer : public QVulkanWindowRenderer, public QObject
   {
+    using Material    = Material<float>;
     using MaterialPtr = std::shared_ptr<Material>;
 
     public:
@@ -132,7 +133,6 @@ namespace sdfRay4d
         const QVector3D &eyePos
       );
 
-
       void buildFrame();
 
       void createBuffers();
@@ -150,26 +150,7 @@ namespace sdfRay4d
       void mapMemory(size_t _byteSize);
       void updateDescriptorSets();
 
-      void cmdSetViewportAndScissor(
-        CmdBuffer &_cmdBuffer,
-        uint32_t _extentWidth,
-        uint32_t _extentHeight
-      ); // TODO: Rename
-      void createDepthDrawCalls(
-        const MaterialPtr &_material,
-        CmdBuffer &_cmdBuffer
-      );
-      void createActorDrawCalls(
-        const MaterialPtr &_material,
-        CmdBuffer &_cmdBuffer
-      );
-      void createSDFRDrawCalls(
-        const MaterialPtr &_material,
-        CmdBuffer &_cmdBuffer,
-        float _extentWidth,
-        float _extentHeight
-      );
-      void cmdRenderPass();
+      void executeCommands();
 
     private:
       const VkPhysicalDeviceLimits *getDeviceLimits() const;
@@ -189,16 +170,10 @@ namespace sdfRay4d
     private:
       Device m_device = VK_NULL_HANDLE;
 
-      Buffer m_depthVertexBuffer = VK_NULL_HANDLE;
-      Buffer m_actorVertexBuffer  = VK_NULL_HANDLE;
-      Buffer m_sdfUniformBuffer   = VK_NULL_HANDLE;
       Buffer m_dynamicUniformBuffer = VK_NULL_HANDLE;
 
       std::vector<Buffer> m_buffers;
 
-      memory::Reqs m_depthVertexMemReq = {};
-      memory::Reqs m_actorVertexMemReq = {};
-      memory::Reqs m_sdfUniformMemReq = {};
       memory::Reqs m_dynamicUniformMemReq = {};
 
       device::Size m_sdfUniformStartOffset = 0;
@@ -210,7 +185,7 @@ namespace sdfRay4d
      * - Pipeline
      */
     private:
-      PipelineHelper m_pipelineHelper;
+      helpers::PipelineHelper m_pipelineHelper;
 
     private:
       texture::ImageView m_depthView = VK_NULL_HANDLE;
@@ -220,7 +195,7 @@ namespace sdfRay4d
      * Qt Vulkan Members
      */
     private:
-      VulkanWindow *m_vkWindow;
+      VulkanWindow *m_vkWindow = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
     /**

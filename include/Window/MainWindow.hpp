@@ -17,6 +17,10 @@ namespace sdfRay4d
     public:
       static QPalette setPalette();
 
+    /**
+     * SDF Graph Widget Window Connection Slots
+     * -------------------------------------------------
+     */
     private slots:
       void loadSDFGraph();
       void resizeSDFGraph(Qt::DockWidgetArea _area);
@@ -24,11 +28,19 @@ namespace sdfRay4d
       void toggleSDFGraphMenu(bool _isVisible);
       void toggleSDFGraphTopLevel();
 
+    /**
+     * SDF Graph Toolbar Button Slots
+     * -------------------------------------------------
+     */
     private slots:
       void autoCompileSDFGraph();
       void compileSDFGraph();
       void saveSDFNodes();
 
+    /**
+     * Main Menu Button Slots
+     * -------------------------------------------------
+     */
     private slots:
       void loadAboutDialog();
       void quitApp();
@@ -39,6 +51,8 @@ namespace sdfRay4d
       void initVkWindow();
 
     private:
+      void createSDFGraphActions();
+      void createSDFGraphWidgetConnections();
       void createActions();
       void createMenus();
 

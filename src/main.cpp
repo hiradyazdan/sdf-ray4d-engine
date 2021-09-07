@@ -4,9 +4,15 @@
 
 using MainWindow = sdfRay4d::MainWindow;
 
-int main(int argc, char *argv[])
+/**
+ *
+ * @param[in] _argc
+ * @param[in] _argv
+ * @return
+ */
+int main(int _argc, char *_argv[])
 {
-  QApplication app(argc, argv);
+  QApplication app(_argc, _argv);
 
   QApplication::setStyle(QStyleFactory::create("fusion"));
   QApplication::setPalette(MainWindow::setPalette());

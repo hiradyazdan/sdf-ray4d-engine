@@ -18,7 +18,7 @@ void Renderer::initVkFunctions()
     m_deviceFuncs,
     m_isMSAA ? m_vkWindow->sampleCountFlagBits() : VK_SAMPLE_COUNT_1_BIT,
     m_vkWindow->defaultRenderPass(),
-    &m_depthView // framebuffer depth attachment for custom renderPass
+    &m_depthView // framebuffer depth attachment for custom renderPass - inited in swapchain
   );
 }
 
@@ -27,12 +27,6 @@ void Renderer::initMaterials()
   initDepthMaterial();
   initActorMaterial();
   initSDFRMaterial();
-
-  m_materials = {
-    m_depthMaterial,
-    m_actorMaterial,
-    m_sdfrMaterial
-  };
 }
 
 void Renderer::initShaders()

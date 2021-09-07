@@ -51,10 +51,10 @@ void Renderer::allocateMemory()
 {
   // Allocate memory for everything at once.
   m_sdfUniformStartOffset = setDynamicOffsetAlignment(
-    0 + m_actorVertexMemReq.size
+    0 + m_actorMaterial->memReq.size
   );
   m_actorMaterial->uniMemStartOffset = setDynamicOffsetAlignment(
-    m_sdfUniformStartOffset + m_sdfUniformMemReq.size
+    m_sdfUniformStartOffset + m_sdfrMaterial->memReq.size
   );
 
   memory::AllocInfo memAllocInfo = {
@@ -126,7 +126,7 @@ void Renderer::updateDescriptorSets()
 
   // Write descriptors for the dynamic uniform buffer in the vertex shaders.
   descriptor::BufferInfo depthVertexBuffer = {
-    m_depthVertexBuffer, // buffer
+    m_depthMaterial->buffer, // buffer
     0, // offset
     m_depthMaterial->vertUniSize // range
   };
@@ -192,7 +192,7 @@ void Renderer::updateDescriptorSets()
 
 void Renderer::createBuffers()
 {
-  if (m_depthVertexBuffer)
+  if (m_depthMaterial->buffer)
   {
     return;
   }
@@ -208,8 +208,10 @@ void Renderer::createBuffers()
     depthBufferSize,
     VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
     VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-    m_depthVertexBuffer,
-    m_depthVertexMemReq
+    m_depthMaterial->buffer,
+    m_depthMaterial->memReq
+//    m_depthVertexBuffer,
+//    m_depthVertexMemReq
   );
 
   const auto actorBufferSize = m_actorMesh.data()->vertexCount * 8 * sizeof(float);
@@ -220,8 +222,10 @@ void Renderer::createBuffers()
   createBuffer(
     actorBufferSize,
     VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-    m_actorVertexBuffer,
-    m_actorVertexMemReq
+    m_actorMaterial->buffer,
+    m_actorMaterial->memReq
+//    m_actorVertexBuffer,
+//    m_actorVertexMemReq
   );
 
   auto Kb = (1 << 10);
@@ -239,8 +243,10 @@ void Renderer::createBuffers()
     VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT |
     VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
     VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-    m_sdfUniformBuffer,
-    m_sdfUniformMemReq
+    m_sdfrMaterial->buffer,
+    m_sdfrMaterial->memReq
+//    m_sdfUniformBuffer,
+//    m_sdfUniformMemReq
   );
 
   /**
@@ -263,9 +269,9 @@ void Renderer::createBuffers()
 
   allocateMemory();
 
-  bindBufferToMemory(m_depthVertexBuffer, 0);
-  bindBufferToMemory(m_actorVertexBuffer, m_depthMaterial->vertUniSize);
-  bindBufferToMemory(m_sdfUniformBuffer, m_sdfUniformStartOffset);
+  bindBufferToMemory(m_depthMaterial->buffer, 0);
+  bindBufferToMemory(m_actorMaterial->buffer, m_depthMaterial->vertUniSize);
+  bindBufferToMemory(m_sdfrMaterial->buffer, m_sdfUniformStartOffset);
   bindBufferToMemory(m_dynamicUniformBuffer, m_actorMaterial->uniMemStartOffset);
 
   mapMemory(actorBufferSize);

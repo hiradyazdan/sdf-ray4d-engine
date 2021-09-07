@@ -3,29 +3,32 @@
 #include <QtConcurrentRun>
 #include <QSize>
 
-#include "Material.hpp"
+#include "BaseHelper.hpp"
+
+#include "Framebuffer.hpp"
 #include "RenderPass.hpp"
+#include "Command.hpp"
 
-namespace sdfRay4d
+namespace sdfRay4d::helpers
 {
-  using namespace vk;
-
   /**
    * @class PipelineHelper
    * @brief
    *
-   * @note as Material is big struct with high level of usage
-   * and importance throughout the entire application lifecycle
-   * all functions that uses it as a parameter designated the
-   * parameter as a const reference (&) to use the same memory
+   * @note as Material is relatively a big struct with high level
+   * of usage and importance, throughout the entire application
+   * lifecycle, all functions that use it as a parameter, designated
+   * the parameter as a const reference (&), to use the same memory
    * address and keep the consistency of the material data intact.
    *
    */
-  class PipelineHelper
+  class PipelineHelper : protected BaseHelper
   {
-    using MaterialPtr         = std::shared_ptr<Material>;
     using ShaderStageInfoList = std::vector<pipeline::ShaderStageInfo>;
     using DescLayoutList      = std::vector<descriptor::Layout>;
+
+    public:
+      CommandHelper command;
 
     public:
       void init(
@@ -33,7 +36,7 @@ namespace sdfRay4d
         QVulkanDeviceFunctions *_deviceFuncs,
         const SampleCountFlags &_sampleCountFlags,
         const RenderPass &_defaultRenderPass,
-        texture::ImageView *_attachments
+        texture::ImageView *_fbAttachments
       );
 
     public:
@@ -80,7 +83,6 @@ namespace sdfRay4d
 
     public:
       RenderPass &getRenderPass         (bool _useDefault = true);
-      Framebuffer &getFramebuffer       (uint32_t _width = 0, uint32_t _height = 0);
 
     /**
      * Create Pipeline Helpers (on Worker Thread)
@@ -98,7 +100,7 @@ namespace sdfRay4d
       void createComputePipeline        (const MaterialPtr &_material);
       void createGraphicsPipeline       (const MaterialPtr &_material);
 
-      void initShaderStages             (const MaterialPtr &_material);
+      static void initShaderStages      (const MaterialPtr &_material);
 
       void createDescriptorSets         (const MaterialPtr &_material);
       void createDescriptorPool         (const MaterialPtr &_material);
@@ -124,21 +126,17 @@ namespace sdfRay4d
       void setMultisampleState          (const MaterialPtr &_material);
 
     private:
-      void createFramebuffer            (uint32_t _width, uint32_t _height);
-
-    private:
-      QMutex m_pipeMutex;
-
       Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
       pipeline::Cache m_pipelineCache = VK_NULL_HANDLE;
+      shader::Module m_currentShaderModule = VK_NULL_HANDLE;
 
-      texture::ImageView *m_attachments = VK_NULL_HANDLE;
-      Framebuffer m_frameBuffer = VK_NULL_HANDLE;
-      RenderPass m_renderPass = VK_NULL_HANDLE;
+      QMutex m_pipeMutex;
 
+      FramebufferHelper m_framebufferHelper;
       RenderPassHelper m_renderPassHelper;
+
       SampleCountFlags m_sampleCountFlags;
 
       std::vector<MaterialPtr> m_materials;
@@ -146,7 +144,5 @@ namespace sdfRay4d
       QFuture<void> m_inclusiveWorker;
       QFuture<void> m_exclusiveWorker;
       bool m_isHot = false; // for swapping old and new pipelines at runtime
-
-      shader::Module m_currentShaderModule = VK_NULL_HANDLE;
   };
 }
