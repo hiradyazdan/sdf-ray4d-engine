@@ -16,9 +16,6 @@
  * - ShapeDataModel
  *****************************************************/
 
-#include <chrono>
-#include <thread>
-
 #include "SDFGraph.hpp"
 
 #include "SDFGraph/DataModels/Operations/UnionDataModel.hpp"
@@ -38,83 +35,158 @@ using namespace sdfGraph;
 SDFGraph::SDFGraph(
   VulkanWindow *_vkWindow
 ) :
-  m_vkWindow      (_vkWindow)
-, m_shapeMaterial (_vkWindow->getSDFRMaterial(true)) // creates and stores a fresh new SDFR Material
-, m_graphScene    (new FlowScene(registerModels(), this))
-, m_graphView     (new FlowView(m_graphScene))
+  m_vkWindow    (_vkWindow)
+, m_sdfrMaterial(_vkWindow->getSDFRMaterial(true)) // creates and stores a fresh new SDFR Material
+, m_graphScene  (new FlowScene(registerModels(), this))
+, m_graphView   (new FlowView(m_graphScene))
 {
   setStyle();
 
   const auto &sdfrShaders = m_appConstants.shadersPaths.raymarch;
 
-  m_shapeMaterial->fragmentShader.preload({
+  m_sdfrMaterial->fragmentShader.preload({
     sdfrShaders.frag.partials.distanceFuncs,
     sdfrShaders.frag.partials.operations,
     sdfrShaders.frag.main
   });
+
+  connect(
+    m_graphScene, &FlowScene::connectionDeleted,
+    this, &SDFGraph::removeMapNode
+  );
 }
 
-/**
- *
- * @param[in] _isAutoCompile
- */
-void SDFGraph::autoCompile(bool _isAutoCompile)
+void SDFGraph::removeMapNode(const Connection &_connection)
 {
-  if(!_isAutoCompile) return;
+  const auto &node = _connection.getNode(PortType::In);
+  const auto &mapNode = getDataModel<MapDataModel>(node);
 
-  // TODO: perhaps to work out queue watcher multi-threaded solution
-}
-
-/**
- *
- * @note Qt SLOT
- */
-void SDFGraph::compileGraph()
-{
-  for (const auto &node : getNodes())
+  if(mapNode)
   {
+    m_mapNodes.erase(mapNode);
+    m_isMapNodeRemoved = true;
+  }
+
+  if(m_isAutoCompile)
+  {
+    compile();
+  }
+}
+
+void SDFGraph::findMapNodes()
+{
+  for(const auto &node : getNodes())
+  {
+    const auto &nodeValue = node.second;
+
+    if(!nodeValue) continue;
+
     /**
      * @note this seems to be the only way to detect the map node
      * as the nodes order is based on their order of construction
      * at runtime by the user, than static/pre-defined order.
+     *
+     * @note also, flowScene's Signal-Slot connections don't work as
+     * they trigger right before the node data is transferred through
+     * the connections.
      *
      * @note as the shader compilation at runtime is naturally expected
      * to have some minor pause/stalling, semi-reflection approach
      * (no reflection in c++) to dynamically check for runtime data,
      * does not cause any major performance cost for the user.
      */
-    const auto &mapNode = dynamic_cast<MapDataModel*>(node.second->nodeDataModel());
+    const auto &mapNode = getDataModel<MapDataModel>(nodeValue.get());
     if(mapNode)
     {
+      if(m_isAutoCompile)
+      {
+        connect(
+          mapNode, &MapDataModel::isValid,
+          this, &SDFGraph::compile,
+          Qt::UniqueConnection
+        );
+      }
+      else
+      {
+        disconnect(
+          mapNode, &MapDataModel::isValid,
+          this, &SDFGraph::compile
+        );
+      }
+
       qDebug() << "Map NODE data: " << mapNode->getData();
-      m_mapNodes.push_back(mapNode);
+      m_mapNodes.insert(mapNode);
     }
 
-    const auto &shapeNode = dynamic_cast<ShapeDataModel*>(node.second->nodeDataModel());
-    if(shapeNode)
+    if(!m_isAutoCompile) // TODO: Use debug compile def for this
     {
-      qDebug() << "shape NODE data: " << shapeNode->getData();
-    }
+      const auto &shapeNode = getDataModel<ShapeDataModel>(nodeValue.get());
+      if(shapeNode)
+      {
+        qDebug() << "shape NODE data: " << shapeNode->getData();
+      }
 
-    const auto &opNode = dynamic_cast<OperationDataModel*>(node.second->nodeDataModel());
-    if(opNode)
-    {
-      qDebug() << "operation NODE data: " << opNode->getData();
+      const auto &opNode = getDataModel<OperationDataModel>(nodeValue.get());
+      if(opNode)
+      {
+        qDebug() << "operation NODE data: " << opNode->getData();
+      }
     }
   }
+}
+
+/**
+ *
+ * @param[in] _isAutoCompile
+ */
+void SDFGraph::setAutoCompileConnection(bool _isAutoCompile)
+{
+  m_isAutoCompile = _isAutoCompile;
+
+  QtConcurrent::run([this]()
+  {
+    while(true)
+    {
+      if(!m_isAutoCompile)
+      {
+        findMapNodes();
+        break;
+      }
+
+      findMapNodes();
+    }
+  });
+}
+
+/**
+ *
+ * @note Qt SLOT
+ */
+void SDFGraph::compile()
+{
+  findMapNodes();
 
   std::string shaderData;
 
   for(const auto &mapNode : m_mapNodes)
   {
+    const auto &mapNodeData = mapNode->getData().toStdString();
+
+    if(mapNodeData.empty()) continue;
+
     shaderData += "res = ";
-    shaderData += mapNode->getData().toStdString();
+    shaderData += mapNodeData;
     shaderData += "\n  ";
   }
 
-  if (m_shapeMaterial->fragmentShader.isValid()) return;
+  if(
+    m_sdfrMaterial->fragmentShader.isValid() ||
+    shaderData.empty() && !m_isMapNodeRemoved
+  ) return;
 
-  m_shapeMaterial->fragmentShader.load(shaderData);
+  m_isMapNodeRemoved = false;
+
+  m_sdfrMaterial->fragmentShader.load(shaderData);
 
   /**
    * @note to avoid any race condition creating
@@ -143,7 +215,7 @@ SDFGraph::DataModelRegistryPtr SDFGraph::registerModels()
   registry->registerModel<TorusDataModel>(shapeCatName);
 
   registry->registerModel<UnionDataModel>(opCatName);
-  registry->registerModel<SubtractionDataModel>(opCatName);
+//  registry->registerModel<SubtractionDataModel>(opCatName); // FIXME
 
   registry->registerModel<MapDataModel>(mapCatName);
 

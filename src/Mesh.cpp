@@ -13,20 +13,20 @@ using namespace sdfRay4d;
 
 /**
  *
- * @param[in] fn
+ * @param[in] _fileName
  */
-void Mesh::load(const QString &fn)
+void Mesh::load(const QString &_fileName)
 {
   reset();
 
   m_isLoading = true;
 
-  m_worker = QtConcurrent::run([fn]()
+  m_worker = QtConcurrent::run([_fileName]()
   {
     Data md;
-    QFile f(fn);
+    QFile f(_fileName);
     if (!f.open(QIODevice::ReadOnly)) {
-      qWarning("Failed to open %s", qPrintable(fn));
+      qWarning("Failed to open %s", qPrintable(_fileName));
       return md;
     }
     QByteArray buf = f.readAll();
@@ -36,7 +36,7 @@ void Mesh::load(const QString &fn)
 
     if (format != 1)
     {
-      qWarning("Invalid format in %s", qPrintable(fn));
+      qWarning("Invalid format in %s", qPrintable(_fileName));
       return md;
     }
     int ofs = 4;

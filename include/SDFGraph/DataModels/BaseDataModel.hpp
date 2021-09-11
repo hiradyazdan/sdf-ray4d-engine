@@ -38,6 +38,9 @@ namespace sdfRay4d::sdfGraph
       [[nodiscard]] NodeValidationState validationState() const override { return m_validationState; }
       [[nodiscard]] QString validationMessage() const override { return m_validationError; }
 
+    signals:
+      void isValid();
+
     protected:
       NodeValidationState m_validationState = NodeValidationState::Warning;
       QString m_validationError = QString("Missing or incorrect inputs");

@@ -14,7 +14,11 @@ void Renderer::initDepthMaterial()
     m_deviceFuncs
   );
 
-  material->vertexCount = 2 * 3; // FIXME
+  material->vertexCount = m_actorMesh.data()->vertexCount; // FIXME
+  material->bufferSize = material->vertexCount * 8 * sizeof(float); // FIXME
+  material->bufferUsage =
+      VK_BUFFER_USAGE_VERTEX_BUFFER_BIT // Vertex Buffer
+    | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT; // Uniform Buffer
 
   material->sourceStage =
       VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT
@@ -29,12 +33,8 @@ void Renderer::initDepthMaterial()
   // A vec3 still has an alignment of 16,
   // while a mat3 is like 3 * vec3.
   material->vertUniSize = setDynamicOffsetAlignment(
-    2 * 64 + 48
+    2 * 64 + 48 // FIXME
   ); // depth_pass.vert
-
-  // TODO : might not need this for depth texture
-  const auto &maxSamplerAnisotropy = getDeviceLimits()->maxSamplerAnisotropy;
-  material->texture.createSampler(maxSamplerAnisotropy);
 
   material->layoutBindings.resize(1);;
 
@@ -59,6 +59,11 @@ void Renderer::initActorMaterial()
   );
 
   material->vertexCount = m_actorMesh.data()->vertexCount;
+  material->bufferSize = material->vertexCount * 8 * sizeof(float);
+  material->bufferUsage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT; // Vertex Buffer
+  material->uniMemStartOffset = setDynamicOffsetAlignment(
+    0 + material->memReq.size
+  );
 
   // default Qt Vulkan RenderPass
   material->renderPass = m_pipelineHelper.getRenderPass();
@@ -93,48 +98,6 @@ void Renderer::initActorMaterial()
   material->dynamicDescCount = 2;
 
   m_materials.push_back(material);
-
-
-//  if (m_vpDirty)
-//  {
-//    if (m_vpDirty) --m_vpDirty;
-//
-//    QMatrix4x4 vp, model;
-//    QMatrix3x3 modelNormal;
-//    QVector3D eyePos;
-//    getMatrices(&vp, &model, &modelNormal, &eyePos);
-//
-//    // Map the uniform data for the current frame, ignore the geometry data at
-//    // the beginning and the uniforms for other frames.
-//    quint8 *p;
-//    auto result = m_deviceFuncs->vkMapMemory(
-//      m_device, m_bufferMemory,
-//      material->uniMemStartOffset + m_vkWindow->currentFrame() * (
-//        material->vertUniSize +
-//        material->fragUniSize
-//      ),
-//      material->vertUniSize + material->fragUniSize,
-//      0, reinterpret_cast<void **>(&p)
-//    );
-//    if (result != VK_SUCCESS)
-//    {
-//      qFatal("Failed to map memory: %d", result);
-//    }
-//
-//    // Vertex shader uniforms
-//    memcpy(p, vp.constData(), 64);
-//    memcpy(p + 64, model.constData(), 64);
-//    const float *mnp = modelNormal.constData();
-//    memcpy(p + 128, mnp, 12);
-//    memcpy(p + 128 + 16, mnp + 3, 12);
-//    memcpy(p + 128 + 32, mnp + 6, 12);
-//
-//    // Fragment shader uniforms
-//    p += material->vertUniSize;
-//    writeFragUni(p, eyePos);
-//
-////    m_deviceFuncs->vkUnmapMemory(m_device, m_bufferMemory);
-//  }
 }
 
 /**
@@ -146,6 +109,16 @@ void Renderer::initSDFRMaterial(const MaterialPtr &_material)
   _material->isHotSwappable = true;
 
   _material->vertexCount = 2 * 3;
+
+  auto Kb = (1 << 10);
+  auto UPLOAD_REGION_SIZE = 64 * Kb;
+  _material->bufferSize = UPLOAD_REGION_SIZE;
+  _material->bufferUsage =
+      VK_BUFFER_USAGE_VERTEX_BUFFER_BIT
+    | VK_BUFFER_USAGE_INDEX_BUFFER_BIT
+    | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
+    | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT
+    | VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
   // default Qt Vulkan RenderPass
   _material->renderPass = m_pipelineHelper.getRenderPass();
@@ -168,20 +141,17 @@ void Renderer::initSDFRMaterial(const MaterialPtr &_material)
 
   _material->vertUniSize = setDynamicOffsetAlignment(
     2 * 64 + 48
-  ); // see color_phong.vert
+  ); // see rasterized_mesh_pass.vert
   _material->fragUniSize = setDynamicOffsetAlignment(
     6 * 16 + 12 + 2 * 4
-  ); // see color_phong.frag
+  ); // see rasterized_mesh_pass.frag
+
+  // TODO : might not need this for depth texture
+  const auto &maxSamplerAnisotropy = getDeviceLimits()->maxSamplerAnisotropy;
+  _material->texture.createSampler(maxSamplerAnisotropy);
 
   _material->layoutBindings.resize(1);
 
-  //  _material->layoutBindings[0] = {
-  //    0, // binding
-  //    VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, // descriptorType
-  //    1, // descriptorCount
-  //    VK_SHADER_STAGE_VERTEX_BIT, // stageFlags
-  //    nullptr // pImmutableSamplers
-  //  };
   _material->layoutBindings[0] = {
     0, // binding
     VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, // descriptorType

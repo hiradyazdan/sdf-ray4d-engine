@@ -59,7 +59,7 @@ bool SPIRVCompiler::compile(
     shader.setEntryPoint(_entryPoint.c_str());
     shader.setSourceEntryPoint(_entryPoint.c_str());
 
-    if (
+    if(
       !shader.parse(
         &glslang::DefaultTBuiltInResource, 100,
         false, messages

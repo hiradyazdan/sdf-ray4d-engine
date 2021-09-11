@@ -13,23 +13,49 @@ namespace sdfRay4d::helpers
    */
   class BufferHelper : protected BaseHelper
   {
-    public:
-      BufferHelper();
+    friend class PipelineHelper;
 
     public:
-      void createBuffers();
+      BufferHelper(
+        const Device &_device,
+        QVulkanDeviceFunctions *_deviceFuncs
+      );
+
+    /**
+     * @note BufferHelper is non-copyable
+     */
+    public:
+      BufferHelper() = default;
+      BufferHelper(const BufferHelper&) = delete;
+
+    public:
       void createBuffer(
         device::Size _size,
-        buffer::UsageFlags _usage,
+        const buffer::UsageFlags &_usage,
         Buffer &_buffer,
         memory::Reqs &_memReq
       );
-      void allocateMemory();
-      void bindBufferToMemory(
+
+    public:
+      void allocateMemory(
+        const device::Size &_size,
+        uint32_t _typeIndex
+      );
+      void bindBufferMemory(
         const Buffer &_buffer,
         const device::Size &_memOffset
       );
       void mapMemory(size_t _byteSize);
-      void updateDescriptorSets();
+
+    private:
+      void destroyBuffer(Buffer &_buffer);
+      void freeMemory();
+
+    private:
+      Device m_device = VK_NULL_HANDLE;
+      QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
+
+//      std::vector<Buffer> m_buffers;
+      device::Memory m_bufferMemory = VK_NULL_HANDLE;
   };
 }

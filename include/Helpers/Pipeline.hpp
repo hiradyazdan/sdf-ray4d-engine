@@ -5,9 +5,11 @@
 
 #include "BaseHelper.hpp"
 
+#include "Descriptor.hpp"
+#include "Buffer.hpp"
+#include "Command.hpp"
 #include "Framebuffer.hpp"
 #include "RenderPass.hpp"
-#include "Command.hpp"
 
 namespace sdfRay4d::helpers
 {
@@ -28,16 +30,18 @@ namespace sdfRay4d::helpers
     using DescLayoutList      = std::vector<descriptor::Layout>;
 
     public:
+      BufferHelper buffer;
+      DescriptorHelper descriptor;
       CommandHelper command;
 
     public:
-      void init(
+      void initHelpers(
         const Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs,
         const SampleCountFlags &_sampleCountFlags,
-        const RenderPass &_defaultRenderPass,
-        texture::ImageView *_fbAttachments
+        const RenderPass &_defaultRenderPass
       );
+      void initSwapChainHelpers         (const texture::ImageView &_fbAttachments);
 
     public:
       void createCache();
@@ -66,15 +70,20 @@ namespace sdfRay4d::helpers
       void destroyDescriptorPool        (descriptor::Pool &_pool);
       void destroyDescriptorSetLayout   (DescLayoutList &_setLayouts);
       void destroyDescriptors();
+
       void destroyShaderModules();
       void destroyShaderModule          (Shader &_shader);
+
+      void destroyTexture               (Texture &_texture);
       void destroyTextures();
+
       void destroyPipelines();
-      void destroyPipeline              (const MaterialPtr &_material);
-      void destroyPipelineLayout        (const MaterialPtr &_material);
       void destroyPipeline              (Pipeline &_pipeline);
+      void destroyPipeline              (const MaterialPtr &_material);
       void destroyPipelineLayout        (pipeline::Layout &_pipelineLayout);
+      void destroyPipelineLayout        (const MaterialPtr &_material);
       void destroyRenderPass();
+      void destroyBuffers();
 
       void swapSDFRPipelines(
         const MaterialPtr &_oldMaterial,
@@ -90,7 +99,6 @@ namespace sdfRay4d::helpers
      *
      * Shader Stages: per Material Pipeline
      * Vertex Layout: per Material Pipeline
-     * Descriptor Sets/Layouts: per Material Pipeline
      * Pipeline Layout: per Material Pipeline
      */
     private:
@@ -101,11 +109,6 @@ namespace sdfRay4d::helpers
       void createGraphicsPipeline       (const MaterialPtr &_material);
 
       static void initShaderStages      (const MaterialPtr &_material);
-
-      void createDescriptorSets         (const MaterialPtr &_material);
-      void createDescriptorPool         (const MaterialPtr &_material);
-      void createDescriptorSetLayout    (const MaterialPtr &_material);
-      void allocateDescriptorSets       (const MaterialPtr &_material);
 
     /**
      * PSO (Pipeline State Objects) Helpers (on Worker Thread)
@@ -134,7 +137,6 @@ namespace sdfRay4d::helpers
 
       QMutex m_pipeMutex;
 
-      FramebufferHelper m_framebufferHelper;
       RenderPassHelper m_renderPassHelper;
 
       SampleCountFlags m_sampleCountFlags;

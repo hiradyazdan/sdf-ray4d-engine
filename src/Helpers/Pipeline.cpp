@@ -10,7 +10,6 @@
  * directory named as the class name
  *
  * Partials:
- * - create_descriptor_set_helpers.cpp
  * - create_pipeline_helpers.cpp
  * - create_pipeline_workers.cpp
  * - destroy_helpers.cpp
@@ -30,45 +29,45 @@ using namespace sdfRay4d::helpers;
  * to initialize device and deviceFuncs members, because they're only initialized
  * after Renderer constructor and within QVulkanRenderer's initResources().
  *
- * @note
- * As attachments (depthView) is populated later in initSwapchainResources,
- * it should be a pointer, so that its reference value gets used here directly
- * and as they could be multiple attachments/image views later on,
- * it should be either a vector of references which is not directly
- * available in C++ except by using std::reference_wrapper or just pass
- * the ImageView handle as itself is a handle/reference type
- *
- *
  * @param[in] _device
  * @param[in] _deviceFuncs
  * @param[in] _sampleCountFlags
  * @param[in] _defaultRenderPass
- * @param[in] _fbAttachments framebuffer attachments
+ *
  */
-void PipelineHelper::init(
+void PipelineHelper::initHelpers(
   const Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs,
   const SampleCountFlags &_sampleCountFlags,
-  const RenderPass &_defaultRenderPass,
-  texture::ImageView *_fbAttachments
+  const RenderPass &_defaultRenderPass
 )
 {
   m_device            = _device;
   m_deviceFuncs       = _deviceFuncs;
   m_sampleCountFlags  = _sampleCountFlags;
 
-  m_framebufferHelper = FramebufferHelper(
-    _device, _deviceFuncs,
-    _fbAttachments
-  );
   m_renderPassHelper  = RenderPassHelper(
-    _device, _deviceFuncs,
-    _sampleCountFlags,
+    m_device, m_deviceFuncs,
+    m_sampleCountFlags,
     _defaultRenderPass
   );
-  command             = CommandHelper(_device, _deviceFuncs);
 
-  m_renderPassHelper.setFramebufferHelper(m_framebufferHelper);
+  descriptor          = DescriptorHelper(m_device, m_deviceFuncs);
+  command             = CommandHelper(m_device, m_deviceFuncs);
+}
+
+/**
+ *
+ * @param[in] _fbAttachments framebuffer attachments
+ */
+void PipelineHelper::initSwapChainHelpers(
+  const texture::ImageView &_fbAttachments
+)
+{
+  if(m_renderPassHelper.getFramebufferAttachments() == _fbAttachments) return;
+
+  m_renderPassHelper.setFramebufferAttachments(_fbAttachments);
+  buffer = BufferHelper(m_device, m_deviceFuncs);
   command.setRenderPassHelper(m_renderPassHelper);
 }
 

@@ -27,7 +27,7 @@ namespace sdfRay4d
       void createSDFRPipeline();
 
     signals:
-      void sdfGraphChanged();
+      void compileSDFGraph();
 
     private:
       void mousePressEvent    (QMouseEvent *_event) override;

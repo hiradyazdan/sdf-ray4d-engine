@@ -44,8 +44,6 @@ namespace sdfRay4d::helpers
      *
      */
     public:
-      void executeCmdSetViewport();
-      void executeCmdSetScissor();
       void executeRenderPass(const std::vector<MaterialPtr> &_materials);
       void executePipelineBarrier(const MaterialPtr &_material);
 
@@ -55,6 +53,8 @@ namespace sdfRay4d::helpers
      *
      */
     private:
+      void executeCmdSetViewport();
+      void executeCmdSetScissor();
       void executeCmdBind          (const MaterialPtr &_material);
       void executeCmdPushConstants (const MaterialPtr &_material);
       void executeCmdDraw          (const MaterialPtr &_material);

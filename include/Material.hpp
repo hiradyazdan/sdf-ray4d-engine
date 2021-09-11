@@ -44,7 +44,14 @@ namespace sdfRay4d
 
     // Buffer
     Buffer                      buffer = VK_NULL_HANDLE;
+    Buffer                      dynamicUniformBuffer = VK_NULL_HANDLE;
+    buffer::UsageFlags          bufferUsage = {};
+    device::Size                bufferSize = 0;
+    device::Size                vertUniSize = 0;
+    device::Size                fragUniSize = 0;
+    device::Size                uniMemStartOffset = 0;
     memory::Reqs                memReq = {};
+    memory::Reqs                dynamicUniformMemReq = {};
 
     // Descriptor
     descriptor::Pool            descPool = VK_NULL_HANDLE;
@@ -72,10 +79,6 @@ namespace sdfRay4d
     // RenderPass
     RenderPass                  renderPass = VK_NULL_HANDLE;
     Framebuffer                 framebuffer = VK_NULL_HANDLE;
-
-    device::Size                vertUniSize = 0;
-    device::Size                fragUniSize = 0;
-    device::Size                uniMemStartOffset = 0;
 
     uint32_t                    vertexCount = 0;
 

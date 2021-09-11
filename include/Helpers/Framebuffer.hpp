@@ -13,16 +13,8 @@ namespace sdfRay4d::helpers
    */
   class FramebufferHelper : protected BaseHelper
   {
-    friend class PipelineHelper;
     friend class RenderPassHelper;
     friend class CommandHelper;
-
-    public:
-      FramebufferHelper(
-        const Device &_device,
-        QVulkanDeviceFunctions *_deviceFuncs,
-        texture::ImageView *_attachments
-      );
 
     /**
      * @note FramebufferHelper is non-copyable
@@ -32,9 +24,17 @@ namespace sdfRay4d::helpers
       FramebufferHelper(const FramebufferHelper&) = delete;
 
     private:
+      FramebufferHelper(
+        const Device &_device,
+        QVulkanDeviceFunctions *_deviceFuncs
+      ) noexcept;
+
+    private:
       void createFramebuffer(const RenderPass &_renderPass);
+      void setAttachments(const texture::ImageView &_attachments);
       void setSize(uint32_t _extentWidth, uint32_t _extentHeight);
       void setDefaultFramebuffer(const Framebuffer &_framebuffer);
+      texture::ImageView getAttachments() { return m_attachments; }
       Framebuffer &getFramebuffer(
         const RenderPass &_renderPass,
         bool _useDefault
@@ -46,7 +46,7 @@ namespace sdfRay4d::helpers
 
       Framebuffer m_defaultFrameBuffer = VK_NULL_HANDLE;
       Framebuffer m_frameBuffer = VK_NULL_HANDLE;
-      texture::ImageView *m_attachments = VK_NULL_HANDLE;
+      texture::ImageView m_attachments = VK_NULL_HANDLE;
 
       uint32_t m_extentWidth = 0;
       uint32_t m_extentHeight = 0;

@@ -17,8 +17,7 @@ namespace sdfRay4d
     public:
       Shader(
         Device &_device,
-        QVulkanDeviceFunctions *_deviceFuncs,
-        int _version = 450
+        QVulkanDeviceFunctions *_deviceFuncs
       );
 
     public:
@@ -26,7 +25,7 @@ namespace sdfRay4d
       {
         shader::Module shaderModule = VK_NULL_HANDLE;
 
-        bool isValid() const { return shaderModule != VK_NULL_HANDLE; }
+        [[nodiscard]] bool isValid() const { return shaderModule != VK_NULL_HANDLE; }
       };
 
     /**

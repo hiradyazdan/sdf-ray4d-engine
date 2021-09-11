@@ -33,21 +33,21 @@ void Renderer::initSwapChainResources()
   );
 //  m_proj.translate(0, 0, -4);
 
+  markViewProjDirty();
+
   createDepthView();
 
-  markViewProjDirty();
+  m_pipelineHelper.initSwapChainHelpers(
+    m_depthMaterial->texture.getImageView() // framebuffer depth attachment for custom renderPass
+  );
 }
 
 void Renderer::releaseSwapChainResources()
 {
   qDebug("releaseSwapChainResources");
 
-  // It is important to finish the pending frame right here since this is the
-  // last opportunity to act with all resources intact.
   m_frameWatcher.waitForFinished();
 
-  // Cannot count on the finished() signal being emitted before returning
-  // from here.
   if (m_isFramePending)
   {
     m_isFramePending = false;

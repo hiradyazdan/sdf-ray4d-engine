@@ -21,7 +21,7 @@ void Renderer::startNextFrame()
    * generating command buffers can be
    * offloaded to a CPU worker thread
    */
-  auto worker = QtConcurrent::run(
+  const auto &worker = QtConcurrent::run(
     this,
     &Renderer::buildFrame
   );
@@ -52,8 +52,9 @@ void Renderer::updateFrame()
   /**
    * @note this has to be invoked after
    * frameReady and requestUpdate methods
-   * as otherwise it adds to the command buffer
-   * that its bound pipeline is already destroyed.
+   * as otherwise it attempts to add to the
+   * command buffer that its bound pipeline is
+   * already destroyed.
    *
    */
   swapSDFRPipelines();

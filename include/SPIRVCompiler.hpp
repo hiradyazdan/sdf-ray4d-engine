@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <QVulkanWindow>
+#include <QMutex>
 
 #include <glslang/Public/ShaderLang.h>
 #include <glslang/SPIRV/GlslangToSpv.h>

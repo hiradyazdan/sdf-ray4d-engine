@@ -1,7 +1,16 @@
 /*****************************************************
  * Class: RenderPassHelper (General)
  * Members: General Functions (Public/Private)
- * Partials: None
+ *
+ * This Class is split into partials to categorize
+ * and classify the functionality
+ * for the purpose of readability/maintainability
+ *
+ * The partials can be found in the respective
+ * directory named as the class name
+ *
+ * Partials:
+ * - set_framebuffer_helpers.cpp
  *****************************************************/
 
 #include "Helpers/RenderPass.hpp"
@@ -26,48 +35,8 @@ RenderPassHelper::RenderPassHelper(
 , m_deviceFuncs(_deviceFuncs)
 , m_sampleCountFlags(_sampleCountFlags)
 , m_defaultRenderPass(_renderPass)
+, m_framebufferHelper(FramebufferHelper(_device, _deviceFuncs))
 {}
-
-/**
- *
- * @param[in] _framebufferHelper
- */
-void RenderPassHelper::setFramebufferHelper(
-  const FramebufferHelper &_framebufferHelper
-)
-{
-  m_framebufferHelper = _framebufferHelper;
-}
-
-/**
- *
- * @param[in] _framebuffer
- */
-void RenderPassHelper::setDefaultFramebuffer(
-  const Framebuffer &_framebuffer
-)
-{
-  m_framebufferHelper.setDefaultFramebuffer(_framebuffer);
-}
-
-/**
- *
- * @param[in] _extentWidth
- * @param[in] _extentHeight
- */
-void RenderPassHelper::setFramebufferSize(
-  uint32_t _extentWidth,
-  uint32_t _extentHeight
-)
-{
-  m_extentWidth = _extentWidth;
-  m_extentHeight = _extentHeight;
-
-  m_framebufferHelper.setSize(
-    _extentWidth,
-    _extentHeight
-  );
-}
 
 /**
  * @brief creates a custom (non Qt-Vulkan) renderPass

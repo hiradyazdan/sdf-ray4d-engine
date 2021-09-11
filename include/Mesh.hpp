@@ -23,7 +23,7 @@ namespace sdfRay4d
       };
 
     public:
-      void load(const QString &fn);
+      void load(const QString &_fileName);
       Data *data();
       bool isValid() { return data()->isValid(); }
       void reset();

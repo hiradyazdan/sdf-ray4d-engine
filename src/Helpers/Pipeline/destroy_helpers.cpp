@@ -126,17 +126,16 @@ void PipelineHelper::destroyShaderModules()
   }
 }
 
+void PipelineHelper::destroyTexture(Texture &_texture)
+{
+  _texture.destroy();
+}
+
 void PipelineHelper::destroyTextures()
 {
   for(const auto &material : m_materials)
   {
-    auto &image     = material->texture.getImage();
-    auto &imageView = material->texture.getImageView();
-    auto &sampler   = material->texture.getSampler();
-
-    if(sampler)   m_deviceFuncs->vkDestroySampler   (m_device, sampler,nullptr);
-    if(imageView) m_deviceFuncs->vkDestroyImageView (m_device, imageView,nullptr);
-    if(image)     m_deviceFuncs->vkDestroyImage     (m_device, image,nullptr);
+    material->texture.destroy();
   }
 }
 
@@ -166,5 +165,15 @@ void PipelineHelper::destroyRenderPass()
       );
       renderPass = VK_NULL_HANDLE;
     }
+  }
+}
+
+void PipelineHelper::destroyBuffers()
+{
+  for(auto &material : m_materials)
+  {
+    buffer.destroyBuffer(material->buffer);
+    buffer.destroyBuffer(material->dynamicUniformBuffer);
+    buffer.freeMemory();
   }
 }

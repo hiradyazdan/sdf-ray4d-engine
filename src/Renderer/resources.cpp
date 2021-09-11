@@ -32,6 +32,7 @@ void Renderer::initResources()
   qDebug("initResources");
 
   m_isFramePending = false;
+  m_materials.clear();
 
   initVkFunctions();
   initMaterials();
@@ -45,12 +46,6 @@ void Renderer::releaseResources()
 {
   qDebug("releaseResources");
 
-  /**
-   * @note
-   *
-   * This may not be necessary since SDF Pipeline is already created
-   * before opening the SDF Graph (race condition was avoided by UI design)
-   */
   m_pipelineHelper.waitForWorkersToFinish();
 
   m_pipelineHelper.destroyDescriptors();
@@ -58,6 +53,5 @@ void Renderer::releaseResources()
   m_pipelineHelper.destroyRenderPass();
   m_pipelineHelper.destroyShaderModules();
   m_pipelineHelper.destroyTextures();
-
-  destroyBuffers();
+  m_pipelineHelper.destroyBuffers();
 }

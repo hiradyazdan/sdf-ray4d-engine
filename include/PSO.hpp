@@ -39,8 +39,8 @@ namespace sdfRay4d
     // e.g. polygon fill mode, front facing, culling mode
     pipeline::RasterizationInfo rasterizationState;
 
-    /*
-     * the blending factor and operation between
+    /**
+     * @note the blending factor and operation between
      * the source and destination fragments
      */
     pipeline::ColorBlendInfo    colorBlendState;
@@ -51,35 +51,36 @@ namespace sdfRay4d
     // depth/stencil operation
     pipeline::DepthStencilInfo  depthStencilState;
 
-    /*
-     * controls the samples to be used in pixel depiction
+    /**
+     * @note controls the samples to be used in pixel depiction
      * during the rasterization for anti-aliasing purposes
      */
     pipeline::MultisampleInfo   multisampleState;
 
-    /**********************************************************
-     * Below are somewhat POD data containers to store data and avoid
+    /**
+     * @note Below are somewhat POD containers to store data and avoid
      * having data pointers from going out of scope while trying
      * to access memory between different methods.
      */
+
     using DynamicStateList      = std::vector<DynamicState>;
     using VertexBindingDescList = std::vector<VertexBindingDesc>;
     using VertexAttrDescList    = std::vector<VertexAttrDesc>;
 
     // pipeline::DynamicInfo.pDynamicStates is a pointer
     // => needs to persist data in scope via struct
-    DynamicStateList                dynamicStates;
+    [[maybe_unused]] DynamicStateList                dynamicStates;
 
     // pipeline::VertexInputInfo.pVertexBindingDescriptions is pointer
     // => needs to persist data in scope via struct
-    VertexBindingDescList           vertexBindingDesc;
+    [[maybe_unused]] VertexBindingDescList           vertexBindingDesc;
 
     // pipeline::VertexInputInfo.pVertexAttributeDescriptions is pointer
     // => needs to persist data in scope via struct
-    VertexAttrDescList              vertexAttrDesc;
+    [[maybe_unused]] VertexAttrDescList              vertexAttrDesc;
 
     // pipeline::ColorBlendInfo.pAttachments is a pointer
     // => needs to persist data in scope via struct
-    pipeline::ColorBlendAttachment  colorBlendAttachment;
+    [[maybe_unused]] pipeline::ColorBlendAttachment  colorBlendAttachment;
   };
 }

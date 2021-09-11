@@ -163,7 +163,9 @@ void Shader::load(
 
   m_worker = QtConcurrent::run([_shaderData, this]()
   {
-    const auto &serializableData = _shaderData.data();
+    const auto &originalTemplate = m_appConstants.shaderTmpl.toStdString();
+    const auto &shaderData = !_shaderData.empty() ? _shaderData : originalTemplate;
+    const auto &serializableData = shaderData.data();
 
     serialize(QByteArray(serializableData));
 
@@ -178,8 +180,6 @@ void Shader::load(
     std::string log;
 
     /**
-     * TODO: make SPIRVCompiler::compile thread-safe with lock/unlock?
-     *
      * @note
      *
      * SPV Compiler is not thread-safe and cannot synchronously compile
@@ -234,11 +234,11 @@ Shader::Data Shader::load(
   shader::Info shaderInfo = {}; // memset
   shaderInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
   shaderInfo.codeSize = !_isPrecompiled
-                        ? _spvBytes.size() * sizeof(uint32_t)
-                        : _rawSPVBytes.size();
+    ? _spvBytes.size() * sizeof(uint32_t)
+    : _rawSPVBytes.size();
   shaderInfo.pCode = !_isPrecompiled
-                     ? _spvBytes.data()
-                     : reinterpret_cast<const uint32_t *>(_rawSPVBytes.constData());
+    ? _spvBytes.data()
+    : reinterpret_cast<const uint32_t*>(_rawSPVBytes.constData());
 
   auto result = m_deviceFuncs->vkCreateShaderModule(
     m_device,
@@ -250,8 +250,6 @@ Shader::Data Shader::load(
   if (result != VK_SUCCESS)
   {
     qWarning("Failed to create shader module: %d", result);
-
-    return data;
   }
 
   return data;

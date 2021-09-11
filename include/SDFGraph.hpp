@@ -23,27 +23,34 @@ namespace sdfRay4d
 
     using DataModelRegistryPtr  = std::shared_ptr<QtNodes::DataModelRegistry>;
     using NodePtr               = std::unique_ptr<QtNodes::Node>;
-    using NodePtrSet            = std::unordered_map<QUuid, NodePtr>;
+    using NodePtrMap            = std::unordered_map<QUuid, NodePtr>;
 
     using MaterialPtr           = std::shared_ptr<Material<float>>;
-    using MapDataModelList      = std::vector<sdfGraph::MapDataModel*>;
+    using MapDataModelPtrSet    = std::unordered_set<sdfGraph::MapDataModel*>;
 
     public:
       explicit SDFGraph(VulkanWindow *_vkWindow);
 
     public:
       FlowView *getView() { return m_graphView; }
-      void autoCompile(bool _isAutoCompile = false);
+      void setAutoCompileConnection(bool _isAutoCompile = false);
 
     public slots:
-      void compileGraph();
+      void compile();
+      void removeMapNode(const sdfGraph::Connection &_connection);
 
     private:
       static DataModelRegistryPtr registerModels();
       static void setStyle();
 
     private:
-      const NodePtrSet &getNodes() { return m_graphScene->nodes(); }
+      const NodePtrMap &getNodes() { return m_graphScene->nodes(); }
+      void findMapNodes();
+
+    private:
+      template<typename TDataModel>
+      TDataModel *getDataModel(const sdfGraph::Node *_node)
+      const noexcept { return dynamic_cast<TDataModel*>(_node->nodeDataModel()); }
 
     private:
       Constants m_appConstants;
@@ -53,9 +60,10 @@ namespace sdfRay4d
       FlowView *m_graphView = nullptr;
 
     private:
-      MaterialPtr m_shapeMaterial = VK_NULL_HANDLE;
-      MapDataModelList m_mapNodes;
+      MaterialPtr m_sdfrMaterial = VK_NULL_HANDLE;
+      MapDataModelPtrSet m_mapNodes;
 
       bool m_isAutoCompile = false;
+      bool m_isMapNodeRemoved = false;
   };
 }

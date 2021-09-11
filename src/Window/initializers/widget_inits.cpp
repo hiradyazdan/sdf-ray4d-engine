@@ -72,13 +72,17 @@ void MainWindow::loadAboutDialog()
     this,
     tr("About Menu"),
     tr(
-      "The <b>Menu</b> example shows how to create "
-      "menu-bar menus and context menus."
+      "4D SDF Raymarching Engine..."
     )
   );
 }
 
 void MainWindow::quitApp()
 {
+  if(m_sdfGraph)
+  {
+    m_sdfGraph->setAutoCompileConnection(false);
+  }
+
   QApplication::exit(EXIT_SUCCESS);
 }

@@ -81,7 +81,7 @@ void PipelineHelper::createPipeline(const MaterialPtr &_material)
     }
   }
 
-  createDescriptorSets(_material);
+  descriptor.createDescriptorSets(_material);
   createLayout(_material);
   createGraphicsPipeline(_material);
 

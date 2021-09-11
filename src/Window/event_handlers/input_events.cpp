@@ -107,7 +107,7 @@ void MainWindow::keyPressEvent(QKeyEvent *_event)
 			if(_event->modifiers() == Qt::ShiftModifier)
 			{
 			  // Signal for compile SDF Graph (Slot = SDFGraph::compileGraph)
-			  emit m_vkWindow->sdfGraphChanged();
+			  emit m_vkWindow->compileSDFGraph();
 			}
     }
       break;
@@ -128,12 +128,13 @@ void MainWindow::resizeEvent(QResizeEvent *_event)
 
 void MainWindow::resizeSDFGraph(Qt::DockWidgetArea _area)
 {
-  auto isTopBottom = _area == Qt::TopDockWidgetArea  || _area == Qt::BottomDockWidgetArea;
-  auto isLeftRight = _area == Qt::LeftDockWidgetArea || _area == Qt::RightDockWidgetArea;
-  auto isUndocked = !isTopBottom && !isLeftRight;
+  if(m_sdfGraphWidget->isFloating()) return;
 
-  auto width = m_windowSize.width();
-  auto height = m_windowSize.height();
+  const auto &width = m_windowSize.width();
+  const auto &height = m_windowSize.height();
+
+  const auto &isTopBottom = _area == Qt::TopDockWidgetArea  || _area == Qt::BottomDockWidgetArea;
+  const auto &isLeftRight = _area == Qt::LeftDockWidgetArea || _area == Qt::RightDockWidgetArea;
 
   if(isTopBottom)
   {
@@ -146,10 +147,13 @@ void MainWindow::resizeSDFGraph(Qt::DockWidgetArea _area)
     m_sdfGraphWidget->setMaximumSize(width / 2, height);
     m_sdfGraphWidget->setMinimumSize(width / 3, height);
   }
+}
 
-  if(isUndocked)
-  {
-    m_sdfGraphWidget->setFixedSize(int(width / 1.5), int(height / 1.5));
-    m_sdfGraphWidget->setMaximumSize(width, height);
-  }
+void MainWindow::resizeSDFGraphFloating()
+{
+  const auto &width = m_windowSize.width();
+  const auto &height = m_windowSize.height();
+
+  m_sdfGraphWidget->setFixedSize(int(width / 1.5), int(height / 1.5));
+  m_sdfGraphWidget->setMaximumSize(width, height);
 }

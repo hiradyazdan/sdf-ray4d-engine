@@ -8,20 +8,33 @@
 
 using namespace sdfRay4d::helpers;
 
+//FramebufferHelper::FBHelperPtr FramebufferHelper::create(
+//  const Device &_device,
+//  QVulkanDeviceFunctions *_deviceFuncs,
+//  const texture::ImageView &_attachments
+//) noexcept
+//{
+//  return FBHelperPtr(
+//    new FramebufferHelper(_device, _deviceFuncs, _attachments)
+//  );
+//}
+
 /**
  * @param[in] _device
  * @param[in] _deviceFuncs
- * @param[in] _attachments
  */
 FramebufferHelper::FramebufferHelper(
   const Device &_device,
-  QVulkanDeviceFunctions *_deviceFuncs,
-  texture::ImageView *_attachments
-) :
+  QVulkanDeviceFunctions *_deviceFuncs
+) noexcept :
   m_device(_device)
 , m_deviceFuncs(_deviceFuncs)
-, m_attachments(_attachments)
 {}
+
+void FramebufferHelper::setAttachments(const texture::ImageView &_attachments)
+{
+  m_attachments = _attachments;
+}
 
 /**
  * @brief sets default Qt Vulkan framebuffer
@@ -90,7 +103,7 @@ void FramebufferHelper::createFramebuffer(const RenderPass &_renderPass)
   framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
   framebufferInfo.renderPass = _renderPass; // custom renderPass
   framebufferInfo.attachmentCount = 1; // depth pass attachment image view is only 1
-  framebufferInfo.pAttachments = m_attachments;
+  framebufferInfo.pAttachments = &m_attachments;
   framebufferInfo.width = m_extentWidth;
   framebufferInfo.height = m_extentHeight;
   framebufferInfo.layers = 1;

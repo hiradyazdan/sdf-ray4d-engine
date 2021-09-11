@@ -73,11 +73,9 @@ void Texture::createImage(
 /**
  *
  * @param[in] _deviceMemIndex
- * @param[in,out] _bufferMemory
  */
 void Texture::createImageMemory(
-  uint32_t _deviceMemIndex,
-  device::Memory &_bufferMemory
+  uint32_t _deviceMemIndex
 )
 {
   memory::Reqs memReqs;
@@ -98,13 +96,13 @@ void Texture::createImageMemory(
     m_device,
     &memAllocInfo,
     nullptr,
-    &_bufferMemory
+    &m_imageMem
   );
 
   m_deviceFuncs->vkBindImageMemory(
     m_device,
     m_image,
-    _bufferMemory,
+    m_imageMem,
     0
   );
 }
@@ -150,7 +148,7 @@ void Texture::createImageView(
   ImageAspect _aspectMask
 )
 {
-  createImageView(_aspectMask, &m_imageView);
+  createImageView(_aspectMask, m_imageView);
 }
 
 /**
@@ -159,7 +157,7 @@ void Texture::createImageView(
  */
 void Texture::createImageView(
   ImageAspect _aspectMask,
-  texture::ImageView *_imageView
+  texture::ImageView &_imageView
 )
 {
   ImageViewInfo viewInfo = {}; // memset
@@ -187,7 +185,7 @@ void Texture::createImageView(
     m_device,
     &viewInfo,
     nullptr,
-    _imageView
+    &_imageView
   );
 
   if (result != VK_SUCCESS)
@@ -195,7 +193,7 @@ void Texture::createImageView(
     qFatal("Failed to create Texture Image View: %d", result);
   }
 
-  m_imageView = *_imageView;
+  m_imageView = _imageView;
 }
 
 /**
@@ -250,10 +248,27 @@ void Texture::createSampler(
 
 void Texture::destroy()
 {
-  m_deviceFuncs->vkDestroySampler(m_device, m_sampler, nullptr);
+  if(m_sampler)
+  {
+    m_deviceFuncs->vkDestroySampler(m_device, m_sampler, nullptr);
+    m_sampler = VK_NULL_HANDLE;
+  }
 
-  m_deviceFuncs->vkDestroyImageView(m_device, m_imageView, nullptr);
-  m_deviceFuncs->vkDestroyImage(m_device, m_image, nullptr);
+  if(m_imageView)
+  {
+    m_deviceFuncs->vkDestroyImageView(m_device, m_imageView, nullptr);
+    m_imageView = VK_NULL_HANDLE;
+  }
 
-  m_deviceFuncs->vkFreeMemory(m_device, m_imageMem, nullptr);
+  if(m_image)
+  {
+    m_deviceFuncs->vkDestroyImage(m_device, m_image, nullptr);
+    m_image = VK_NULL_HANDLE;
+  }
+
+  if(m_imageMem)
+  {
+    m_deviceFuncs->vkFreeMemory(m_device, m_imageMem, nullptr);
+    m_imageMem = VK_NULL_HANDLE;
+  }
 }

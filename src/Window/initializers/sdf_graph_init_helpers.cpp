@@ -49,7 +49,7 @@ void MainWindow::createSDFGraphActions()
 void MainWindow::compileSDFGraph()
 {
   // Signal for compile SDF Graph (Slot = SDFGraph::compileGraph)
-  emit m_vkWindow->sdfGraphChanged();
+  emit m_vkWindow->compileSDFGraph();
 }
 
 void MainWindow::autoCompileSDFGraph()
@@ -57,7 +57,7 @@ void MainWindow::autoCompileSDFGraph()
   const auto &isAutoCompile = m_autoCompileAction->isChecked();
 
   m_compileAction->setEnabled(!isAutoCompile);
-  m_sdfGraph->autoCompile(isAutoCompile);
+  m_sdfGraph->setAutoCompileConnection(isAutoCompile);
 }
 
 void MainWindow::saveSDFNodes()
@@ -75,7 +75,7 @@ void MainWindow::loadSDFGraph()
   m_sdfGraph = new SDFGraph(m_vkWindow);
   m_sdfGraphWidget = new QDockWidget(tr("SDF Graph Editor"), this);
   m_sdfGraphWidget->setAllowedAreas(
-    Qt::TopDockWidgetArea
+      Qt::TopDockWidgetArea
     | Qt::BottomDockWidgetArea
     | Qt::LeftDockWidgetArea
     | Qt::RightDockWidgetArea
@@ -107,8 +107,8 @@ void MainWindow::loadSDFGraph()
   createSDFGraphWidgetConnections();
 
   connect(
-    m_vkWindow, &VulkanWindow::sdfGraphChanged, // signal/sender (event)
-    m_sdfGraph, &SDFGraph::compileGraph // slot/receiver (event handler)
+    m_vkWindow, &VulkanWindow::compileSDFGraph, // signal/sender (event)
+    m_sdfGraph, &SDFGraph::compile // slot/receiver (event handler)
   );
 }
 
@@ -149,15 +149,16 @@ void MainWindow::toggleSDFGraphMenu(bool _isVisible)
 
 void MainWindow::toggleSDFGraphTopLevel()
 {
-  if (m_sdfGraphWidget->isFloating())
-  {
-    m_sdfGraphWidget->setWindowFlags(
+  if(!m_sdfGraphWidget->isFloating()) return;
+
+  resizeSDFGraphFloating();
+
+  m_sdfGraphWidget->setWindowFlags(
       Qt::CustomizeWindowHint
-      | Qt::Window
-      | Qt::WindowMinimizeButtonHint
-      | Qt::WindowMaximizeButtonHint
-      | Qt::WindowCloseButtonHint
-    );
-    m_sdfGraphWidget->show();
-  }
+    | Qt::Window
+    | Qt::WindowMinimizeButtonHint
+    | Qt::WindowMaximizeButtonHint
+    | Qt::WindowCloseButtonHint
+  );
+  m_sdfGraphWidget->show();
 }

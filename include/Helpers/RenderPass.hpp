@@ -31,6 +31,10 @@ namespace sdfRay4d::helpers
       RenderPassHelper() = default;
       RenderPassHelper(const RenderPassHelper&) = delete;
 
+    /**
+     * Create RenderPass Helpers
+     * -------------------------------------------------
+     */
     private:
       void createCustomRenderPass(
         const Format &_colorFormat = VK_FORMAT_B8G8R8A8_UNORM,
@@ -40,15 +44,23 @@ namespace sdfRay4d::helpers
       RenderPass &getRenderPass(bool _useDefault = true);
       RenderPassBeginInfo &getRenderPassInfo() { return m_renderPassInfo; }
 
-      void setFramebufferHelper(const FramebufferHelper &_framebufferHelper);
+    /**
+     * Framebuffer Helpers
+     * -------------------------------------------------
+     */
+    private:
+      texture::ImageView getFramebufferAttachments();
+      void setFramebufferAttachments(const texture::ImageView &_fbAttachments);
       void setDefaultFramebuffer(const Framebuffer &_framebuffer);
       void setFramebufferSize(uint32_t _extentWidth, uint32_t _extentHeight);
+
 
     private:
       FramebufferHelper m_framebufferHelper; // friend
 
       Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
+
       RenderPass m_defaultRenderPass = VK_NULL_HANDLE;
       RenderPass m_renderPass = VK_NULL_HANDLE;
 

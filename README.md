@@ -83,7 +83,9 @@ to pass the depth buffer to the next rendering pass and use it.
 
 ### Vulkan Execution Model
 
-![Vulkan Execution Model](./docs/design/vulkan-execution-model.png)
+TBC
+
+[comment]: <> (![Vulkan Execution Model]&#40;./docs/design/vulkan-execution-model.png&#41;)
 
 ### Qt Vulkan
 

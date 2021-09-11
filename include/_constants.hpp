@@ -23,11 +23,14 @@ namespace sdfRay4d
    {
      using str = QString;
 
-     str assetsPath   = "assets/";
+     int shaderVersion  = 450;
+     str shaderTmpl     = "/* ------ PLACEHOLDER (DO NOT CHANGE) ------ */";
 
-     str shadersPath  = assetsPath + "shaders/";
-     str modelsPath   = assetsPath + "models/";
-     str texturesPath = assetsPath + "textures/";
+     str assetsPath     = "assets/";
+
+     str shadersPath    = assetsPath + "shaders/";
+     str modelsPath     = assetsPath + "models/";
+     str texturesPath   = assetsPath + "textures/";
 
      /**
       * @struct Models

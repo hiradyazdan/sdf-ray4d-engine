@@ -69,8 +69,6 @@ namespace sdfRay4d
       void walk(float amount);
       void strafe(float amount);
 
-      void createDepthView();
-
     /**
      * Resources: Init Helpers (General)
      * -------------------------------------------------
@@ -102,54 +100,28 @@ namespace sdfRay4d
       void initActorShaders();
       void initSDFRShaders();
 
-    private:
-      void markViewProjDirty();
-
     /**
-     * Resources - Destroy Helpers
+     * Swapchain Resource Helpers
      * -------------------------------------------------
      *
      */
     private:
-      void destroyBuffers();
-      void destroyBuffer(Buffer &_buffer);
+      void createDepthView();
+
+    private:
+      void markViewProjDirty();
 
     /**
      * Frame Helpers (on Worker Thread)
      * -------------------------------------------------
      * - Buffers
-     * - Draw Calls
-     * - Render Pass
+     * - Update Descriptor Sets
+     * - Commands
      */
     private:
-      void getMatrices(
-        QMatrix4x4 *vp,
-        QMatrix4x4 *model,
-        QMatrix3x3 *modelNormal,
-        QVector3D *eyePos
-      );
-      void writeFragUni(
-        quint8 *p,
-        const QVector3D &eyePos
-      );
-
       void buildFrame();
-
       void createBuffers();
-      void createBuffer(
-        device::Size _size,
-        buffer::UsageFlags _usage,
-        Buffer &_buffer,
-        memory::Reqs &_memReq
-      );
-      void allocateMemory();
-      void bindBufferToMemory(
-        const Buffer &_buffer,
-        const device::Size &_memOffset
-      );
-      void mapMemory(size_t _byteSize);
       void updateDescriptorSets();
-
       void executeCommands();
 
     private:
@@ -165,20 +137,10 @@ namespace sdfRay4d
       bool m_isFramePending = false;
 
     /**
-     * Vulkan Members - Device, Memory & Buffer
+     * Vulkan Members
      */
     private:
       Device m_device = VK_NULL_HANDLE;
-
-      Buffer m_dynamicUniformBuffer = VK_NULL_HANDLE;
-
-      std::vector<Buffer> m_buffers;
-
-      memory::Reqs m_dynamicUniformMemReq = {};
-
-      device::Size m_sdfUniformStartOffset = 0;
-
-      device::Memory m_bufferMemory = VK_NULL_HANDLE;
 
     /**
      * Vulkan Helper Members
@@ -186,10 +148,6 @@ namespace sdfRay4d
      */
     private:
       helpers::PipelineHelper m_pipelineHelper;
-
-    private:
-      texture::ImageView m_depthView = VK_NULL_HANDLE;
-      device::Memory m_imageBufferMemory = VK_NULL_HANDLE;
 
     /**
      * Qt Vulkan Members
@@ -210,7 +168,7 @@ namespace sdfRay4d
       float m_nearPlane = 0.01f;
       float m_farPlane = 1000.0f;
       QMatrix4x4 m_proj;
-      int m_vpDirty = 0;
+      int m_concurrentFrameCount = 0;
       Camera m_camera;
       QSize m_windowSize;
 //      QVector3D m_lightPos;

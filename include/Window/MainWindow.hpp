@@ -24,6 +24,7 @@ namespace sdfRay4d
     private slots:
       void loadSDFGraph();
       void resizeSDFGraph(Qt::DockWidgetArea _area);
+      void resizeSDFGraphFloating();
       void toggleSDFGraph();
       void toggleSDFGraphMenu(bool _isVisible);
       void toggleSDFGraphTopLevel();

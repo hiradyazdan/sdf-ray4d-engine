@@ -11,11 +11,11 @@
  *
  * Partials:
  * - resources (resources.cpp)
- *      - destroy_helpers.cpp
  *      - init_helpers.cpp
  *      - init_materials_helpers.cpp
  *      - init_shaders_helpers.cpp
  *      - sdf_graph_pipeline_helpers.cpp
+ *      - swapchain_helpers.cpp
  * - frame (frame.cpp)
  *      - buffers.cpp
  *      - command_exec_helpers.cpp
@@ -52,39 +52,5 @@ Renderer::Renderer(
 
 void Renderer::markViewProjDirty()
 {
-  m_vpDirty = m_vkWindow->concurrentFrameCount();
-}
-
-/**
- * @brief creates depth image view (texture)
- * to be used for depth/z-buffer calculation and use between passes
- */
-void Renderer::createDepthView()
-{
-  if(m_depthView) return;
-
-  auto &depthTexture = m_depthMaterial->texture;
-  const auto &aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-
-  depthTexture.createImage(
-    m_windowSize.width(),
-    m_windowSize.height(),
-    VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT |
-    VK_IMAGE_USAGE_SAMPLED_BIT
-  );
-  depthTexture.createImageMemory(
-    m_vkWindow->deviceLocalMemoryIndex(),
-    m_imageBufferMemory
-  );
-  depthTexture.createImageMemoryBarrier(
-    VK_IMAGE_LAYOUT_UNDEFINED,
-    VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-    aspectMask,
-    VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-    VK_ACCESS_SHADER_READ_BIT
-  );
-  depthTexture.createImageView(
-    aspectMask,
-    &m_depthView
-  );
+  m_concurrentFrameCount = m_vkWindow->concurrentFrameCount();
 }

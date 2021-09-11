@@ -13,12 +13,11 @@ void Renderer::initVkFunctions()
   m_device          = m_vkWindow->device();
   m_deviceFuncs     = vkInstance->deviceFunctions(m_device);
 
-  m_pipelineHelper.init(
+  m_pipelineHelper.initHelpers(
     m_device,
     m_deviceFuncs,
     m_isMSAA ? m_vkWindow->sampleCountFlagBits() : VK_SAMPLE_COUNT_1_BIT,
-    m_vkWindow->defaultRenderPass(),
-    &m_depthView // framebuffer depth attachment for custom renderPass - inited in swapchain
+    m_vkWindow->defaultRenderPass()
   );
 }
 

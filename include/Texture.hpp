@@ -28,10 +28,7 @@ namespace sdfRay4d
           VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
           VK_IMAGE_USAGE_STORAGE_BIT
       );
-      void createImageMemory(
-        uint32_t _deviceMemIndex,
-        device::Memory &_bufferMemory
-      );
+      void createImageMemory(uint32_t _deviceMemIndex);
       void createImageMemoryBarrier(
         const texture::ImageLayout &_oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
         const texture::ImageLayout &_newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
@@ -44,7 +41,7 @@ namespace sdfRay4d
       );
       void createImageView(
         texture::ImageAspect _aspectMask,
-        texture::ImageView *_imageView
+        texture::ImageView &_imageView
       );
       void createSampler(
         const float &_maxAnisotropy = 1.0f,

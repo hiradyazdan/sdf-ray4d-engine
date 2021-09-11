@@ -1,9 +1,9 @@
 /*****************************************************
- * Partial Class: PipelineHelper
+ * Partial Class: DescriptorHelper
  * Members: Create Descriptor Set Helpers (Private)
  *****************************************************/
 
-#include "Helpers/Pipeline.hpp"
+#include "Helpers/Descriptor.hpp"
 
 using namespace sdfRay4d::helpers;
 
@@ -12,7 +12,7 @@ using namespace sdfRay4d::helpers;
  * @param[in] _material
  * @param[out] _material->descPool
  */
-void PipelineHelper::createDescriptorPool(
+void DescriptorHelper::createDescriptorPool(
   const MaterialPtr &_material
 )
 {
@@ -50,9 +50,9 @@ void PipelineHelper::createDescriptorPool(
 /**
  *
  * @param[in] _material
- * @param[out] _material->descSetLayouts
+ * @param[out] _material->descSetLayout
  */
-void PipelineHelper::createDescriptorSetLayout(
+void DescriptorHelper::createDescriptorSetLayout(
   const MaterialPtr &_material
 )
 {
@@ -94,9 +94,9 @@ void PipelineHelper::createDescriptorSetLayout(
 /**
  *
  * @param[in] _material
- * @param[out] _material->descSets
+ * @param[out] _material->descSet
  */
-void PipelineHelper::allocateDescriptorSets(
+void DescriptorHelper::allocateDescriptorSets(
   const MaterialPtr &_material
 )
 {
@@ -143,7 +143,7 @@ void PipelineHelper::allocateDescriptorSets(
  * @param[out] _material->descSetLayouts
  * @param[out] _material->descSets
  */
-void PipelineHelper::createDescriptorSets(
+void DescriptorHelper::createDescriptorSets(
   const MaterialPtr &_material
 )
 {

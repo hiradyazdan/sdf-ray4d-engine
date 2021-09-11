@@ -22,8 +22,6 @@ Renderer::MaterialPtr &Renderer::getSDFRMaterial(bool _isNew)
     m_deviceFuncs
   );
 
-  initSDFRMaterial(m_newSDFRMaterial);
-
   return m_newSDFRMaterial;
 }
 
@@ -34,6 +32,8 @@ void Renderer::createSDFRPipeline()
    * so, will reuse the same new material for every compile
    */
   const auto &newMaterial = getSDFRMaterial();
+
+  initSDFRMaterial(newMaterial);
 
   m_isNewWorker = true;
   m_pipelineHelper.createWorker(
@@ -86,6 +86,7 @@ void Renderer::swapSDFRPipelines()
     m_pipelineHelper.destroyShaderModule(m_newSDFRMaterial->fragmentShader);
     m_pipelineHelper.destroyDescriptorSetLayout(m_newSDFRMaterial->descSetLayouts);
     m_pipelineHelper.destroyDescriptorPool(m_newSDFRMaterial->descPool);
+    m_pipelineHelper.destroyTexture(m_newSDFRMaterial->texture);
 
     m_pipelineHelper.destroyPipelineLayout(oldPipelineLayout);
     m_pipelineHelper.destroyPipeline(oldPipeline);

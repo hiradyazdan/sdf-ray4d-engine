@@ -1,3 +1,5 @@
+#include <QTimer>
+
 #include "SDFGraph/DataModels/MapDataModel.hpp"
 
 using namespace sdfRay4d::sdfGraph;
@@ -42,16 +44,24 @@ void MapDataModel::setInData(
 {
   auto mapData = std::dynamic_pointer_cast<MapData>(_data);
 
-//  if(mapData && !mapData->getData().contains("op"))
-//  {
-//    mapData = nullptr;
-//  }
-
   if (mapData)
   {
     m_validationState = NodeValidationState::Valid;
     m_validationError = QString();
     m_mapData = mapData;
+
+    /**
+     * @note since spv compiler initializes per process and not per thread,
+     * the shaders cannot be compiled asynchronously, therefore there's a
+     * slight delay between each compilation, if compile slot is invoked
+     * asynchronously with by emitting isValid signal right away, the app
+     * crashes due to spv compiler not being thread-safe. If we wait for the
+     * async function to finish, then the UI/Main thread will stall/freeze
+     * slightly.
+     *
+     * The solution is to delay the signal emitter with a few milliseconds.
+     */
+    QTimer::singleShot(200, this, &MapDataModel::isValid);
   }
   else
   {
