@@ -131,8 +131,6 @@ namespace sdfRay4d
       );
 
     private:
-      Constants m_appConstants;
-
       bool m_isMSAA;
       bool m_isFramePending = false;
 

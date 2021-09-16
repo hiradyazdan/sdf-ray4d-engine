@@ -42,12 +42,12 @@ SDFGraph::SDFGraph(
 {
   setStyle();
 
-  const auto &sdfrShaders = m_appConstants.shadersPaths.raymarch;
+  namespace sdfrShaders = Constants::shadersPaths::raymarch::frag;
 
   m_sdfrMaterial->fragmentShader.preload({
-    sdfrShaders.frag.partials.distanceFuncs,
-    sdfrShaders.frag.partials.operations,
-    sdfrShaders.frag.main
+    sdfrShaders::partials::distanceFuncs,
+    sdfrShaders::partials::operations,
+    sdfrShaders::main
   });
 
   connect(
@@ -56,6 +56,11 @@ SDFGraph::SDFGraph(
   );
 }
 
+/**
+ * @note Qt SLOT
+ * 
+ * @param[in] _connection
+ */
 void SDFGraph::removeMapNode(const Connection &_connection)
 {
   const auto &node = _connection.getNode(PortType::In);
@@ -65,15 +70,15 @@ void SDFGraph::removeMapNode(const Connection &_connection)
   {
     m_mapNodes.erase(mapNode);
     m_isMapNodeRemoved = true;
-  }
 
-  if(m_isAutoCompile)
-  {
-    compile();
+    if(m_isAutoCompile)
+    {
+      autoCompile();
+    }
   }
 }
 
-void SDFGraph::findMapNodes()
+void SDFGraph::setMapNodes()
 {
   for(const auto &node : getNodes())
   {
@@ -96,25 +101,12 @@ void SDFGraph::findMapNodes()
      * does not cause any major performance cost for the user.
      */
     const auto &mapNode = getDataModel<MapDataModel>(nodeValue.get());
-    if(mapNode)
+    if(mapNode && !m_isMapNodeRemoved)
     {
-      if(m_isAutoCompile)
-      {
-        connect(
-          mapNode, &MapDataModel::isValid,
-          this, &SDFGraph::compile,
-          Qt::UniqueConnection
-        );
-      }
-      else
-      {
-        disconnect(
-          mapNode, &MapDataModel::isValid,
-          this, &SDFGraph::compile
-        );
-      }
+      setMapNodeConnections(mapNode);
 
       qDebug() << "Map NODE data: " << mapNode->getData();
+
       m_mapNodes.insert(mapNode);
     }
 
@@ -137,54 +129,111 @@ void SDFGraph::findMapNodes()
 
 /**
  *
+ * @param[in] _mapDataModel
+ */
+void SDFGraph::setMapNodeConnections(const MapDataModel *_mapDataModel) const
+{
+  if(m_isAutoCompile)
+  {
+    connect(
+      _mapDataModel, &MapDataModel::isValid,
+      this, &SDFGraph::autoCompile,
+      Qt::UniqueConnection
+    );
+  }
+  else
+  {
+    disconnect(
+      _mapDataModel, &MapDataModel::isValid,
+      this, &SDFGraph::autoCompile
+    );
+  }
+}
+
+/**
+ *
  * @param[in] _isAutoCompile
  */
-void SDFGraph::setAutoCompileConnection(bool _isAutoCompile)
+void SDFGraph::setAutoCompile(bool _isAutoCompile)
 {
   m_isAutoCompile = _isAutoCompile;
 
-  QtConcurrent::run([this]()
+  /**
+   * @note if set auto is requested after creation of valid
+   * nodes and connections, compile will not be invoked as
+   * signal-slot are not connected at that point. Also, if
+   * in manual compile the nodes were invalidated (removed)
+   * and then switch to auto, they need to be compiled as
+   * the map node isValid signal does not emit at that point
+   *
+   * So, need to manually compile on selecting auto, if a
+   * map node exists and has shader data (is valid).
+   */
+  compile();
+
+  m_worker = QtConcurrent::run([this]()
   {
+    /**
+     * @note we only need to find the map nodes
+     * and set the map node connections through an infinite
+     * loop in a background process, which creates dynamic/runtime
+     * connections for signal/slot between dynamic map data and the
+     * compile function. This will allow the auto compile to get
+     * triggered only when the map node is ready and valid.
+     */
     while(true)
     {
-      if(!m_isAutoCompile)
-      {
-        findMapNodes();
-        break;
-      }
+      if(!m_isAutoCompile) break;
 
-      findMapNodes();
+      setMapNodes();
+
+      /**
+       * @note this one millisecond makes the whole difference
+       * when removing a connection or node and/or switch to manual
+       * compile after, otherwise the app will crash.
+       *
+       * TODO: Figure out why and replace with a better logic
+       */
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
   });
 }
 
 /**
- *
  * @note Qt SLOT
+ *
+ * @param[in] _isAutoCompile
  */
-void SDFGraph::compile()
+void SDFGraph::compile(bool _isAutoCompile)
 {
-  findMapNodes();
+  if(!_isAutoCompile)
+  {
+    /**
+     * @note this will prevent race condition to happen intermittently
+     * when switching between auto compile and manual compile
+     */
+    m_worker.waitForFinished();
+
+    setMapNodes();
+  }
 
   std::string shaderData;
 
   for(const auto &mapNode : m_mapNodes)
   {
-    const auto &mapNodeData = mapNode->getData().toStdString();
+    const auto &mapData = mapNode->getData().toStdString();
 
-    if(mapNodeData.empty()) continue;
+    if(mapData.empty()) continue;
 
     shaderData += "res = ";
-    shaderData += mapNodeData;
+    shaderData += mapData;
     shaderData += "\n  ";
   }
 
   if(
     m_sdfrMaterial->fragmentShader.isValid() ||
-    shaderData.empty() && !m_isMapNodeRemoved
+    (shaderData.empty() && !m_isMapNodeRemoved)
   ) return;
-
-  m_isMapNodeRemoved = false;
 
   m_sdfrMaterial->fragmentShader.load(shaderData);
 
@@ -196,6 +245,21 @@ void SDFGraph::compile()
    * with IPC method on a separate thread.
    */
   m_vkWindow->createSDFRPipeline();
+
+  /**
+   * @note this has to be set back to false after shader
+   * compilation and when other relevant workers finished
+   * their job, otherwise the infinite loop of setMapNodes
+   * in the separate thread (for auto compile) will repopulate
+   * the already deleted map node which can cause race condition
+   * issue and crashes the application.
+   */
+  m_isMapNodeRemoved = false;
+}
+
+void SDFGraph::autoCompile()
+{
+  compile(true);
 }
 
 /**

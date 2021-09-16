@@ -25,6 +25,6 @@ namespace sdfRay4d::sdfGraph
       QString getData() override;
 
     private:
-      std::shared_ptr<MapData> m_mapData;
+      std::shared_ptr<MapData> m_mapData = nullptr;
   };
 }

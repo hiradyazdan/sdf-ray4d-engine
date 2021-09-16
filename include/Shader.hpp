@@ -91,8 +91,6 @@ namespace sdfRay4d
       );
 
     private:
-      Constants m_appConstants;
-
       SPIRVCompiler m_spirvCompiler;
 
       int m_version;

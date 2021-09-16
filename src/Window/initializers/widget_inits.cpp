@@ -81,7 +81,7 @@ void MainWindow::quitApp()
 {
   if(m_sdfGraph)
   {
-    m_sdfGraph->setAutoCompileConnection(false);
+    m_sdfGraph->terminateAutoCompile();
   }
 
   QApplication::exit(EXIT_SUCCESS);

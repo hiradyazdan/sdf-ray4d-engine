@@ -21,7 +21,7 @@ Texture::Texture(
   ) :
   m_device(_device)
 , m_deviceFuncs(_deviceFuncs)
-//, m_texturesPath(m_appConstants.assetsPath + _texturesPath)
+//, m_texturesPath(Constants::texturesPath)
 {}
 
 /**

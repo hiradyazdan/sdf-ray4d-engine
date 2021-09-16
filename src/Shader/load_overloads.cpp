@@ -163,7 +163,7 @@ void Shader::load(
 
   m_worker = QtConcurrent::run([_shaderData, this]()
   {
-    const auto &originalTemplate = m_appConstants.shaderTmpl.toStdString();
+    const auto &originalTemplate = Constants::shaderTmpl;
     const auto &shaderData = !_shaderData.empty() ? _shaderData : originalTemplate;
     const auto &serializableData = shaderData.data();
 

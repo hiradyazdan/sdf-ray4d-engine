@@ -33,10 +33,11 @@ namespace sdfRay4d
 
     public:
       FlowView *getView() { return m_graphView; }
-      void setAutoCompileConnection(bool _isAutoCompile = false);
+      void setAutoCompile(bool _isAutoCompile = false);
+      void terminateAutoCompile() { m_isAutoCompile = false; }
 
     public slots:
-      void compile();
+      void compile(bool _isAutoCompile = false);
       void removeMapNode(const sdfGraph::Connection &_connection);
 
     private:
@@ -44,17 +45,24 @@ namespace sdfRay4d
       static void setStyle();
 
     private:
+      void autoCompile();
       const NodePtrMap &getNodes() { return m_graphScene->nodes(); }
-      void findMapNodes();
+      void setMapNodes();
+      void setMapNodeConnections(const sdfGraph::MapDataModel *_mapDataModel) const;
 
     private:
+      /**
+       * @tparam[in] TDataModel
+       * @param[in] _node
+       * @return pointer to TDataModel instance
+       */
       template<typename TDataModel>
-      TDataModel *getDataModel(const sdfGraph::Node *_node)
-      const noexcept { return dynamic_cast<TDataModel*>(_node->nodeDataModel()); }
+      TDataModel *getDataModel(
+        const sdfGraph::Node *_node
+      ) const noexcept
+      { return dynamic_cast<TDataModel*>(_node->nodeDataModel()); }
 
     private:
-      Constants m_appConstants;
-
       VulkanWindow *m_vkWindow = VK_NULL_HANDLE;
       FlowScene *m_graphScene = nullptr;
       FlowView *m_graphView = nullptr;
@@ -65,5 +73,6 @@ namespace sdfRay4d
 
       bool m_isAutoCompile = false;
       bool m_isMapNodeRemoved = false;
+      QFuture<void> m_worker;
   };
 }

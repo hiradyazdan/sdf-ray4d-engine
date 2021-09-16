@@ -57,7 +57,7 @@ void MainWindow::autoCompileSDFGraph()
   const auto &isAutoCompile = m_autoCompileAction->isChecked();
 
   m_compileAction->setEnabled(!isAutoCompile);
-  m_sdfGraph->setAutoCompileConnection(isAutoCompile);
+  m_sdfGraph->setAutoCompile(isAutoCompile);
 }
 
 void MainWindow::saveSDFNodes()

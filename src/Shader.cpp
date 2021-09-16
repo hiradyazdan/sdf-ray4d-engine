@@ -30,9 +30,9 @@ Shader::Shader(
 ) :
   m_device(_device)
 , m_deviceFuncs(_deviceFuncs)
-, m_version(m_appConstants.shaderVersion)
-, m_shadersPath(m_appConstants.shadersPath)
-, m_template(m_appConstants.shaderTmpl.toStdString())
+, m_version(Constants::shaderVersion)
+, m_shadersPath(Constants::shadersPath)
+, m_template(Constants::shaderTmpl)
 {}
 
 /**

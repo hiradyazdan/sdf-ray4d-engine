@@ -40,8 +40,8 @@ Renderer::Renderer(
 , m_isMSAA(_isMSAA)
 {
   m_actorMesh.load(
-    m_appConstants.modelsPath
-    + m_appConstants.modelsPaths.actor
+    QString(Constants::modelsPath) +
+      QString(Constants::modelsPaths::actor)
   );
 
   connect(

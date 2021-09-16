@@ -29,8 +29,6 @@ namespace sdfRay4d
       void reset();
 
     private:
-      Constants m_appConstants;
-
       bool m_isLoading = false;
       QFuture<Data> m_worker;
       Data m_data;

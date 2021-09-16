@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "_constants.hpp"
+
 #include <nodes/NodeDataModel>
 #include <nodes/NodeData>
 

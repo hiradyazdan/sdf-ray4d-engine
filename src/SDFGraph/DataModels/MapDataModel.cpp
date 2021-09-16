@@ -60,8 +60,10 @@ void MapDataModel::setInData(
      * slightly.
      *
      * The solution is to delay the signal emitter with a few milliseconds.
+     * The longer the delay, the less stalling, but not too long as the
+     * automatic compilation will be delayed.
      */
-    QTimer::singleShot(200, this, &MapDataModel::isValid);
+    QTimer::singleShot(Constants::autoCompileInterval, this, &MapDataModel::isValid);
   }
   else
   {
