@@ -16,14 +16,6 @@ project(
     LANGUAGES CXX
 )
 
-if(${CMAKE_VERSION} VERSION_LESS "3.16")
-    message("Your CMake version is ${CMAKE_VERSION}. Update to at least 3.16 to enable unity_build to speed up incremental builds")
-else()
-    # If UNITY BUILD causes compile or runtime issues (e.g. ODRs) turn this off.
-    # TODO: setting this may mess up the IDE syntax error detections intermittently
-#    set(CMAKE_UNITY_BUILD ON)
-endif()
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
@@ -34,12 +26,23 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_AUTOMOC ON) # Qt's extensions handler - Meta Object Compiler (moc)
 set(CMAKE_AUTORCC ON)
 
+# NOTE:
+#
+# Here we explicitly define and unify output directory path, to avoid
+# discrepancies between command-line vs IDE build paths on Windows, as
+# need to use them within shell scripts for asset pipeline. MSVC defaults
+# to Debug output directory which is not always the case with different
+# IDEs configurations.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY          ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG    ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE  ${CMAKE_BINARY_DIR})
+
 include_directories(include)
 include_directories(externals)
 
 #find_package(glslang CONFIG REQUIRED) # vcpkg port is broken
 find_package(Vulkan REQUIRED)
-find_package(glm REQUIRED)
+#find_package(glm REQUIRED) # not required yet
 find_package(Qt5 COMPONENTS Widgets Concurrent)
 
 add_executable(${TARGET_NAME})
@@ -66,7 +69,7 @@ target_sources(${TARGET_NAME} PRIVATE ${${TARGET_NAME}_SOURCE})
 #target_link_libraries(${TARGET_NAME} PRIVATE glslang::glslang glslang::SPIRV glslang::HLSL glslang::OGLCompiler)
 target_link_libraries(${TARGET_NAME} PRIVATE glslang glslang-default-resource-limits SPIRV)
 target_link_libraries(${TARGET_NAME} PRIVATE Vulkan::Vulkan)
-target_link_libraries(${TARGET_NAME} PRIVATE glm::glm)
+#target_link_libraries(${TARGET_NAME} PRIVATE glm::glm)
 target_link_libraries(${TARGET_NAME} PRIVATE Qt5::Widgets Qt5::Concurrent)
 target_link_libraries(${TARGET_NAME} PRIVATE nodes)
 
@@ -80,61 +83,60 @@ set(DEPTH_SHADERS_PATH ${SHADERS_PATH}/Depth)
 set(ACTOR_SHADERS_PATH ${SHADERS_PATH}/Actor)
 set(STATIC_SHADERS_PATH ${SDFR_SHADERS_PATH}/static)
 set(PARTS_SHADERS_PATH ${SDFR_SHADERS_PATH}/_partials)
-set(SPV_COMPILE_SCRIPT spirv_static_compile.sh)
-set(SPV_PARTS_COMPILE_SCRIPT spirv_partials_compile.sh)
-
-if(NOT DEFINED CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug)
-endif()
-
-# NOTE:
-#
-# sub-shelling the compiler script to bash makes the cmake's
-# target directory path to need to change as bash mounts to a
-# different home directory and therefore cannot be an absolute path
-# Below is a work around to make the relative directory gets automatically
-# populated with the correct values.
-if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
-    set(RELATIVE_TARGET_DIR ${CMAKE_BUILD_TYPE})
-else()
-    set(RELATIVE_TARGET_DIR .)
-endif()
+set(SPV_COMPILE_SCRIPT ./spirv_static_compile.sh)
+set(SPV_PARTS_COMPILE_SCRIPT ./spirv_partials_compile.sh)
 
 # ONLY use for static shaders to speed up the scene's initial load time.
 add_custom_target(
     ${TARGET_NAME}_ASSET_PIPELINE ALL
 
+    # Copy SPIRV Static Compile Script
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    ${CMAKE_CURRENT_SOURCE_DIR}/${SPV_COMPILE_SCRIPT}
+    ${CMAKE_SOURCE_DIR}/${SPV_COMPILE_SCRIPT}
     $<TARGET_FILE_DIR:${TARGET_NAME}>
 
+    # Copy SPIRV Partial Static Compile Script
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    ${CMAKE_CURRENT_SOURCE_DIR}/${SPV_PARTS_COMPILE_SCRIPT}
+    ${CMAKE_SOURCE_DIR}/${SPV_PARTS_COMPILE_SCRIPT}
     $<TARGET_FILE_DIR:${TARGET_NAME}>
 
+    # Copy All Assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/assets
     $<TARGET_FILE_DIR:${TARGET_NAME}>/assets
 
-    # Depth Pass Shaders
+    # Compile & Cleanup: Depth Pass Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
-    "STATIC_SHADERS_PATH=${RELATIVE_TARGET_DIR}/${DEPTH_SHADERS_PATH} ${RELATIVE_TARGET_DIR}/${SPV_COMPILE_SCRIPT}"
+    "STATIC_SHADERS_PATH=${DEPTH_SHADERS_PATH} ${SPV_COMPILE_SCRIPT}"
 
-    # Rasterization Pass Shaders
+    # Compile & Cleanup: Rasterization Pass Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
-    "STATIC_SHADERS_PATH=${RELATIVE_TARGET_DIR}/${ACTOR_SHADERS_PATH} ${RELATIVE_TARGET_DIR}/${SPV_COMPILE_SCRIPT}"
+    "STATIC_SHADERS_PATH=${ACTOR_SHADERS_PATH} ${SPV_COMPILE_SCRIPT}"
 
-    # SDFR (Raymarch) Shaders
+    # Compile & Cleanup: SDFR (Raymarch) Main Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
-    "STATIC_SHADERS_PATH=${RELATIVE_TARGET_DIR}/${STATIC_SHADERS_PATH} ${RELATIVE_TARGET_DIR}/${SPV_COMPILE_SCRIPT}"
+    "STATIC_SHADERS_PATH=${STATIC_SHADERS_PATH} ${SPV_COMPILE_SCRIPT}"
 
+    # Compile & Cleanup: SDFR (Raymarch) Partial Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
-    "PARTS_SHADERS_PATH=${RELATIVE_TARGET_DIR}/${PARTS_SHADERS_PATH} ${RELATIVE_TARGET_DIR}/${SPV_PARTS_COMPILE_SCRIPT}"
+    "PARTS_SHADERS_PATH=${PARTS_SHADERS_PATH} ${SPV_PARTS_COMPILE_SCRIPT}"
 
     COMMENT "Copying Assets, Compiling Shaders & Removing Redundant files."
 )
 
 #############################################################################
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/tests)
+#add_subdirectory(${PROJECT_SOURCE_DIR}/tests)
 add_subdirectory(${PROJECT_SOURCE_DIR}/externals)
+
+if(${CMAKE_VERSION} VERSION_LESS "3.16")
+    message("Your CMake version is ${CMAKE_VERSION}. Update to at least 3.16 to enable unity_build to speed up incremental builds")
+else()
+    # If UNITY BUILD causes compile or runtime issues (e.g. ODRs) turn this off.
+    # TODO: setting this may mess up the IDE syntax error detections intermittently
+    set_target_properties(
+        ${TARGET_NAME}
+        glslang glslang-default-resource-limits SPIRV
+        PROPERTIES UNITY_BUILD ON
+    )
+endif()

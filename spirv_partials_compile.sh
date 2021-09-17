@@ -20,7 +20,7 @@ GLSL_FILE_COUNT=2
 counter=0
 for ext in glsl vert frag comp; do
   for file in *.${ext}; do
-    if [[ ! -f $file ]]; then break; fi;
+    if [[ ! -f $file ]]; then continue; fi;
 
     if [[ ${ext} == glsl && $counter < "$GLSL_FILE_COUNT" ]]; then
       counter+=1

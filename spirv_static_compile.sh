@@ -15,7 +15,7 @@ cd ${STATIC_SHADERS_PATH} || echo "Error - No such file or directory: ${STATIC_S
 
 for ext in vert frag comp; do
   for file in *.${ext}; do
-    if [[ ! -f $file ]]; then break; fi;
+    if [[ ! -f $file ]]; then continue; fi;
 
     prefix="$(cut -d'.' -f1 <<<"$file")"
 
