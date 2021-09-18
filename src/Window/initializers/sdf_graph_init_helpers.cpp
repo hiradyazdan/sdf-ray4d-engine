@@ -142,6 +142,10 @@ void MainWindow::toggleSDFGraph()
   m_sdfGraphWidget->setVisible(!isSDFGraphVisible);
 }
 
+/**
+ *
+ * @param[in] _isVisible
+ */
 void MainWindow::toggleSDFGraphMenu(bool _isVisible)
 {
   m_toggleSDFGraphAction->setText(_isVisible ? "Hide" : "Show");

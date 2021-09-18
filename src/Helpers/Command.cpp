@@ -117,15 +117,33 @@ void CommandHelper::executeCmdPushConstants(const MaterialPtr &_material)
 {
   if(_material->pushConstantRangeCount <= 0) return;
 
-  const auto &pushConstants = _material->pushConstants.data();
+  /**
+   * @note this needs to be local and a copy
+   * than reference the original, to avoid
+   * adding infinite number of per frame data
+   *
+   * TODO: Fix dynamic data/mouse positions
+   */
+  auto pushConstants = _material->pushConstants;
+
+  float perFrameData[3] = {
+    1, // mouse position x
+    1, // mouse position y
+
+    1 // time
+  };
+
+  pushConstants.insert(
+    pushConstants.end(), std::begin(perFrameData), std::end(perFrameData)
+  );
 
   m_deviceFuncs->vkCmdPushConstants(
     m_cmdBuffer,
     _material->pipelineLayout,
     VK_SHADER_STAGE_FRAGMENT_BIT,
     0/*sizeof(mvp) - 4*/,
-    sizeof(pushConstants),
-    pushConstants
+    sizeof(pushConstants.data()),
+    pushConstants.data()
   );
 }
 

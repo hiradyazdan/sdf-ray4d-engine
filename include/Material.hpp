@@ -107,7 +107,7 @@ namespace sdfRay4d
     {};
 
     /**
-     * @brief creates push constants with range data
+     * @brief sets push constants range data
      * @note
      * There's no need to allow
      * for creating more than one
@@ -116,13 +116,11 @@ namespace sdfRay4d
      *
      * @param[in] _offset push constants range offset
      * @param[in] _size push constants range size
-     * @param[in] _pushConstants push constants data
      * @param[in] _stageFlags one or more shader stage flag bits
      */
-    void createPushConstants(
+    void setPushConstantRange(
       uint32_t _offset,
       uint32_t _size,
-      std::vector<TConst> _pushConstants,
       shader::StageFlags _stages = VK_SHADER_STAGE_FRAGMENT_BIT
     )
     {
@@ -131,8 +129,6 @@ namespace sdfRay4d
       pushConstantRange.stageFlags = _stages;
       pushConstantRange.offset = _offset;
       pushConstantRange.size = _size;
-
-      pushConstants = _pushConstants;
     }
   };
 }

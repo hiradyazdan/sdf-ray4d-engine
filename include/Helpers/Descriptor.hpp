@@ -15,8 +15,6 @@ namespace sdfRay4d::helpers
   {
     friend class PipelineHelper;
 
-//    using LayoutBindingList = std::vector<descriptor::LayoutBinding>;
-
     public:
       DescriptorHelper(
         const Device &_device,

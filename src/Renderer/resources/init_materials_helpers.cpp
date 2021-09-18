@@ -123,21 +123,7 @@ void Renderer::initSDFRMaterial(const MaterialPtr &_material)
   // default Qt Vulkan RenderPass
   _material->renderPass = m_pipelineHelper.getRenderPass();
 
-  _material->createPushConstants(
-    0, 64,
-    {
-      (float) m_vkWindow->width(),
-      (float) m_vkWindow->height(),
-
-      (float) 1,
-      (float) 1,
-
-      (float) 1,
-
-      m_nearPlane,
-      m_farPlane
-    }
-  );
+  _material->setPushConstantRange(0, 64);
 
   _material->vertUniSize = setDynamicOffsetAlignment(
     2 * 64 + 48

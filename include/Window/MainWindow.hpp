@@ -66,6 +66,7 @@ namespace sdfRay4d
 //      void mouseMoveEvent(QMouseEvent *_event) override;
       void keyPressEvent(QKeyEvent *_event) override;
       void resizeEvent(QResizeEvent *_event) override;
+      void closeEvent(QCloseEvent *_event) override;
 
     /**
      * Vulkan
