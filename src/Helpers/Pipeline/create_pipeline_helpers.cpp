@@ -7,7 +7,7 @@
 
 using namespace sdfRay4d::helpers;
 
-void PipelineHelper::createCache()
+void PipelineHelper::createCache() noexcept
 {
   /**
    * @note
@@ -34,7 +34,7 @@ void PipelineHelper::createCache()
   }
 }
 
-void PipelineHelper::createPipelines()
+void PipelineHelper::createPipelines() noexcept
 {
   for(const auto &material : m_materials)
   {
@@ -45,7 +45,9 @@ void PipelineHelper::createPipelines()
 /**
  * @param[in] _material
  */
-void PipelineHelper::createPipeline(const MaterialPtr &_material)
+void PipelineHelper::createPipeline(
+  const MaterialPtr &_material
+) noexcept
 {
   /**
    * @note makes pipeline creation thread safe
@@ -100,7 +102,7 @@ void PipelineHelper::createPipeline(const MaterialPtr &_material)
 void PipelineHelper::swapSDFRPipelines(
   const MaterialPtr &_oldMaterial,
   const MaterialPtr &_newMaterial
-)
+) noexcept
 {
   // safe-guard in case if this is invoked elsewhere
   if(!m_isHot) return;
@@ -119,7 +121,9 @@ void PipelineHelper::swapSDFRPipelines(
  *
  * @param[in] _material
  */
-void PipelineHelper::createLayout(const MaterialPtr &_material)
+void PipelineHelper::createLayout(
+  const MaterialPtr &_material
+) noexcept
 {
   pipeline::LayoutInfo pipelineLayoutInfo = {}; // memset
   pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -148,7 +152,7 @@ void PipelineHelper::createLayout(const MaterialPtr &_material)
  */
 void PipelineHelper::createComputePipeline(
   const MaterialPtr &_material
-)
+) noexcept
 {
   //  initShaderStages();
   //  initPSOs();
@@ -182,7 +186,7 @@ void PipelineHelper::createComputePipeline(
  */
 void PipelineHelper::createGraphicsPipeline(
   const MaterialPtr &_material
-)
+) noexcept
 {
   initShaderStages(_material);
   initPSOs(_material);
@@ -238,7 +242,9 @@ void PipelineHelper::createGraphicsPipeline(
  * per Material Pipeline
  * @param[in] _material
  */
-void PipelineHelper::initShaderStages(const MaterialPtr &_material)
+void PipelineHelper::initShaderStages(
+  const MaterialPtr &_material
+) noexcept
 {
   const auto &structureType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 

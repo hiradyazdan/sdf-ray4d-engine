@@ -18,7 +18,7 @@ void DescriptorHelper::addWriteSet(
   const descriptor::Set &_descSet,
   const descriptor::LayoutBinding &_layoutBinding,
   const descriptor::BufferInfo &_bufferInfo
-)
+) noexcept
 {
   descriptor::Write descriptor = {};
 
@@ -43,7 +43,7 @@ void DescriptorHelper::addWriteSet(
   const descriptor::Set &_descSet,
   const descriptor::LayoutBinding &_layoutBinding,
   const descriptor::ImageInfo &_imageInfo
-)
+) noexcept
 {
   descriptor::Write descriptor = {};
 

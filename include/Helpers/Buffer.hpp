@@ -19,7 +19,7 @@ namespace sdfRay4d::helpers
       BufferHelper(
         const Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs
-      );
+      ) noexcept;
 
     /**
      * @note BufferHelper is non-copyable
@@ -34,22 +34,22 @@ namespace sdfRay4d::helpers
         const buffer::UsageFlags &_usage,
         Buffer &_buffer,
         memory::Reqs &_memReq
-      );
+      ) noexcept;
 
     public:
       void allocateMemory(
         const device::Size &_size,
         uint32_t _typeIndex
-      );
+      ) noexcept;
       void bindBufferMemory(
         const Buffer &_buffer,
         const device::Size &_memOffset
-      );
-      void mapMemory(size_t _byteSize);
+      ) noexcept;
+      void mapMemory(size_t _byteSize) noexcept;
 
     private:
-      void destroyBuffer(Buffer &_buffer);
-      void freeMemory();
+      void destroyBuffer(Buffer &_buffer) noexcept;
+      void freeMemory() noexcept;
 
     private:
       Device m_device = VK_NULL_HANDLE;

@@ -8,17 +8,6 @@
 
 using namespace sdfRay4d::helpers;
 
-//FramebufferHelper::FBHelperPtr FramebufferHelper::create(
-//  const Device &_device,
-//  QVulkanDeviceFunctions *_deviceFuncs,
-//  const texture::ImageView &_attachments
-//) noexcept
-//{
-//  return FBHelperPtr(
-//    new FramebufferHelper(_device, _deviceFuncs, _attachments)
-//  );
-//}
-
 /**
  * @param[in] _device
  * @param[in] _deviceFuncs
@@ -31,7 +20,9 @@ FramebufferHelper::FramebufferHelper(
 , m_deviceFuncs(_deviceFuncs)
 {}
 
-void FramebufferHelper::setAttachments(const texture::ImageView &_attachments)
+void FramebufferHelper::setAttachments(
+  const texture::ImageView &_attachments
+) noexcept
 {
   m_attachments = _attachments;
 }
@@ -40,7 +31,9 @@ void FramebufferHelper::setAttachments(const texture::ImageView &_attachments)
  * @brief sets default Qt Vulkan framebuffer
  * @param[in] _framebuffer
  */
-void FramebufferHelper::setDefaultFramebuffer(const Framebuffer &_framebuffer)
+void FramebufferHelper::setDefaultFramebuffer(
+  const Framebuffer &_framebuffer
+) noexcept
 {
   m_defaultFrameBuffer = _framebuffer;
 }
@@ -50,7 +43,10 @@ void FramebufferHelper::setDefaultFramebuffer(const Framebuffer &_framebuffer)
  * @param[in] _extentWidth
  * @param[in] _extentHeight
  */
-void FramebufferHelper::setSize(uint32_t _extentWidth, uint32_t _extentHeight)
+void FramebufferHelper::setSize(
+  uint32_t _extentWidth,
+  uint32_t _extentHeight
+) noexcept
 {
   m_extentWidth = _extentWidth;
   m_extentHeight = _extentHeight;
@@ -64,7 +60,7 @@ void FramebufferHelper::setSize(uint32_t _extentWidth, uint32_t _extentHeight)
 Framebuffer &FramebufferHelper::getFramebuffer(
   const RenderPass &_renderPass,
   bool _useDefault
-)
+) noexcept
 {
   /**
    * @note
@@ -89,7 +85,9 @@ Framebuffer &FramebufferHelper::getFramebuffer(
 /**
  * @brief creates a custom (non Qt-Vulkan) framebuffer
  */
-void FramebufferHelper::createFramebuffer(const RenderPass &_renderPass)
+void FramebufferHelper::createFramebuffer(
+  const RenderPass &_renderPass
+) noexcept
 {
   if(m_extentWidth == 0 || m_extentHeight == 0)
   {

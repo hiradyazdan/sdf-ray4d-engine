@@ -7,9 +7,13 @@
 
 using namespace sdfRay4d::helpers;
 
+/**
+ *
+ * @param[in] _material
+ */
 void CommandHelper::executeCmdBind(
   const MaterialPtr &_material
-)
+) noexcept
 {
   m_deviceFuncs->vkCmdBindPipeline(
     m_cmdBuffer,

@@ -19,7 +19,7 @@ void BufferHelper::createBuffer(
   const buffer::UsageFlags &_usage,
   Buffer &_buffer,
   memory::Reqs &_memReq
-)
+) noexcept
 {
   buffer::Info bufInfo = {}; // memset
   bufInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

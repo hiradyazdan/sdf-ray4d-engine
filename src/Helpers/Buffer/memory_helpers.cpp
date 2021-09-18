@@ -15,7 +15,7 @@ using namespace sdfRay4d::helpers;
 void BufferHelper::allocateMemory(
   const device::Size &_size,
   uint32_t _typeIndex
-)
+) noexcept
 {
   memory::AllocInfo memAllocInfo = {
     VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, // sType
@@ -44,7 +44,7 @@ void BufferHelper::allocateMemory(
 void BufferHelper::bindBufferMemory(
   const Buffer &_buffer,
   const device::Size &_memOffset
-)
+) noexcept
 {
   auto result = m_deviceFuncs->vkBindBufferMemory(
     m_device,
@@ -65,7 +65,7 @@ void BufferHelper::bindBufferMemory(
  */
 void BufferHelper::mapMemory(
   size_t _byteSize
-)
+) noexcept
 {
   // Copy vertex data.
   quint8 *p;

@@ -14,7 +14,7 @@ using namespace sdfRay4d::helpers;
  */
 void PipelineHelper::createWorkers(
   const std::vector<MaterialPtr> &_materials
-)
+) noexcept
 {
   m_materials = _materials;
 
@@ -36,7 +36,7 @@ void PipelineHelper::createWorkers(
  */
 void PipelineHelper::createWorker(
   const std::vector<MaterialPtr> &_materials
-)
+) noexcept
 {
   m_materials = _materials;
 
@@ -54,7 +54,7 @@ void PipelineHelper::createWorker(
 void PipelineHelper::createWorker(
   const MaterialPtr &_material,
   bool _isHot
-)
+) noexcept
 {
   m_isHot = _isHot;
   m_exclusiveWorker = QtConcurrent::run(

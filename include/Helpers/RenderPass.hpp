@@ -22,7 +22,7 @@ namespace sdfRay4d::helpers
         QVulkanDeviceFunctions *_deviceFuncs,
         const SampleCountFlags &_sampleCountFlags,
         const RenderPass &_renderPass
-      );
+      ) noexcept;
 
     /**
      * @note RenderPassHelper is non-copyable
@@ -39,20 +39,20 @@ namespace sdfRay4d::helpers
       void createCustomRenderPass(
         const Format &_colorFormat = VK_FORMAT_B8G8R8A8_UNORM,
         const Format &_depthStencilFormat = VK_FORMAT_D16_UNORM//VK_FORMAT_D24_UNORM_S8_UINT
-      );
-      void createRenderPassInfo(const std::vector<MaterialPtr> &_materials);
-      RenderPass &getRenderPass(bool _useDefault = true);
-      RenderPassBeginInfo &getRenderPassInfo() { return m_renderPassInfo; }
+      ) noexcept;
+      void createRenderPassInfo(const std::vector<MaterialPtr> &_materials) noexcept;
+      RenderPass &getRenderPass(bool _useDefault = true) noexcept;
+      RenderPassBeginInfo &getRenderPassInfo() noexcept { return m_renderPassInfo; }
 
     /**
      * Framebuffer Helpers
      * -------------------------------------------------
      */
     private:
-      texture::ImageView getFramebufferAttachments();
-      void setFramebufferAttachments(const texture::ImageView &_fbAttachments);
-      void setDefaultFramebuffer(const Framebuffer &_framebuffer);
-      void setFramebufferSize(uint32_t _extentWidth, uint32_t _extentHeight);
+      texture::ImageView &getFramebufferAttachments() noexcept;
+      void setFramebufferAttachments(const texture::ImageView &_fbAttachments) noexcept;
+      void setDefaultFramebuffer(const Framebuffer &_framebuffer) noexcept;
+      void setFramebufferSize(uint32_t _extentWidth, uint32_t _extentHeight) noexcept;
 
 
     private:

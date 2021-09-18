@@ -26,7 +26,7 @@ using namespace sdfRay4d::helpers;
 CommandHelper::CommandHelper(
   const Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs
-) :
+) noexcept :
   m_device(_device)
 , m_deviceFuncs(_deviceFuncs)
 {}
@@ -45,7 +45,7 @@ void CommandHelper::init(
   int _frameId,
   uint32_t _extentWidth,
   uint32_t _extentHeight
-)
+) noexcept
 {
   m_cmdBuffer     = _cmdBuffer;
   m_frameId       = _frameId;
@@ -66,12 +66,14 @@ void CommandHelper::init(
  *
  * @param[in] _renderPassHelper
  */
-void CommandHelper::setRenderPassHelper(const RenderPassHelper &_renderPassHelper)
+void CommandHelper::setRenderPassHelper(
+  const RenderPassHelper &_renderPassHelper
+) noexcept
 {
   m_renderPassHelper = _renderPassHelper;
 }
 
-void CommandHelper::executeCmdSetViewport()
+void CommandHelper::executeCmdSetViewport() noexcept
 {
   Viewport viewport = {
     0.0f, // x
@@ -89,7 +91,7 @@ void CommandHelper::executeCmdSetViewport()
   );
 }
 
-void CommandHelper::executeCmdSetScissor()
+void CommandHelper::executeCmdSetScissor() noexcept
 {
   Rect2D scissor = {
     { // offset
@@ -113,7 +115,9 @@ void CommandHelper::executeCmdSetScissor()
  *
  * @param[in] _material
  */
-void CommandHelper::executeCmdPushConstants(const MaterialPtr &_material)
+void CommandHelper::executeCmdPushConstants(
+  const MaterialPtr &_material
+) noexcept
 {
   if(_material->pushConstantRangeCount <= 0) return;
 
@@ -153,7 +157,7 @@ void CommandHelper::executeCmdPushConstants(const MaterialPtr &_material)
  */
 void CommandHelper::executeRenderPass(
   const std::vector<MaterialPtr> &_materials
-)
+) noexcept
 {
   m_renderPassHelper.createRenderPassInfo(_materials);
 
@@ -177,7 +181,9 @@ void CommandHelper::executeRenderPass(
  *
  * @param[in] _material
  */
-void CommandHelper::executePipelineBarrier(const MaterialPtr &_material)
+void CommandHelper::executePipelineBarrier(
+  const MaterialPtr &_material
+) noexcept
 {
   /**
    * @note GPU - GPU (device) Sync Command

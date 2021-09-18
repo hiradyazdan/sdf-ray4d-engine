@@ -26,12 +26,12 @@ using namespace sdfRay4d::helpers;
 DescriptorHelper::DescriptorHelper(
   const Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs
-) :
+) noexcept :
   m_device(_device)
 , m_deviceFuncs(_deviceFuncs)
 {}
 
-void DescriptorHelper::updateDescriptorSets()
+void DescriptorHelper::updateDescriptorSets() noexcept
 {
   m_deviceFuncs->vkUpdateDescriptorSets(
     m_device,

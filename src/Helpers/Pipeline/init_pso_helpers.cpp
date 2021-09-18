@@ -7,7 +7,13 @@
 
 using namespace sdfRay4d::helpers;
 
-void PipelineHelper::initPSOs(const MaterialPtr &_material)
+/**
+ *
+ * @param[in] _material
+ */
+void PipelineHelper::initPSOs(
+  const MaterialPtr &_material
+) noexcept
 {
   setDynamicState(_material);
   setVertexInputState(_material);
@@ -19,7 +25,13 @@ void PipelineHelper::initPSOs(const MaterialPtr &_material)
   setMultisampleState(_material);
 }
 
-void PipelineHelper::setDynamicState(const MaterialPtr &_material)
+/**
+ * 
+ * @param[in] _material 
+ */
+void PipelineHelper::setDynamicState(
+  const MaterialPtr &_material
+) noexcept
 {
   auto &pso = _material->pso;
   auto &dynamicState = pso.dynamicState = {}; // memset
@@ -33,7 +45,13 @@ void PipelineHelper::setDynamicState(const MaterialPtr &_material)
   dynamicState.pDynamicStates = states.data();
 }
 
-void PipelineHelper::setVertexInputState(const MaterialPtr &_material)
+/**
+ * 
+ * @param[in] _material 
+ */
+void PipelineHelper::setVertexInputState(
+  const MaterialPtr &_material
+) noexcept
 {
   auto &pso = _material->pso;
   auto &vertexInputState = pso.vertexInputState = {}; // memset
@@ -74,7 +92,13 @@ void PipelineHelper::setVertexInputState(const MaterialPtr &_material)
   vertexInputState.flags = 0;
 }
 
-void PipelineHelper::setInputAssemblyState(const MaterialPtr &_material)
+/**
+ * 
+ * @param[in] _material 
+ */
+void PipelineHelper::setInputAssemblyState(
+  const MaterialPtr &_material
+) noexcept
 {
   auto &pso = _material->pso;
   auto &inputAssemblyState = pso.inputAssemblyState = {}; // memset
@@ -84,7 +108,13 @@ void PipelineHelper::setInputAssemblyState(const MaterialPtr &_material)
   inputAssemblyState.primitiveRestartEnable = VK_FALSE;
 }
 
-void PipelineHelper::setRasterizationState(const MaterialPtr &_material)
+/**
+ * 
+ * @param[in] _material 
+ */
+void PipelineHelper::setRasterizationState(
+  const MaterialPtr &_material
+) noexcept
 {
   auto &pso = _material->pso;
   auto &rasterizationState = pso.rasterizationState = {}; // memset
@@ -102,7 +132,13 @@ void PipelineHelper::setRasterizationState(const MaterialPtr &_material)
   rasterizationState.lineWidth = 1.0f;
 }
 
-void PipelineHelper::setColorBlendState(const MaterialPtr &_material)
+/**
+ * 
+ * @param[in] _material 
+ */
+void PipelineHelper::setColorBlendState(
+  const MaterialPtr &_material
+) noexcept
 {
   auto &pso = _material->pso;
   auto &colorBlendState = pso.colorBlendState = {}; // memset
@@ -130,7 +166,13 @@ void PipelineHelper::setColorBlendState(const MaterialPtr &_material)
   colorBlendState.pAttachments = &att;
 }
 
-void PipelineHelper::setViewportState(const MaterialPtr &_material)
+/**
+ * 
+ * @param[in] _material 
+ */
+void PipelineHelper::setViewportState(
+  const MaterialPtr &_material
+) noexcept
 {
   auto &pso = _material->pso;
   auto &viewportState = pso.viewportState = {}; // memset
@@ -142,7 +184,13 @@ void PipelineHelper::setViewportState(const MaterialPtr &_material)
   viewportState.pScissors = nullptr;
 }
 
-void PipelineHelper::setDepthStencilState(const MaterialPtr &_material)
+/**
+ * 
+ * @param[in] _material 
+ */
+void PipelineHelper::setDepthStencilState(
+  const MaterialPtr &_material
+) noexcept
 {
   auto &pso = _material->pso;
   auto &depthStencilState = pso.depthStencilState = {}; // memset
@@ -153,7 +201,13 @@ void PipelineHelper::setDepthStencilState(const MaterialPtr &_material)
   depthStencilState.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
 }
 
-void PipelineHelper::setMultisampleState(const MaterialPtr &_material)
+/**
+ * 
+ * @param[in] _material 
+ */
+void PipelineHelper::setMultisampleState(
+  const MaterialPtr &_material
+) noexcept
 {
   auto &pso = _material->pso;
   auto &multisampleState = pso.multisampleState = {}; // memset

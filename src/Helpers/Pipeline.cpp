@@ -40,7 +40,7 @@ void PipelineHelper::initHelpers(
   QVulkanDeviceFunctions *_deviceFuncs,
   const SampleCountFlags &_sampleCountFlags,
   const RenderPass &_defaultRenderPass
-)
+) noexcept
 {
   m_device            = _device;
   m_deviceFuncs       = _deviceFuncs;
@@ -62,7 +62,7 @@ void PipelineHelper::initHelpers(
  */
 void PipelineHelper::initSwapChainHelpers(
   const texture::ImageView &_fbAttachments
-)
+) noexcept
 {
   if(m_renderPassHelper.getFramebufferAttachments() == _fbAttachments) return;
 
@@ -76,12 +76,12 @@ void PipelineHelper::initSwapChainHelpers(
  * @param[in] _useDefault
  * @return RenderPass instance
  */
-RenderPass &PipelineHelper::getRenderPass(bool _useDefault)
+RenderPass &PipelineHelper::getRenderPass(bool _useDefault) noexcept
 {
   return m_renderPassHelper.getRenderPass(_useDefault);
 }
 
-void PipelineHelper::waitForWorkersToFinish()
+void PipelineHelper::waitForWorkersToFinish() noexcept
 {
   for (auto &worker : m_workers)
   {
@@ -97,12 +97,12 @@ void PipelineHelper::waitForWorkersToFinish()
  * the use case is limited to SDF Graph pipeline
  * creation.
  */
-void PipelineHelper::waitForWorkerToFinish()
+void PipelineHelper::waitForWorkerToFinish() noexcept
 {
   m_exclusiveWorker.waitForFinished();
 }
 
-bool PipelineHelper::isWorkerFinished()
+bool PipelineHelper::isWorkerFinished() noexcept
 {
   return m_exclusiveWorker.isFinished();
 }

@@ -14,7 +14,7 @@ using namespace sdfRay4d::helpers;
  */
 void DescriptorHelper::createDescriptorPool(
   const MaterialPtr &_material
-)
+) noexcept
 {
   // TODO: This should be set per material pipeline
   descriptor::PoolSize descPoolSizes[] = {
@@ -54,7 +54,7 @@ void DescriptorHelper::createDescriptorPool(
  */
 void DescriptorHelper::createDescriptorSetLayout(
   const MaterialPtr &_material
-)
+) noexcept
 {
   /**
    * @note
@@ -98,7 +98,7 @@ void DescriptorHelper::createDescriptorSetLayout(
  */
 void DescriptorHelper::allocateDescriptorSets(
   const MaterialPtr &_material
-)
+) noexcept
 {
   /**
    * @note
@@ -145,7 +145,7 @@ void DescriptorHelper::allocateDescriptorSets(
  */
 void DescriptorHelper::createDescriptorSets(
   const MaterialPtr &_material
-)
+) noexcept
 {
   createDescriptorPool(_material);
   createDescriptorSetLayout(_material);

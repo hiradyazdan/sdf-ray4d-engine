@@ -11,7 +11,9 @@ using namespace sdfRay4d::helpers;
  *
  * @param[in] _material
  */
-void CommandHelper::executeCmdDraw(const MaterialPtr &_material)
+void CommandHelper::executeCmdDraw(
+  const MaterialPtr &_material
+) noexcept
 {
   m_deviceFuncs->vkCmdDraw(
     m_cmdBuffer,

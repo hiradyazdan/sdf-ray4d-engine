@@ -7,7 +7,7 @@
 
 using namespace sdfRay4d::helpers;
 
-texture::ImageView RenderPassHelper::getFramebufferAttachments()
+texture::ImageView &RenderPassHelper::getFramebufferAttachments() noexcept
 {
   return m_framebufferHelper.getAttachments();
 }
@@ -18,7 +18,7 @@ texture::ImageView RenderPassHelper::getFramebufferAttachments()
  */
 void RenderPassHelper::setFramebufferAttachments(
   const texture::ImageView &_fbAttachments
-)
+) noexcept
 {
   m_framebufferHelper.setAttachments(_fbAttachments);
 }
@@ -29,7 +29,7 @@ void RenderPassHelper::setFramebufferAttachments(
  */
 void RenderPassHelper::setDefaultFramebuffer(
   const Framebuffer &_framebuffer
-)
+) noexcept
 {
   m_framebufferHelper.setDefaultFramebuffer(_framebuffer);
 }
@@ -42,7 +42,7 @@ void RenderPassHelper::setDefaultFramebuffer(
 void RenderPassHelper::setFramebufferSize(
   uint32_t _extentWidth,
   uint32_t _extentHeight
-)
+) noexcept
 {
   m_extentWidth = _extentWidth;
   m_extentHeight = _extentHeight;

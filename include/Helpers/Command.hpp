@@ -20,7 +20,7 @@ namespace sdfRay4d::helpers
       CommandHelper(
         const Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs
-      );
+      ) noexcept;
 
     /**
      * @note CommandHelper is non-copyable
@@ -36,7 +36,7 @@ namespace sdfRay4d::helpers
         int _frameId,
         uint32_t _extentWidth,
         uint32_t _extentHeight
-      );
+      ) noexcept;
 
     /**
      * Command Execution Functions (PUBLIC)
@@ -44,8 +44,8 @@ namespace sdfRay4d::helpers
      *
      */
     public:
-      void executeRenderPass(const std::vector<MaterialPtr> &_materials);
-      void executePipelineBarrier(const MaterialPtr &_material);
+      void executeRenderPass(const std::vector<MaterialPtr> &_materials) noexcept;
+      void executePipelineBarrier(const MaterialPtr &_material) noexcept;
 
     /**
      * Command Execution Functions (PRIVATE)
@@ -53,14 +53,14 @@ namespace sdfRay4d::helpers
      *
      */
     private:
-      void executeCmdSetViewport();
-      void executeCmdSetScissor();
-      void executeCmdBind          (const MaterialPtr &_material);
-      void executeCmdPushConstants (const MaterialPtr &_material);
-      void executeCmdDraw          (const MaterialPtr &_material);
+      void executeCmdSetViewport() noexcept;
+      void executeCmdSetScissor() noexcept;
+      void executeCmdBind          (const MaterialPtr &_material) noexcept;
+      void executeCmdPushConstants (const MaterialPtr &_material) noexcept;
+      void executeCmdDraw          (const MaterialPtr &_material) noexcept;
 
     private:
-      void setRenderPassHelper(const RenderPassHelper &_renderPassHelper);
+      void setRenderPassHelper(const RenderPassHelper &_renderPassHelper) noexcept;
 
     private:
       Device m_device = VK_NULL_HANDLE;

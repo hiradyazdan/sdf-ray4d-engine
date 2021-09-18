@@ -7,7 +7,13 @@
 
 using namespace sdfRay4d::helpers;
 
-void PipelineHelper::destroyPipeline(Pipeline &_pipeline)
+/**
+ *
+ * @param[in] _pipeline
+ */
+void PipelineHelper::destroyPipeline(
+  Pipeline &_pipeline
+) noexcept
 {
   if (!_pipeline) return;
 
@@ -19,9 +25,13 @@ void PipelineHelper::destroyPipeline(Pipeline &_pipeline)
   _pipeline = VK_NULL_HANDLE;
 }
 
+/**
+ *
+ * @param[in] _pipelineLayout
+ */
 void PipelineHelper::destroyPipelineLayout(
   pipeline::Layout &_pipelineLayout
-)
+) noexcept
 {
   if (!_pipelineLayout) return;
 
@@ -33,21 +43,29 @@ void PipelineHelper::destroyPipelineLayout(
   _pipelineLayout = VK_NULL_HANDLE;
 }
 
+/**
+ *
+ * @param[in] _material
+ */
 void PipelineHelper::destroyPipeline(
   const MaterialPtr &_material
-)
+) noexcept
 {
   destroyPipeline(_material->pipeline);
 }
 
+/**
+ *
+ * @param[in] _material
+ */
 void PipelineHelper::destroyPipelineLayout(
   const MaterialPtr &_material
-)
+) noexcept
 {
   destroyPipelineLayout(_material->pipelineLayout);
 }
 
-void PipelineHelper::destroyPipelines()
+void PipelineHelper::destroyPipelines() noexcept
 {
   for(const auto &material : m_materials)
   {
@@ -65,7 +83,13 @@ void PipelineHelper::destroyPipelines()
   m_pipelineCache = VK_NULL_HANDLE;
 }
 
-void PipelineHelper::destroyDescriptorSetLayout(DescLayoutList &_setLayouts)
+/**
+ *
+ * @param[in] _setLayouts
+ */
+void PipelineHelper::destroyDescriptorSetLayout(
+  DescLayoutList &_setLayouts
+) noexcept
 {
   if (_setLayouts.empty()) return;
 
@@ -81,9 +105,13 @@ void PipelineHelper::destroyDescriptorSetLayout(DescLayoutList &_setLayouts)
   _setLayouts.resize(0);
 }
 
+/**
+ *
+ * @param[in] _pool
+ */
 void PipelineHelper::destroyDescriptorPool(
   descriptor::Pool &_pool
-)
+) noexcept
 {
   if (!_pool) return;
 
@@ -95,7 +123,7 @@ void PipelineHelper::destroyDescriptorPool(
   _pool = VK_NULL_HANDLE;
 }
 
-void PipelineHelper::destroyDescriptors()
+void PipelineHelper::destroyDescriptors() noexcept
 {
   for(const auto &material : m_materials)
   {
@@ -104,7 +132,13 @@ void PipelineHelper::destroyDescriptors()
   }
 }
 
-void PipelineHelper::destroyShaderModule(Shader &_shader)
+/**
+ *
+ * @param[in] _shader
+ */
+void PipelineHelper::destroyShaderModule(
+  Shader &_shader
+) noexcept
 {
   if (!_shader.isValid()) return;
 
@@ -117,7 +151,7 @@ void PipelineHelper::destroyShaderModule(Shader &_shader)
   _shader.reset();
 }
 
-void PipelineHelper::destroyShaderModules()
+void PipelineHelper::destroyShaderModules() noexcept
 {
   for(const auto &material : m_materials)
   {
@@ -126,12 +160,18 @@ void PipelineHelper::destroyShaderModules()
   }
 }
 
-void PipelineHelper::destroyTexture(Texture &_texture)
+/**
+ *
+ * @param[in] _texture
+ */
+void PipelineHelper::destroyTexture(
+  Texture &_texture
+) noexcept
 {
   _texture.destroy();
 }
 
-void PipelineHelper::destroyTextures()
+void PipelineHelper::destroyTextures() noexcept
 {
   for(const auto &material : m_materials)
   {
@@ -139,7 +179,7 @@ void PipelineHelper::destroyTextures()
   }
 }
 
-void PipelineHelper::destroyRenderPass()
+void PipelineHelper::destroyRenderPass() noexcept
 {
   for (const auto &material : m_materials)
   {
@@ -168,7 +208,7 @@ void PipelineHelper::destroyRenderPass()
   }
 }
 
-void PipelineHelper::destroyBuffers()
+void PipelineHelper::destroyBuffers() noexcept
 {
   for(auto &material : m_materials)
   {

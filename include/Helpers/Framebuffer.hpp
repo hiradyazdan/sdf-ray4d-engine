@@ -30,15 +30,15 @@ namespace sdfRay4d::helpers
       ) noexcept;
 
     private:
-      void createFramebuffer(const RenderPass &_renderPass);
-      void setAttachments(const texture::ImageView &_attachments);
-      void setSize(uint32_t _extentWidth, uint32_t _extentHeight);
-      void setDefaultFramebuffer(const Framebuffer &_framebuffer);
-      texture::ImageView getAttachments() { return m_attachments; }
+      void createFramebuffer(const RenderPass &_renderPass) noexcept;
+      void setAttachments(const texture::ImageView &_attachments) noexcept;
+      void setSize(uint32_t _extentWidth, uint32_t _extentHeight) noexcept;
+      void setDefaultFramebuffer(const Framebuffer &_framebuffer) noexcept;
+      texture::ImageView &getAttachments() noexcept { return m_attachments; }
       Framebuffer &getFramebuffer(
         const RenderPass &_renderPass,
         bool _useDefault
-      );
+      ) noexcept;
 
     private:
       Device m_device = VK_NULL_HANDLE;

@@ -30,7 +30,7 @@ RenderPassHelper::RenderPassHelper(
   QVulkanDeviceFunctions *_deviceFuncs,
   const SampleCountFlags &_sampleCountFlags,
   const RenderPass &_renderPass
-) :
+) noexcept :
   m_device(_device)
 , m_deviceFuncs(_deviceFuncs)
 , m_sampleCountFlags(_sampleCountFlags)
@@ -55,7 +55,7 @@ RenderPassHelper::RenderPassHelper(
 void RenderPassHelper::createCustomRenderPass(
   const Format &_colorFormat,
   const Format &_depthStencilFormat
-)
+) noexcept
 {
   AttachmentDesc attDesc[1] = {}; // memset
 
@@ -105,7 +105,7 @@ void RenderPassHelper::createCustomRenderPass(
  */
 void RenderPassHelper::createRenderPassInfo(
   const std::vector<MaterialPtr> &_materials
-)
+) noexcept
 {
   const auto &rpMaterial = _materials[0];
   const auto &rpFramebuffer = m_framebufferHelper.getFramebuffer(
@@ -146,7 +146,7 @@ void RenderPassHelper::createRenderPassInfo(
  * @param[in] _useDefault
  * @return RenderPass instance
  */
-RenderPass &RenderPassHelper::getRenderPass(bool _useDefault)
+RenderPass &RenderPassHelper::getRenderPass(bool _useDefault) noexcept
 {
   if(!m_renderPass && !_useDefault)
   {

@@ -21,12 +21,12 @@ using namespace sdfRay4d::helpers;
 BufferHelper::BufferHelper(
   const Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs
-) :
+) noexcept :
   m_device(_device)
 , m_deviceFuncs(_deviceFuncs)
 {}
 
-void BufferHelper::destroyBuffer(Buffer &_buffer)
+void BufferHelper::destroyBuffer(Buffer &_buffer) noexcept
 {
   if (!_buffer) return;
 
@@ -38,7 +38,7 @@ void BufferHelper::destroyBuffer(Buffer &_buffer)
   _buffer = VK_NULL_HANDLE;
 }
 
-void BufferHelper::freeMemory()
+void BufferHelper::freeMemory() noexcept
 {
   if (!m_bufferMemory) return;
 
