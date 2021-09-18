@@ -20,6 +20,10 @@ FramebufferHelper::FramebufferHelper(
 , m_deviceFuncs(_deviceFuncs)
 {}
 
+/**
+ *
+ * @param[in] _attachments
+ */
 void FramebufferHelper::setAttachments(
   const texture::ImageView &_attachments
 ) noexcept
@@ -54,6 +58,7 @@ void FramebufferHelper::setSize(
 
 /**
  * @brief retrieves current in-use framebuffer instance
+ * @param[in] _renderPass
  * @param[in] _useDefault
  * @return Framebuffer instance
  */
@@ -84,6 +89,7 @@ Framebuffer &FramebufferHelper::getFramebuffer(
 
 /**
  * @brief creates a custom (non Qt-Vulkan) framebuffer
+ * @param[in] _renderPass
  */
 void FramebufferHelper::createFramebuffer(
   const RenderPass &_renderPass

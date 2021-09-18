@@ -78,7 +78,7 @@ target_link_libraries(${TARGET_NAME} PRIVATE nodes)
 
 find_program(SHELL bash HINTS /bin)
 set(SHADERS_PATH assets/shaders)
-set(SDFR_SHADERS_PATH ${SHADERS_PATH}/Raymarch) # TODO: Pass this as a compile definition or env var to code
+set(SDFR_SHADERS_PATH ${SHADERS_PATH}/Raymarch)
 set(DEPTH_SHADERS_PATH ${SHADERS_PATH}/Depth)
 set(ACTOR_SHADERS_PATH ${SHADERS_PATH}/Actor)
 set(STATIC_SHADERS_PATH ${SDFR_SHADERS_PATH}/static)

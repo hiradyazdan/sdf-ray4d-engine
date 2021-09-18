@@ -18,7 +18,7 @@ git clone --recursive https://github.com/hiradyazdan/masters-project
 
 ***Note:***
 
-- glslang (***Note*** The latest pull (09 Aug) from `glslang` has a typo in its cmake config.
+- glslang (***Note*** The latest pull (18 Sept.) from `glslang` has a typo in its cmake config.
   Please modify its `CMakeLists.txt` at line `144` to `endif(MSVC AND OVERRIDE_MSVCCRT)`.)
 - nodeeditor also has a conflict with vcpkg that have to manually remove a snippet of code from
   the CMakeLists.txt in `nodeeditor/external/CMakeLists.txt` as below:
