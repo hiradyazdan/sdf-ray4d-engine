@@ -9,7 +9,7 @@
  */
 namespace sdfRay4d::Constants
 {
-  constexpr auto autoCompileInterval  = 200; // milliseconds
+  constexpr auto autoCompileInterval  = 350; // milliseconds
 
   constexpr auto shaderVersion        = 450;
   constexpr auto shaderTmpl           = "/* ------ PLACEHOLDER (DO NOT CHANGE) ------ */";

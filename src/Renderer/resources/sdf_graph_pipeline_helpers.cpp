@@ -52,10 +52,11 @@ void Renderer::swapSDFRPipelines()
 
   m_isNewWorker = false;
 
-  auto oldPipeline        = m_sdfrMaterial->pipeline;
-  auto oldPipelineLayout  = m_sdfrMaterial->pipelineLayout;
+  m_oldPipeline.pipeline  = m_sdfrMaterial->pipeline;
+  m_oldPipeline.layout    = m_sdfrMaterial->pipelineLayout;
 
   m_pipelineHelper.waitForWorkerToFinish();
+  m_destroyWorker.waitForFinished();
 
   m_pipelineHelper.swapSDFRPipelines(
     m_sdfrMaterial,
@@ -83,12 +84,25 @@ void Renderer::swapSDFRPipelines()
 
   if(result == VK_SUCCESS)
   {
-    m_pipelineHelper.destroyShaderModule(m_newSDFRMaterial->fragmentShader);
-    m_pipelineHelper.destroyDescriptorSetLayout(m_newSDFRMaterial->descSetLayouts);
-    m_pipelineHelper.destroyDescriptorPool(m_newSDFRMaterial->descPool);
-    m_pipelineHelper.destroyTexture(m_newSDFRMaterial->texture);
+    /**
+     * @note this worker helps clearing up all stale/orphaned
+     * vulkan objects for auto compile as a follow up for swapWorker.
+     * FIXME:
+     * But may not clear up some;
+     * - if switch back & forth between manual and auto, and then make changes
+     *   quite repeatedly and fast.
+     * - if multiple objects on auto-compile are loaded and changed quite
+     *   repeatedly and fast.
+     */
+    m_destroyWorker = QtConcurrent::run([this]()
+    {
+      m_pipelineHelper.destroyShaderModule(m_newSDFRMaterial->fragmentShader);
+      m_pipelineHelper.destroyDescriptorSetLayout(m_newSDFRMaterial->descSetLayouts);
+      m_pipelineHelper.destroyDescriptorPool(m_newSDFRMaterial->descPool);
+      m_pipelineHelper.destroyTexture(m_newSDFRMaterial->texture);
 
-    m_pipelineHelper.destroyPipelineLayout(oldPipelineLayout);
-    m_pipelineHelper.destroyPipeline(oldPipeline);
+      m_pipelineHelper.destroyPipelineLayout(m_oldPipeline.layout);
+      m_pipelineHelper.destroyPipeline(m_oldPipeline.pipeline);
+    });
   }
 }

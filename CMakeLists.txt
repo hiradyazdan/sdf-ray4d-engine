@@ -12,7 +12,7 @@ project(
     ${TARGET_NAME}_build
     VERSION 1.0.0
     DESCRIPTION "SDF Ray4D Engine: 4D SDF Raymarching Engine"
-    HOMEPAGE_URL "https://github.com/hiradyazdan/masters-project"
+    HOMEPAGE_URL "https://github.com/hiradyazdan/sdf-ray4d-engine"
     LANGUAGES CXX
 )
 
@@ -133,7 +133,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.16")
     message("Your CMake version is ${CMAKE_VERSION}. Update to at least 3.16 to enable unity_build to speed up incremental builds")
 else()
     # If UNITY BUILD causes compile or runtime issues (e.g. ODRs) turn this off.
-    # TODO: setting this may mess up the IDE syntax error detections intermittently
+    # TODO: setting this may mess up the IDE syntax/error detections intermittently
     set_target_properties(
         ${TARGET_NAME}
         glslang glslang-default-resource-limits SPIRV

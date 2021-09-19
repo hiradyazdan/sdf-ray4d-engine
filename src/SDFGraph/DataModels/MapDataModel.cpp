@@ -53,15 +53,23 @@ void MapDataModel::setInData(
     /**
      * @note since spv compiler initializes per process and not per thread,
      * the shaders cannot be compiled asynchronously, therefore there's a
-     * slight delay between each compilation, if compile slot is invoked
-     * asynchronously with by emitting isValid signal right away, the app
-     * crashes due to spv compiler not being thread-safe. If we wait for the
-     * async function to finish, then the UI/Main thread will stall/freeze
-     * slightly.
+     * slight delay between each compilation;
      *
-     * The solution is to delay the signal emitter with a few milliseconds.
-     * The longer the delay, the less stalling, but not too long as the
-     * automatic compilation will be delayed.
+     * - If compile slot is invoked asynchronously by emitting isValid signal
+     *   right away, the app crashes due to spv compiler not being thread-safe.
+     * - If we wait for the async function to finish, then the UI/Main thread
+     *   will stall/freeze slightly.
+     * - Can't also make a ping-pong effect to emit signals back and forth
+     *   to notify when compile is finished in order to emit a new compile
+     *   signal, as there's no way to pass the sdf graph instance to data
+     *   models.
+     * - Using a QProcess to manually manage signals/slots and synchronously
+     *   wait for a signal doesn't also seem to be possible, as data models
+     *   are isolated from the outside as mentioned above.
+     *
+     * So, currently the solution is to delay the signal emitter with a few
+     * milliseconds. The longer the delay, the less stalling, but not too
+     * long as the automatic compilation will be delayed.
      */
     QTimer::singleShot(Constants::autoCompileInterval, this, &MapDataModel::isValid);
   }

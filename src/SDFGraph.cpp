@@ -131,7 +131,9 @@ void SDFGraph::setMapNodes()
  *
  * @param[in] _mapDataModel
  */
-void SDFGraph::setMapNodeConnections(const MapDataModel *_mapDataModel) const
+void SDFGraph::setMapNodeConnections(
+  MapDataModel *_mapDataModel
+) const
 {
   if(m_isAutoCompile)
   {

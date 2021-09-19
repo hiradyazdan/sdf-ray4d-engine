@@ -50,12 +50,25 @@ void Renderer::updateFrame()
   m_vkWindow->requestUpdate();
 
   /**
+   * @note should not wait for swapWorker to finish as:
+   * - no need as it's in render loop and will repeat per-frame anyway
+   * - if wait some stale/orphaned vulkan objects remain un-destroyed
+   */
+  if(!m_swapWorker.isFinished()) return;
+
+  /**
    * @note this has to be invoked after
    * frameReady and requestUpdate methods
    * as otherwise it attempts to add to the
    * command buffer that its bound pipeline is
    * already destroyed.
    *
+   * @note this worker clears up most stale/orphaned
+   * vulkan objects for auto-compile
+   *
    */
-  swapSDFRPipelines();
+  m_swapWorker = QtConcurrent::run([this]()
+  {
+    swapSDFRPipelines();
+  });
 }

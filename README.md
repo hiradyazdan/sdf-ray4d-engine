@@ -7,13 +7,14 @@
 - Bash Shell
 - Qt v5.10+ (tested with 5.15)
 - Vulkan SDK v1.2.x (tested with v1.2.176.1)
+- Currently, Windows only
 
 ## Download
 
 clone repository with its submodules:
 
 ```shell
-git clone --recursive https://github.com/hiradyazdan/masters-project
+git clone --recurse-submodules -j8 https://github.com/hiradyazdan/sdf-ray4d-engine.git
 ```
 
 ***Note:***
@@ -181,6 +182,8 @@ Therefore, SDF Graph window/widget is activated by
 clicking on a menu button by the user which provides access
 to all required functionality to load dynamic shaders.
 
+![SDF Graph Async/Load Design (High-level)](./docs/design/sdf-graph-async-load.png)
+
 SDF Graph recompiles the shader which means the pipeline object will need to be updated
 by the shader modification. However, as in Vulkan almost all objects are immutable, on shader recompilation,
 the pipeline object is no exception and cannot be updated, so it needs to be recreated.
@@ -222,10 +225,6 @@ This requires a specific algorithm to identify which shaders need to be picked u
 
 SPIRV shaders are essentially a set of shader instructions in bytecode, which means they won't have any comments or empty spaces
 included and therefore are already space-optimized. Using Vulkan SDK's SPIRV Disassembler (`spirv-dis`) prints out shader instructions.
-
-## Codebase Future Improvements
-
-- Make Helper classes non-copyable
 
 ## Unity Native Plugin
 

@@ -48,7 +48,7 @@ namespace sdfRay4d
       void autoCompile();
       const NodePtrMap &getNodes() { return m_graphScene->nodes(); }
       void setMapNodes();
-      void setMapNodeConnections(const sdfGraph::MapDataModel *_mapDataModel) const;
+      void setMapNodeConnections(sdfGraph::MapDataModel *_mapDataModel) const;
 
     private:
       /**
@@ -73,6 +73,7 @@ namespace sdfRay4d
 
       bool m_isAutoCompile = false;
       bool m_isMapNodeRemoved = false;
+
       QFuture<void> m_worker;
   };
 }

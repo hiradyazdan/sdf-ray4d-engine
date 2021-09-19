@@ -131,14 +131,18 @@ namespace sdfRay4d
       );
 
     private:
-      bool m_isMSAA;
+      bool m_isMSAA = false;
       bool m_isFramePending = false;
+      bool m_isNewWorker = false;
 
-    /**
-     * Vulkan Members
-     */
-    private:
-      Device m_device = VK_NULL_HANDLE;
+      float m_rotation = 0.0f;
+      float m_verticalAngle = 45.0f;
+      float m_nearPlane = 0.01f;
+      float m_farPlane = 1000.0f;
+      int m_concurrentFrameCount = 0;
+
+      Mesh m_actorMesh;
+      Camera m_camera;
 
     /**
      * Vulkan Helper Members
@@ -148,28 +152,34 @@ namespace sdfRay4d
       helpers::PipelineHelper m_pipelineHelper;
 
     /**
+     * Vulkan Members
+     */
+    private:
+      Device m_device = VK_NULL_HANDLE;
+
+    /**
      * Qt Vulkan Members
      */
     private:
-      VulkanWindow *m_vkWindow = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
+      VulkanWindow *m_vkWindow = VK_NULL_HANDLE;
+
+    /**
+     * Qt Members
+     */
+    private:
+      QVector3D m_lightPos;
+      QMatrix4x4 m_proj;
+      QSize m_windowSize;
 
     /**
      * Qt Members - Multi-threading
      */
     private:
       QFutureWatcher<void> m_frameWatcher;
+      QFuture<void> m_swapWorker;
+      QFuture<void> m_destroyWorker;
       QMutex m_guiMutex;
-
-    private:
-      float m_verticalAngle = 45.0f;
-      float m_nearPlane = 0.01f;
-      float m_farPlane = 1000.0f;
-      QMatrix4x4 m_proj;
-      int m_concurrentFrameCount = 0;
-      Camera m_camera;
-      QSize m_windowSize;
-//      QVector3D m_lightPos;
 
     /**
      * Materials
@@ -180,12 +190,12 @@ namespace sdfRay4d
       MaterialPtr m_sdfrMaterial    = VK_NULL_HANDLE;
       MaterialPtr m_newSDFRMaterial = VK_NULL_HANDLE;
 
-      Mesh m_actorMesh;
-
       std::vector<MaterialPtr> m_materials;
 
-      float m_rotation = 0.0f;
-
-      bool m_isNewWorker = false;
+      struct
+      {
+        Pipeline pipeline;
+        pipeline::Layout layout;
+      } m_oldPipeline;
   };
 }
