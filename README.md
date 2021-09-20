@@ -61,19 +61,6 @@ there's no `Module Header units` support for C++17 which is used in this project
 
 ## Design
 
-### SDF Raymarching (Sphere Tracing)
-
-#### SDF Raymarched Objects Interaction with Mesh-based (Rasterized Geometry) Objects - Depth Calculation
-
-![Depth buffer Multi-pass Transfer Model](./docs/design/depth-buffer-multi-pass-transfer.svg)
-
-In order to be able to render rasterized objects on top of the raymarched objects
-depth buffer calculation is required. In doing so, an extra rendering pass is introduced
-to pass the depth buffer to the next rendering pass and use it.
-
-- https://www.iquilezles.org/www/articles/raypolys/raypolys.htm
-- https://computergraphics.stackexchange.com/questions/7674/how-to-align-ray-marching-on-top-of-traditional-3d-rasterization
-
 ### Vulkan vs. DirectX vs. OpenGL
 
 ***Vulkan Advantages***
@@ -159,10 +146,27 @@ bottleneck:
 
 ###### Graphics API Overhead (Qt Vulkan Wrapper)
 
-Memory Allocation is managed via`QVulkanDeviceFunctions` which has no
+Memory Allocation is managed via `QVulkanDeviceFunctions` which has no
 more overhead than if it was managed through `VMA` (Vulkan Memory Allocator),
 which is a vulkan Memory Allocation Library, to simplify the creation and
 allocation of resources, while giving access to Vulkan functions.
+
+### SDF Raymarching (Sphere Tracing)
+
+TBC
+
+### Depth Buffer Multi-pass Transfer Model
+
+##### SDF Raymarched Objects Interaction with Mesh-based (Rasterized Geometry) Objects - Depth Calculation
+
+![Depth buffer Multi-pass Transfer Model](./docs/design/depth-buffer-multi-pass-transfer.svg)
+
+In order to be able to render rasterized objects on top of the raymarched objects
+depth buffer calculation is required. In doing so, an extra rendering pass is introduced
+to pass the depth buffer to the next rendering pass and use it.
+
+- https://www.iquilezles.org/www/articles/raypolys/raypolys.htm
+- https://computergraphics.stackexchange.com/questions/7674/how-to-align-ray-marching-on-top-of-traditional-3d-rasterization
 
 ## Qt Widgets
 

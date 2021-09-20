@@ -20,6 +20,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
+if(${CMAKE_VERSION} VERSION_LESS "3.16")
+    message("Your CMake version is ${CMAKE_VERSION}. Update to at least 3.16 to enable unity_build to speed up incremental builds")
+else()
+    # If UNITY BUILD causes compile or runtime issues (e.g. ODRs) turn this off.
+    # TODO: setting this may mess up the IDE syntax/error detections intermittently
+    set(CMAKE_UNITY_BUILD ON)
+endif()
+
 # TODO: Use Sanitizers for dynamic (RTC) analysis
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g -OX")
 
@@ -128,15 +136,3 @@ add_custom_target(
 
 #add_subdirectory(${PROJECT_SOURCE_DIR}/tests)
 add_subdirectory(${PROJECT_SOURCE_DIR}/externals)
-
-if(${CMAKE_VERSION} VERSION_LESS "3.16")
-    message("Your CMake version is ${CMAKE_VERSION}. Update to at least 3.16 to enable unity_build to speed up incremental builds")
-else()
-    # If UNITY BUILD causes compile or runtime issues (e.g. ODRs) turn this off.
-    # TODO: setting this may mess up the IDE syntax/error detections intermittently
-    set_target_properties(
-        ${TARGET_NAME}
-        glslang glslang-default-resource-limits SPIRV
-        PROPERTIES UNITY_BUILD ON
-    )
-endif()

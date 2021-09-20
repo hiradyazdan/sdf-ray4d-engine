@@ -45,3 +45,5 @@ set_property(TARGET SPIRV       PROPERTY FOLDER "externals")
 
 # nodeeditor
 add_subdirectory(nodeeditor)
+
+set_property(TARGET nodes PROPERTY UNITY_BUILD OFF)
