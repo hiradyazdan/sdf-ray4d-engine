@@ -17,7 +17,7 @@ Renderer::MaterialPtr &Renderer::getSDFRMaterial(bool _isNew)
 {
   if(!_isNew) return m_newSDFRMaterial;
 
-  m_newSDFRMaterial = std::make_shared<Material>(
+  m_newSDFRMaterial = std::make_shared<Mat>(
     m_device,
     m_deviceFuncs
   );

@@ -20,6 +20,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
+find_program(SHELL bash HINTS /bin)
+
 if(${CMAKE_VERSION} VERSION_LESS "3.16")
     message("Your CMake version is ${CMAKE_VERSION}. Update to at least 3.16 to enable unity_build to speed up incremental builds")
 else()
@@ -45,13 +47,43 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY          ${CMAKE_BINARY_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG    ${CMAKE_BINARY_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE  ${CMAKE_BINARY_DIR})
 
+if(UNIX AND NOT APPLE)
+    set(QT_VERSION 5.15)
+    set(QT_VERSION_PATCH ${QT_VERSION}.2)
+    set(CONFIG_FILE .env.config)
+    set(QT_BUILD_SCRIPT ./qt_vulkan_source_build.sh)
+
+    # NOTE
+    #
+    # This builds qt from source to enable vulkan instance and functions at configure time.
+    # It may take up to an hour or less depending on the system memory.
+    if(NOT QT_BUILD_COMPLETE)
+        execute_process(
+            # Copy Environment Variables Manifest
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_SOURCE_DIR}/${CONFIG_FILE}
+            ${CMAKE_BINARY_DIR}/${CONFIG_FILE}
+
+            # Copy Qt Source Build Script
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_SOURCE_DIR}/${QT_BUILD_SCRIPT}
+            ${CMAKE_BINARY_DIR}/${QT_BUILD_SCRIPT}
+
+            # Qt Vulkan Configure, Build and Install
+            COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
+            "QT_VERSION=${QT_VERSION} QT_VERSION_PATCH=${QT_VERSION_PATCH} . ${QT_BUILD_SCRIPT}"
+        )
+        set(QT_BUILD_COMPLETE TRUE CACHE BOOL "Qt Build completed?" FORCE)
+    endif()
+endif()
+
 include_directories(include)
 include_directories(externals)
 
 #find_package(glslang CONFIG REQUIRED) # vcpkg port is broken
 find_package(Vulkan REQUIRED)
 #find_package(glm REQUIRED) # not required yet
-find_package(Qt5 COMPONENTS Widgets Concurrent)
+find_package(Qt5 ${QT_VERSION} COMPONENTS Widgets Concurrent REQUIRED)
 
 add_executable(${TARGET_NAME})
 
@@ -84,7 +116,6 @@ target_link_libraries(${TARGET_NAME} PRIVATE nodes)
 # Static Assets Pipeline
 #############################################################################
 
-find_program(SHELL bash HINTS /bin)
 set(SHADERS_PATH assets/shaders)
 set(SDFR_SHADERS_PATH ${SHADERS_PATH}/Raymarch)
 set(DEPTH_SHADERS_PATH ${SHADERS_PATH}/Depth)
@@ -115,19 +146,19 @@ add_custom_target(
 
     # Compile & Cleanup: Depth Pass Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
-    "STATIC_SHADERS_PATH=${DEPTH_SHADERS_PATH} ${SPV_COMPILE_SCRIPT}"
+    "STATIC_SHADERS_PATH=${DEPTH_SHADERS_PATH} . ${SPV_COMPILE_SCRIPT}"
 
     # Compile & Cleanup: Rasterization Pass Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
-    "STATIC_SHADERS_PATH=${ACTOR_SHADERS_PATH} ${SPV_COMPILE_SCRIPT}"
+    "STATIC_SHADERS_PATH=${ACTOR_SHADERS_PATH} . ${SPV_COMPILE_SCRIPT}"
 
     # Compile & Cleanup: SDFR (Raymarch) Main Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
-    "STATIC_SHADERS_PATH=${STATIC_SHADERS_PATH} ${SPV_COMPILE_SCRIPT}"
+    "STATIC_SHADERS_PATH=${STATIC_SHADERS_PATH} . ${SPV_COMPILE_SCRIPT}"
 
     # Compile & Cleanup: SDFR (Raymarch) Partial Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
-    "PARTS_SHADERS_PATH=${PARTS_SHADERS_PATH} ${SPV_PARTS_COMPILE_SCRIPT}"
+    "PARTS_SHADERS_PATH=${PARTS_SHADERS_PATH} . ${SPV_PARTS_COMPILE_SCRIPT}"
 
     COMMENT "Copying Assets, Compiling Shaders & Removing Redundant files."
 )

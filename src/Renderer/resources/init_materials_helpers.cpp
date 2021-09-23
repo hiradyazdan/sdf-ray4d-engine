@@ -9,7 +9,7 @@ using namespace sdfRay4d;
 
 void Renderer::initDepthMaterial()
 {
-  auto &material = m_depthMaterial = std::make_shared<Material>(
+  auto &material = m_depthMaterial = std::make_shared<Mat>(
     m_device,
     m_deviceFuncs
   );
@@ -53,7 +53,7 @@ void Renderer::initDepthMaterial()
 
 void Renderer::initActorMaterial()
 {
-  auto &material = m_actorMaterial = std::make_shared<Material>(
+  auto &material = m_actorMaterial = std::make_shared<Mat>(
     m_device,
     m_deviceFuncs
   );
@@ -151,7 +151,7 @@ void Renderer::initSDFRMaterial(const MaterialPtr &_material)
 
 void Renderer::initSDFRMaterial()
 {
-  m_sdfrMaterial = std::make_shared<Material>(
+  m_sdfrMaterial = std::make_shared<Mat>(
     m_device,
     m_deviceFuncs
   );

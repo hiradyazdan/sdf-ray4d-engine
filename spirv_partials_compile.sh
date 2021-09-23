@@ -2,16 +2,16 @@
 
 if [[ -z ${PARTS_SHADERS_PATH} ]]; then
   echo "PARTS_SHADERS_PATH Variable should be set!"
-  exit 1;
+  return 1
 fi
 
-if glslc 2>/dev/null; then
-  glslc_cmd=glslc
-else
+if command -v glslc.exe >/dev/null 2>&1; then
   glslc_cmd=glslc.exe
+else
+  glslc_cmd=glslc
 fi
 
-cd ${PARTS_SHADERS_PATH} || echo "Error - No such file or directory: ${PARTS_SHADERS_PATH}"
+cd ${PARTS_SHADERS_PATH} || return
 
 sdfr_pass_file_copy=sdfr_pass.frag
 sdfr_pass_file_orig=../dynamic/sdfr_pass.frag
@@ -52,4 +52,4 @@ for ext in glsl vert frag comp; do
   done
 done
 
-exit 0
+return 0

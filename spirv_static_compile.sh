@@ -2,16 +2,16 @@
 
 if [[ -z ${STATIC_SHADERS_PATH} ]]; then
   echo "STATIC_SHADERS_PATH Variable should be set!"
-  exit 1;
+  return 1
 fi
 
-if glslc 2>/dev/null; then
-  glslc_cmd=glslc
-else
+if command -v glslc.exe >/dev/null 2>&1; then
   glslc_cmd=glslc.exe
+else
+  glslc_cmd=glslc
 fi
 
-cd ${STATIC_SHADERS_PATH} || echo "Error - No such file or directory: ${STATIC_SHADERS_PATH}"
+cd ${STATIC_SHADERS_PATH} || return
 
 for ext in vert frag comp; do
   for file in *.${ext}; do
@@ -26,4 +26,4 @@ for ext in vert frag comp; do
   done
 done
 
-exit 0
+return 0

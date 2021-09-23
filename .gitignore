@@ -48,3 +48,7 @@ renderdoc/*
 .DS_Store
 .vs
 .idea
+
+.env
+.env.config
+.env.build

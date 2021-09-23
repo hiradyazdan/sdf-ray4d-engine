@@ -16,8 +16,8 @@ namespace sdfRay4d
 
   class Renderer : public QVulkanWindowRenderer, public QObject
   {
-    using Material    = Material<float>;
-    using MaterialPtr = std::shared_ptr<Material>;
+    using Mat         = Material<float>;
+    using MaterialPtr = std::shared_ptr<Mat>;
 
     public:
       explicit Renderer(
