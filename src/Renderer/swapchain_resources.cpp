@@ -54,6 +54,7 @@ void Renderer::releaseSwapChainResources()
 {
   qDebug("releaseSwapChainResources");
 
+  m_swapWorker.waitForFinished();
   m_frameWatcher.waitForFinished();
 
   if (m_isFramePending)
