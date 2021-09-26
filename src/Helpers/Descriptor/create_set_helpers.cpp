@@ -16,13 +16,6 @@ void DescriptorHelper::createDescriptorPool(
   const MaterialPtr &_material
 ) noexcept
 {
-  // TODO: This should be set per material pipeline
-  descriptor::PoolSize descPoolSizes[] = {
-    {
-      VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-      2
-    }
-  };
   descriptor::PoolInfo descPoolInfo = {}; // memset
   descPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
   /**
@@ -31,8 +24,8 @@ void DescriptorHelper::createDescriptorPool(
    * multiple set if texture sampler needed along with other descriptors (one set per texture/sampler)
    */
   descPoolInfo.maxSets = _material->descSetLayoutCount;
-  descPoolInfo.poolSizeCount = sizeof(descPoolSizes) / sizeof(descPoolSizes[0]);
-  descPoolInfo.pPoolSizes = descPoolSizes;
+  descPoolInfo.poolSizeCount = _material->descPoolSizes.size();
+  descPoolInfo.pPoolSizes = _material->descPoolSizes.data();
 
   auto result = m_deviceFuncs->vkCreateDescriptorPool(
     m_device,

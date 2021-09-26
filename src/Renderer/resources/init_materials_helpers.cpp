@@ -36,6 +36,13 @@ void Renderer::initDepthMaterial()
     2 * 64 + 48 // FIXME
   ); // depth_pass.vert
 
+  material->descPoolSizes = {
+    {
+      VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, // type
+      1 // descriptorCount
+    }
+  };
+
   material->layoutBindings.resize(1);;
 
   material->layoutBindings[0] = {
@@ -77,6 +84,13 @@ void Renderer::initActorMaterial()
   material->fragUniSize = setDynamicOffsetAlignment(
     6 * 16 + 12 + 2 * 4
   ); // see color_phong.frag
+
+  material->descPoolSizes = {
+    {
+      VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, // type
+      2 // descriptorCount
+    }
+  };
 
   material->layoutBindings.resize(2);
 
@@ -135,6 +149,13 @@ void Renderer::initSDFRMaterial(const MaterialPtr &_material)
   // TODO : might not need this for depth texture
   const auto &maxSamplerAnisotropy = getDeviceLimits()->maxSamplerAnisotropy;
   _material->texture.createSampler(maxSamplerAnisotropy);
+
+  _material->descPoolSizes = {
+    {
+      VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, // type
+      1 // descriptorCount
+    }
+  };
 
   _material->layoutBindings.resize(1);
 

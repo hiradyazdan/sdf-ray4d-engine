@@ -49,8 +49,6 @@ void CommandHelper::init(
 {
   m_cmdBuffer     = _cmdBuffer;
   m_frameId       = _frameId;
-  m_extentWidth   = _extentWidth;
-  m_extentHeight  = _extentHeight;
 
   m_renderPassHelper.setDefaultFramebuffer(_framebuffer);
   m_renderPassHelper.setFramebufferSize(
@@ -58,8 +56,8 @@ void CommandHelper::init(
     _extentHeight
   );
 
-  executeCmdSetViewport();
-  executeCmdSetScissor();
+  executeCmdSetViewport(_extentWidth, _extentHeight);
+  executeCmdSetScissor(_extentWidth, _extentHeight);
 }
 
 /**
@@ -73,13 +71,13 @@ void CommandHelper::setRenderPassHelper(
   m_renderPassHelper = _renderPassHelper;
 }
 
-void CommandHelper::executeCmdSetViewport() noexcept
+void CommandHelper::executeCmdSetViewport(uint32_t _extentWidth, uint32_t _extentHeight) noexcept
 {
   Viewport viewport = {
     0.0f, // x
     0.0f, // y
-    float(m_extentWidth), // width
-    float(m_extentHeight), // height
+    (float) _extentWidth, // width
+    (float) _extentHeight, // height
     0, // minDepth
     1 // maxDepth
   };
@@ -91,7 +89,7 @@ void CommandHelper::executeCmdSetViewport() noexcept
   );
 }
 
-void CommandHelper::executeCmdSetScissor() noexcept
+void CommandHelper::executeCmdSetScissor(uint32_t _extentWidth, uint32_t _extentHeight) noexcept
 {
   Rect2D scissor = {
     { // offset
@@ -99,8 +97,8 @@ void CommandHelper::executeCmdSetScissor() noexcept
       0 // y
     },
     {  // extent
-      m_extentWidth, // width
-      m_extentHeight // height
+      _extentWidth, // width
+      _extentHeight // height
     }
   };
   m_deviceFuncs->vkCmdSetScissor(

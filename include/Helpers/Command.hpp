@@ -53,11 +53,11 @@ namespace sdfRay4d::helpers
      *
      */
     private:
-      void executeCmdSetViewport() noexcept;
-      void executeCmdSetScissor() noexcept;
-      void executeCmdBind          (const MaterialPtr &_material) noexcept;
-      void executeCmdPushConstants (const MaterialPtr &_material) noexcept;
-      void executeCmdDraw          (const MaterialPtr &_material) noexcept;
+      void executeCmdSetViewport    (uint32_t _extentWidth, uint32_t _extentHeight) noexcept;
+      void executeCmdSetScissor     (uint32_t _extentWidth, uint32_t _extentHeight) noexcept;
+      void executeCmdBind           (const MaterialPtr &_material) noexcept;
+      void executeCmdPushConstants  (const MaterialPtr &_material) noexcept;
+      void executeCmdDraw           (const MaterialPtr &_material) noexcept;
 
     private:
       void setRenderPassHelper(const RenderPassHelper &_renderPassHelper) noexcept;
@@ -71,7 +71,5 @@ namespace sdfRay4d::helpers
       RenderPassHelper m_renderPassHelper;
 
       int m_frameId = 0;
-      uint32_t m_extentWidth = 0;
-      uint32_t m_extentHeight = 0;
   };
 }

@@ -69,18 +69,18 @@ namespace sdfRay4d
 
     // pipeline::DynamicInfo.pDynamicStates is a pointer
     // => needs to persist data in scope via struct
-    [[maybe_unused]] DynamicStateList                dynamicStates;
+    DynamicStateList                dynamicStates;
 
     // pipeline::VertexInputInfo.pVertexBindingDescriptions is pointer
     // => needs to persist data in scope via struct
-    [[maybe_unused]] VertexBindingDescList           vertexBindingDesc;
+    VertexBindingDescList           vertexBindingDesc;
 
     // pipeline::VertexInputInfo.pVertexAttributeDescriptions is pointer
     // => needs to persist data in scope via struct
-    [[maybe_unused]] VertexAttrDescList              vertexAttrDesc;
+    VertexAttrDescList              vertexAttrDesc;
 
     // pipeline::ColorBlendInfo.pAttachments is a pointer
     // => needs to persist data in scope via struct
-    [[maybe_unused]] pipeline::ColorBlendAttachment  colorBlendAttachment;
+    pipeline::ColorBlendAttachment  colorBlendAttachment;
   };
 }

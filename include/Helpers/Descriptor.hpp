@@ -55,6 +55,8 @@ namespace sdfRay4d::helpers
       Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
+      descriptor::BufferInfo m_bufferInfo = {};
+      descriptor::ImageInfo m_imageInfo = {};
       std::vector<descriptor::Write> m_descWriteList = {};
   };
 }

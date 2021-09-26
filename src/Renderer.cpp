@@ -15,7 +15,6 @@
  *      - init_materials_helpers.cpp
  *      - init_shaders_helpers.cpp
  *      - sdf_graph_pipeline_helpers.cpp
- *      - swapchain_helpers.cpp
  * - frame (frame.cpp)
  *      - buffers.cpp
  *      - command_exec_helpers.cpp

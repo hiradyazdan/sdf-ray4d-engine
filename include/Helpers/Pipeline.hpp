@@ -28,6 +28,7 @@ namespace sdfRay4d::helpers
   {
     using ShaderStageInfoList = std::vector<pipeline::ShaderStageInfo>;
     using DescLayoutList      = std::vector<descriptor::Layout>;
+    using ImageViewList       = std::vector<texture::ImageView>;
 
     public:
       BufferHelper buffer;
@@ -41,7 +42,6 @@ namespace sdfRay4d::helpers
         const SampleCountFlags &_sampleCountFlags,
         const RenderPass &_defaultRenderPass
       ) noexcept;
-      void initSwapChainHelpers         (const texture::ImageView &_fbAttachments) noexcept;
 
     public:
       void createCache() noexcept;
@@ -91,6 +91,7 @@ namespace sdfRay4d::helpers
       ) noexcept;
 
     public:
+      void setFramebufferAttachments    (const ImageViewList &_fbAttachments) noexcept;
       RenderPass &getRenderPass         (bool _useDefault = true) noexcept;
 
     /**
