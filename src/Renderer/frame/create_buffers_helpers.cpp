@@ -98,16 +98,14 @@ void Renderer::updateDescriptorSets()
       m_actorMaterial->fragUniSize // range
     }
   );
-
-  descriptor::ImageInfo imageInfo = {}; // memset
-  imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-  imageInfo.imageView = m_depthMaterial->texture.getImageView();
-  imageInfo.sampler = m_sdfrMaterial->texture.getSampler();
-
   m_pipelineHelper.descriptor.addWriteSet(
     m_sdfrMaterial->descSets[0],
     m_sdfrMaterial->layoutBindings[0],
-    imageInfo
+    {
+      m_sdfrMaterial->texture.getSampler(), // sampler
+      m_depthMaterial->texture.getImageView(), // imageView
+      VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, // imageLayout
+    }
   );
 
   m_pipelineHelper.descriptor.updateDescriptorSets();

@@ -100,7 +100,7 @@ void RenderPassHelper::createCustomRenderPass(
 }
 
 /**
- *
+ * @brief creates renderPassInfo for both default and custom renderPass
  * @param[in] _materials
  */
 void RenderPassHelper::createRenderPassInfo(

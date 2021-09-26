@@ -30,6 +30,7 @@ namespace sdfRay4d
   struct Material
   {
     using ShaderStageInfoList = std::vector<pipeline::ShaderStageInfo>;
+    using DescPoolSizeList    = std::vector<descriptor::PoolSize>;
     using LayoutBindingList   = std::vector<descriptor::LayoutBinding>;
     using DescLayoutList      = std::vector<descriptor::Layout>;
     using DescSettList        = std::vector<descriptor::Set>;
@@ -55,6 +56,7 @@ namespace sdfRay4d
 
     // Descriptor
     descriptor::Pool            descPool = VK_NULL_HANDLE;
+    DescPoolSizeList            descPoolSizes;
     LayoutBindingList           layoutBindings;
     DescLayoutList              descSetLayouts;
     DescSettList                descSets;

@@ -35,8 +35,6 @@ void Renderer::initSwapChainResources()
 
   markViewProjDirty();
 
-  createDepthView();
-
   m_sdfrMaterial->pushConstants = {
     (float) m_windowSize.width(), // resolution x
     (float) m_windowSize.height(), // resolution y
@@ -44,10 +42,6 @@ void Renderer::initSwapChainResources()
     m_nearPlane, // near plane
     m_farPlane, // far plane
   };
-
-  m_pipelineHelper.initSwapChainHelpers(
-    m_depthMaterial->texture.getImageView() // framebuffer depth attachment for custom renderPass
-  );
 }
 
 void Renderer::releaseSwapChainResources()

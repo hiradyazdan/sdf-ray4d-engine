@@ -33,6 +33,7 @@ void Renderer::buildFrame()
   // makes this function Thread-safe
   QMutexLocker locker(&m_guiMutex);
 
+  createDepthView();
   createBuffers();
 
   m_pipelineHelper.waitForWorkersToFinish();

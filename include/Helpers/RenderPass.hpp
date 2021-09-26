@@ -16,6 +16,8 @@ namespace sdfRay4d::helpers
     friend class PipelineHelper;
     friend class CommandHelper;
 
+    using ImageViewList = std::vector<texture::ImageView>;
+
     public:
       RenderPassHelper(
         const Device &_device,
@@ -49,11 +51,10 @@ namespace sdfRay4d::helpers
      * -------------------------------------------------
      */
     private:
-      texture::ImageView &getFramebufferAttachments() noexcept;
-      void setFramebufferAttachments(const texture::ImageView &_fbAttachments) noexcept;
+      ImageViewList &getFramebufferAttachments() noexcept;
+      void setFramebufferAttachments(const ImageViewList &_fbAttachments) noexcept;
       void setDefaultFramebuffer(const Framebuffer &_framebuffer) noexcept;
       void setFramebufferSize(uint32_t _extentWidth, uint32_t _extentHeight) noexcept;
-
 
     private:
       FramebufferHelper m_framebufferHelper; // friend

@@ -53,6 +53,7 @@ void PipelineHelper::initHelpers(
   );
 
   descriptor          = DescriptorHelper(m_device, m_deviceFuncs);
+  buffer              = BufferHelper(m_device, m_deviceFuncs);
   command             = CommandHelper(m_device, m_deviceFuncs);
 }
 
@@ -60,14 +61,13 @@ void PipelineHelper::initHelpers(
  *
  * @param[in] _fbAttachments framebuffer attachments
  */
-void PipelineHelper::initSwapChainHelpers(
-  const texture::ImageView &_fbAttachments
+void PipelineHelper::setFramebufferAttachments(
+  const ImageViewList &_fbAttachments
 ) noexcept
 {
   if(m_renderPassHelper.getFramebufferAttachments() == _fbAttachments) return;
 
   m_renderPassHelper.setFramebufferAttachments(_fbAttachments);
-  buffer = BufferHelper(m_device, m_deviceFuncs);
   command.setRenderPassHelper(m_renderPassHelper);
 }
 

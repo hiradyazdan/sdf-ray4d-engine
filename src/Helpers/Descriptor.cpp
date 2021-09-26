@@ -35,7 +35,7 @@ void DescriptorHelper::updateDescriptorSets() noexcept
 {
   m_deviceFuncs->vkUpdateDescriptorSets(
     m_device,
-    static_cast<uint32_t>(m_descWriteList.size()),
+    m_descWriteList.size(),
     m_descWriteList.data(),
     0,
     nullptr

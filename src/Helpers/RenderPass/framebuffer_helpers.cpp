@@ -7,7 +7,7 @@
 
 using namespace sdfRay4d::helpers;
 
-texture::ImageView &RenderPassHelper::getFramebufferAttachments() noexcept
+RenderPassHelper::ImageViewList &RenderPassHelper::getFramebufferAttachments() noexcept
 {
   return m_framebufferHelper.getAttachments();
 }
@@ -17,7 +17,7 @@ texture::ImageView &RenderPassHelper::getFramebufferAttachments() noexcept
  * @param[in] _fbAttachments
  */
 void RenderPassHelper::setFramebufferAttachments(
-  const texture::ImageView &_fbAttachments
+  const ImageViewList &_fbAttachments
 ) noexcept
 {
   m_framebufferHelper.setAttachments(_fbAttachments);

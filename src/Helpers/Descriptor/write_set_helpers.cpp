@@ -20,14 +20,19 @@ void DescriptorHelper::addWriteSet(
   const descriptor::BufferInfo &_bufferInfo
 ) noexcept
 {
-  descriptor::Write descriptor = {};
+  /**
+   * @note avoids going out of scope
+   */
+  m_bufferInfo = _bufferInfo;
 
-  descriptor.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-  descriptor.dstSet           = _descSet;
-  descriptor.dstBinding       = _layoutBinding.binding;
-  descriptor.descriptorCount  = _layoutBinding.descriptorCount;
-  descriptor.descriptorType   = _layoutBinding.descriptorType;
-  descriptor.pBufferInfo      = &_bufferInfo;
+  descriptor::Write descriptor  = {}; // memset
+
+  descriptor.sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  descriptor.dstSet             = _descSet;
+  descriptor.dstBinding         = _layoutBinding.binding;
+  descriptor.descriptorCount    = _layoutBinding.descriptorCount;
+  descriptor.descriptorType     = _layoutBinding.descriptorType;
+  descriptor.pBufferInfo        = &m_bufferInfo;
 
   m_descWriteList.push_back(descriptor);
 }
@@ -45,14 +50,19 @@ void DescriptorHelper::addWriteSet(
   const descriptor::ImageInfo &_imageInfo
 ) noexcept
 {
-  descriptor::Write descriptor = {};
+  /**
+   * @note avoids going out of scope
+   */
+  m_imageInfo = _imageInfo;
 
-  descriptor.sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-  descriptor.dstSet           = _descSet;
-  descriptor.dstBinding       = _layoutBinding.binding;
-  descriptor.descriptorCount  = _layoutBinding.descriptorCount;
-  descriptor.descriptorType   = _layoutBinding.descriptorType;
-  descriptor.pImageInfo       = &_imageInfo;
+  descriptor::Write descriptor  = {};
+
+  descriptor.sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  descriptor.dstSet             = _descSet;
+  descriptor.dstBinding         = _layoutBinding.binding;
+  descriptor.descriptorCount    = _layoutBinding.descriptorCount;
+  descriptor.descriptorType     = _layoutBinding.descriptorType;
+  descriptor.pImageInfo         = &m_imageInfo;
 
   m_descWriteList.push_back(descriptor);
 }

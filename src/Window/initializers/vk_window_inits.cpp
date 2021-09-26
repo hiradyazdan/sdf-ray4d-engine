@@ -36,7 +36,7 @@ void MainWindow::initVkLayers()
   {
     if (!m_vkInstance->supportedLayers().contains(layer))
     {
-      qFatal("This Validation layer isn't supported: " + layer);
+      qFatal("This Validation layer isn't supported: %s", layer.data());
     }
   }
 

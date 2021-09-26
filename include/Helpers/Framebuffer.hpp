@@ -16,6 +16,8 @@ namespace sdfRay4d::helpers
     friend class RenderPassHelper;
     friend class CommandHelper;
 
+    using ImageViewList = std::vector<texture::ImageView>;
+
     /**
      * @note FramebufferHelper is non-copyable
      */
@@ -31,10 +33,10 @@ namespace sdfRay4d::helpers
 
     private:
       void createFramebuffer(const RenderPass &_renderPass) noexcept;
-      void setAttachments(const texture::ImageView &_attachments) noexcept;
+      void setAttachments(const ImageViewList &_attachments) noexcept;
       void setSize(uint32_t _extentWidth, uint32_t _extentHeight) noexcept;
       void setDefaultFramebuffer(const Framebuffer &_framebuffer) noexcept;
-      texture::ImageView &getAttachments() noexcept { return m_attachments; }
+      ImageViewList &getAttachments() noexcept { return m_attachments; }
       Framebuffer &getFramebuffer(
         const RenderPass &_renderPass,
         bool _useDefault
@@ -46,7 +48,7 @@ namespace sdfRay4d::helpers
 
       Framebuffer m_defaultFrameBuffer = VK_NULL_HANDLE;
       Framebuffer m_frameBuffer = VK_NULL_HANDLE;
-      texture::ImageView m_attachments = VK_NULL_HANDLE;
+      ImageViewList m_attachments = {};
 
       uint32_t m_extentWidth = 0;
       uint32_t m_extentHeight = 0;

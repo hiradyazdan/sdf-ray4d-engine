@@ -25,7 +25,7 @@ FramebufferHelper::FramebufferHelper(
  * @param[in] _attachments
  */
 void FramebufferHelper::setAttachments(
-  const texture::ImageView &_attachments
+  const ImageViewList &_attachments
 ) noexcept
 {
   m_attachments = _attachments;
@@ -106,8 +106,8 @@ void FramebufferHelper::createFramebuffer(
 
   framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
   framebufferInfo.renderPass = _renderPass; // custom renderPass
-  framebufferInfo.attachmentCount = 1; // depth pass attachment image view is only 1
-  framebufferInfo.pAttachments = &m_attachments;
+  framebufferInfo.attachmentCount = m_attachments.size(); // depth pass attachment image view is only 1
+  framebufferInfo.pAttachments = m_attachments.data();
   framebufferInfo.width = m_extentWidth;
   framebufferInfo.height = m_extentHeight;
   framebufferInfo.layers = 1;
