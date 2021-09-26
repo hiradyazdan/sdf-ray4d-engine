@@ -7,7 +7,12 @@
 - Bash Shell
 - Qt v5.10+ (tested with 5.15)
 - Vulkan SDK v1.2.x (tested with v1.2.189)
-- Currently, Windows only
+
+## Supported Platforms
+
+- Windows (out of the box)
+- Linux (requires Qt to build from source)
+- MacOS (TBC)
 
 ## Download
 
@@ -34,12 +39,16 @@ git clone --recurse-submodules -j8 https://github.com/hiradyazdan/sdf-ray4d-engi
 
 ## Build
 
+***Note:*** if on Linux, make a copy of `.env.config.example` and rename it to `.env.config` and
+then fill its required variables before the build. As Qt requires building from source along with the app build,
+it may take up to an hour to finish depending on the system memory.
+
+***Note:*** if on Windows, make sure vcpkg packages are 64-bit system compatible with `-DVCPKG_TARGET_TRIPLET=x64-windows`.
+
 ```shell
 cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_PATH} ..
 cmake --build .
 ```
-
-***Note:*** if on Windows, make sure vcpkg packages are 64-bit system compatible with `-DVCPKG_TARGET_TRIPLET=x64-windows`.
 
 #### CMake Compilation Performance
 
