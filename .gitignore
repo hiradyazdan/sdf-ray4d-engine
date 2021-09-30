@@ -27,6 +27,7 @@
 *.out
 *.app
 *.log
+
 # CMake
 CMakeLists.txt.user
 CMakeCache.txt
@@ -39,6 +40,8 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+# Builds & Instrumentations
 build/
 **/*build*/*
 vcpkg_installed/
@@ -49,6 +52,6 @@ renderdoc/*
 .vs
 .idea
 
-.env
-.env.config
-.env.build
+# Env Vars & Configs
+.env*
+!.env*example

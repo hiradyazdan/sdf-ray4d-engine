@@ -41,7 +41,7 @@ for ext in glsl vert frag comp; do
     prefix="$(cut -d'.' -f1 <<<"$file")"
 
     glslc_status=$(${glslc_cmd} $file -o ${prefix}.${ext}.spv)$?
-    [[ $glslc_status = 0 ]] && echo "${prefix}.${ext}.spv was successfully created!"
+    [[ $glslc_status = 0 ]] && echo -ne "${prefix}.${ext}.spv was successfully created!\n\r"
 
     if [[ "$prefix.$ext" == "$sdfr_pass_file_copy" ]]; then
       mv ${prefix}.${ext}.spv ../static

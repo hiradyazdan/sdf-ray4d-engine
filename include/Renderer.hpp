@@ -126,7 +126,7 @@ namespace sdfRay4d
       void executeCommands();
 
     private:
-      const VkPhysicalDeviceLimits *getDeviceLimits() const;
+      const PhysicalDeviceLimits *getDeviceLimits() const;
       device::Size setDynamicOffsetAlignment(
         device::Size _offset
       );
@@ -197,6 +197,6 @@ namespace sdfRay4d
       {
         Pipeline pipeline;
         pipeline::Layout layout;
-      } m_oldPipeline;
+      } m_oldPipeline = {};
   };
 }

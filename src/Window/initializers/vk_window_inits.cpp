@@ -49,7 +49,9 @@ void MainWindow::initVkInstance()
 {
   m_vkInstance = new QVulkanInstance();
 
+#ifndef NDEBUG
   initVkLayers();
+#endif
 
   if (!m_vkInstance->create())
   {

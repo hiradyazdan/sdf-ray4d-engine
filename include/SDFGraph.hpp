@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QDebug>
-
 #include <nodes/FlowScene>
 #include <nodes/FlowView>
 #include <nodes/Node>

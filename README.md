@@ -3,7 +3,7 @@
 ## Requirements
 
 - C++ 17 compiler (msvc, gcc, clang)
-- cmake v3.12+ (tested with 3.19 - for faster builds use v3.16+)
+- cmake v3.19+ (tested with 3.19)
 - Bash Shell
 - Qt v5.10+ (tested with 5.15)
 - Vulkan SDK v1.2.x (tested with v1.2.189)
@@ -24,9 +24,9 @@ git clone --recurse-submodules -j8 https://github.com/hiradyazdan/sdf-ray4d-engi
 
 ***Note:***
 
-- glslang (***Note*** The latest pull (18 Sept.) from `glslang` has a typo in its cmake config.
-  Please modify its `CMakeLists.txt` at line `144` to `endif(MSVC AND OVERRIDE_MSVCCRT)`.)
-- nodeeditor also has a conflict with vcpkg that have to manually remove a snippet of code from
+- `glslang` (The latest pull 18 Sept.) has a typo in its cmake config.
+  Please modify its `CMakeLists.txt` at line `144` to `endif(MSVC AND OVERRIDE_MSVCCRT)`.
+- `nodeeditor` also has a conflict with vcpkg that have to manually remove a snippet of code from
   the CMakeLists.txt in `nodeeditor/external/CMakeLists.txt` as below:
 
 ```cmake
@@ -46,16 +46,18 @@ it may take up to an hour to finish depending on the system memory.
 ***Note:*** if on Windows, make sure vcpkg packages are 64-bit system compatible with `-DVCPKG_TARGET_TRIPLET=x64-windows`.
 
 ```shell
-cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_PATH} ..
+cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_CMAKE_PATH} ..
 cmake --build .
 ```
 
 #### CMake Compilation Performance
 
-***source file => compilation/translation unit => obj file => linker => executable***
-
 Compiling source class implementations when split into multiple source files (i.e., Partial Class), to allow for
 readability/maintainability, may increase the compilation time.
+
+```
+source file => compilation/translation unit => obj file => linker => executable
+```
 
 It essentially creates extra multiple `obj` files for each split source file which is the result of increase
 in the number of compilation/translation units and therefore increase in the compilation time. There are a few ways
