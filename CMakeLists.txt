@@ -172,6 +172,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $ENV{ProgramFiles\(x86\)}/$ENV{CLANG_CL_DBG_DIR}/$ENV{CLANG_RT_ASAN_DYN}.dll
             ${CMAKE_CURRENT_BINARY_DIR}
+
+            COMMAND_ERROR_IS_FATAL ANY
         )
 
         target_link_directories (${TARGET_NAME} PRIVATE "${ProgramFiles\(x86\)}/$ENV{CLANG_CL_LIB_DIR}")

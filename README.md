@@ -52,7 +52,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_CMAKE_PATH} ..
 cmake --build .
 ```
 
-#### CMake Compilation Performance
+### CMake Compilation Performance
 
 Compiling source class implementations when split into multiple source files (i.e., Partial Class), to allow for
 readability/maintainability, may increase the compilation time.
