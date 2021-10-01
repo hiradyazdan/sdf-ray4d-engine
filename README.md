@@ -37,10 +37,12 @@ git clone --recurse-submodules -j8 https://github.com/hiradyazdan/sdf-ray4d-engi
   endmacro()
 ```
 
-## Build
+## Config & Build
 
-***Note:*** if on Linux, make a copy of `.env.config.example` and rename it to `.env.config` and
-then fill its required variables before the build. As Qt requires building from source along with the app build,
+Make a copy of `.env.build.example`, rename it to `.env.build` and then
+fill/modify its required variables before the build.
+
+***Note:*** if on Linux, as Qt requires building from source along with the app build,
 it may take up to an hour to finish depending on the system memory.
 
 ***Note:*** if on Windows, make sure vcpkg packages are 64-bit system compatible with `-DVCPKG_TARGET_TRIPLET=x64-windows`.

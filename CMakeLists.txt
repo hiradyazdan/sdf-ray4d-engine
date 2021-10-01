@@ -58,33 +58,17 @@ else()
     set(CMAKE_UNITY_BUILD $ENV{CMAKE_UNITY_BUILD})
 endif()
 
-find_program(SHELL bash HINTS /bin)
-
 if(UNIX AND NOT APPLE)
-    set(QT_VERSION          5.15)
-    set(QT_VERSION_PATCH    ${QT_VERSION}.2)
-    set(CONFIG_FILE         .env.config)
-    set(QT_BUILD_SCRIPT     ./qt_vulkan_source_build.sh)
-
     # NOTE
     #
     # This builds qt from source to enable vulkan instance and functions at configure time.
     # It may take up to an hour or less depending on the system memory.
     if(NOT QT_BUILD_COMPLETE)
         execute_process(
-            # Copy Environment Variables Manifest
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${CMAKE_CURRENT_SOURCE_DIR}/${CONFIG_FILE}
-            ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_FILE}
-
-            # Copy Qt Source Build Script
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${CMAKE_CURRENT_SOURCE_DIR}/${QT_BUILD_SCRIPT}
-            ${CMAKE_CURRENT_BINARY_DIR}/${QT_BUILD_SCRIPT}
-
-            # Qt Vulkan Configure, Build and Install
-            COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
-            "QT_VERSION=${QT_VERSION} QT_VERSION_PATCH=${QT_VERSION_PATCH} . ${QT_BUILD_SCRIPT}"
+            COMMAND ${CMAKE_COMMAND} -P
+            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/qt_source_build.cmake
+            ${BUILD_ENV_FILE}
+            ${CMAKE_CURRENT_SOURCE_DIR}
         )
         set(QT_BUILD_COMPLETE TRUE CACHE BOOL "Qt Build completed?" FORCE)
     endif()
@@ -96,7 +80,7 @@ include_directories(externals)
 #find_package(glslang CONFIG REQUIRED) # vcpkg port is broken
 find_package(Vulkan REQUIRED)
 #find_package(glm REQUIRED) # not required yet
-find_package(Qt5 ${QT_VERSION} COMPONENTS Widgets Concurrent REQUIRED)
+find_package(Qt5 $ENV{QT_VERSION} COMPONENTS Widgets Concurrent REQUIRED)
 
 add_executable(${TARGET_NAME})
 
@@ -130,37 +114,39 @@ target_link_libraries(${TARGET_NAME} PRIVATE nodes)
 #############################################################################
 
 if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    add_compile_options(
-        -EHa # should explicitly enable exceptions with clang-cl (https://github.com/catchorg/Catch2/issues/1113)
-        -Wno-c++98-compat
-        -Wno-c++98-compat-pedantic
-        -Wno-deprecated-declarations
-        -Wno-shadow
-        -Wno-switch-enum
-        -Wno-double-promotion
-        -Wno-float-conversion
-        -Wno-sign-conversion
-        -Wno-enum-enum-conversion
-        -Wno-unreachable-code-break
-        -Wno-suggest-destructor-override
-        -Wno-inconsistent-missing-destructor-override
-        -Wno-zero-as-null-pointer-constant
-        -Wno-shorten-64-to-32
-        -Wno-extra-semi-stmt
-        -Wno-implicit-float-conversion
-        -Wno-global-constructors
-        -Wno-redundant-parens
-        -Wno-exit-time-destructors
-        -Wno-documentation
-    )
-    target_compile_options(
-        ${TARGET_NAME} PRIVATE
-        -EHa # should explicitly enable exceptions with clang-cl (https://github.com/catchorg/Catch2/issues/1113)
-        -fsanitize=address /Zi
-        -fsanitize-address-use-after-scope
-    )
-
     if(WIN32)
+        add_compile_options(
+            -EHa # should explicitly enable exceptions with clang-cl (https://github.com/catchorg/Catch2/issues/1113)
+            -Wno-c++98-compat
+            -Wno-c++98-compat-pedantic
+            -Wno-deprecated-declarations
+            -Wno-shadow
+            -Wno-switch-enum
+            -Wno-double-promotion
+            -Wno-float-conversion
+            -Wno-sign-conversion
+            -Wno-enum-enum-conversion
+            -Wno-unreachable-code-break
+            -Wno-suggest-destructor-override
+            -Wno-inconsistent-missing-destructor-override
+            -Wno-zero-as-null-pointer-constant
+            -Wno-shorten-64-to-32
+            -Wno-extra-semi-stmt
+            -Wno-implicit-float-conversion
+            -Wno-global-constructors
+            -Wno-redundant-parens
+            -Wno-exit-time-destructors
+            -Wno-documentation
+        )
+        target_compile_options(
+            ${TARGET_NAME} PRIVATE
+            /Zi
+            -EHa # should explicitly enable exceptions with clang-cl (https://github.com/catchorg/Catch2/issues/1113)
+            -fsanitize=address
+            -fsanitize-recover=address
+            -fsanitize-address-use-after-scope
+        )
+
         if(
             NOT DEFINED ENV{CLANG_CL_LIB_DIR} OR
             NOT DEFINED ENV{CLANG_CL_DBG_DIR} OR
@@ -173,7 +159,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         # NOTE:
         #
         # On Windows, for non-release builds need to manually copy over
-        # the CLANG_RT_ASAN_DYN dbg (debug0 file, otherwise it cannot find
+        # the CLANG_RT_ASAN_DYN dbg (debug) file, otherwise it cannot find
         # the dll as it doesn't exist in the CLANG_CL_LIB_DIR
         #
         # e.g. Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx86\x64\clang_rt.asan_dbg_dynamic-x86_64
@@ -185,12 +171,29 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         execute_process(
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $ENV{ProgramFiles\(x86\)}/$ENV{CLANG_CL_DBG_DIR}/$ENV{CLANG_RT_ASAN_DYN}.dll
-            ${CMAKE_CURRENT_BINARY_DIR}/$ENV{CLANG_RT_ASAN_DYN}.dll
+            ${CMAKE_CURRENT_BINARY_DIR}
         )
 
         target_link_directories (${TARGET_NAME} PRIVATE "${ProgramFiles\(x86\)}/$ENV{CLANG_CL_LIB_DIR}")
         target_link_libraries   (${TARGET_NAME} PRIVATE $ENV{CLANG_RT_ASAN_DYN} $ENV{CLANG_RT_ASAN_DYN_THUNK})
         target_link_options     (${TARGET_NAME} PRIVATE /wholearchive:$ENV{CLANG_RT_ASAN_DYN_THUNK}.lib)
+    elseif(UNIX)
+        # NOTE
+        #
+        # There seems to be gcc version incompatibility issues with sanitizers in CLion
+        # and earlier than gcc 9 or 10 don't work correctly
+        #
+        # https://intellij-support.jetbrains.com/hc/en-us/community/posts/360003031060-Using-sanitizers-with-visual-representation
+        # https://youtrack.jetbrains.com/issue/CPP-13813?_ga=2.196238828.1991408756.1633127548-1736470599.1604156095
+        #
+        target_compile_options(
+            ${TARGET_NAME} PRIVATE
+            -fsanitize=address
+            -fsanitize-recover=address
+            -fsanitize-address-use-after-scope
+        )
+
+        target_link_libraries(${TARGET_NAME} PRIVATE -fsanitize=address)
     endif()
 endif()
 

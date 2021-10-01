@@ -7,39 +7,31 @@
 # https://unix.stackexchange.com/questions/481063/ubuntu-18-04-1-lts-x64-how-to-update-qt-5-10-from-qt-5-9-5
 # https://forum.qt.io/topic/125582/qt-5-15-2-do-not-build-libqxcb-so-but-at-the-same-time-qt-5-14-0-successfully-build-libqxcb-so
 
-CONFIG_FILE=./.env.config
+QT_VERSION_PATTERN='^([0-9]+\.){2}(\*|[0-9]+)(-.*)?$' # semver format
 
-if [[ -f ${CONFIG_FILE} ]]; then
-  set -o allexport
-  # shellcheck source=./.env.config
-  source ${CONFIG_FILE}
-  set +o allexport
-else
-  echo "${CONFIG_FILE} does not exist! You should create ${CONFIG_FILE} with required environment variables."
+if ! [[ ${QT_VERSION} =~ ${QT_VERSION_PATTERN} ]]; then
+  echo "QT_VERSION should be in a valid format (i.e., major.minor.patch)!"
   return 1
 fi
 
-QT_VERSION_MINOR=${QT_VERSION:-'5.15'}
-QT_VERSION_PATCH=${QT_VERSION_PATCH:-"${QT_VERSION_MINOR}.2"}
-
-QT_SOURCE_FILE="qt-everywhere-src-${QT_VERSION_PATCH}.tar.xz"
-QT_SRC_DOWNLOAD_DIR=$(echo ${QT_SRC_DOWNLOAD_DIR} | tr -d '\r')
-QT_TARGET_DIR=$(echo "qt${QT_VERSION_PATCH}" | sed -e 's/\.//g')
-QT_INSTALL_DIR=/opt/${QT_TARGET_DIR}
-
 if [[ -z ${QT_SRC_DOWNLOAD_DIR} ]]; then
-  echo "QT_SRC_DOWNLOAD_DIR environment variable should be set!"
+  echo "QT_SRC_DOWNLOAD_DIR should be set!"
   return 1
 fi
 
 if ! echo ${SYSTEM_PASSWORD} | sudo -Sk >/dev/null 2>&1 true; then
-  echo "SYSTEM_PASSWORD environment variable value is incorrect!"
+  echo "SYSTEM_PASSWORD is incorrect!"
   return 1
 fi
 
+QT_SOURCE_FILE="qt-everywhere-src-${QT_VERSION}.tar.xz"
+QT_TARGET_DIR=$(echo "qt${QT_VERSION}" | sed -e 's/\.//g')
+QT_INSTALL_DIR=/opt/${QT_TARGET_DIR}
+QT_VERSION_MINOR=$(echo ${QT_VERSION} | sed -e 's/\.[^.]*$//')
+
 if [[ -d "${QT_INSTALL_DIR}" ]] || [[ -d "${QT_TARGET_DIR}" ]]; then
-  echo "** Qt v${QT_VERSION_PATCH} has already been installed in ${QT_INSTALL_DIR}."
-  echo "** If you need to reinstall, please delete the following directories:"
+  echo "** Qt v${QT_VERSION} has already been installed in ${QT_INSTALL_DIR}."
+  echo "** If you need to reinstall, delete the following directories:"
   echo "** - ${QT_INSTALL_DIR}"
   echo "** - ${QT_SRC_DOWNLOAD_DIR}/${QT_TARGET_DIR}"
   return 0
@@ -73,7 +65,7 @@ echo ${SYSTEM_PASSWORD} | sudo -Sk apt-get install \
 cd ${QT_SRC_DOWNLOAD_DIR} || return
 
 if [[ ! -d "${QT_TARGET_DIR}" ]]; then
-  wget -nc https://download.qt.io/official_releases/qt/${QT_VERSION_MINOR}/${QT_VERSION_PATCH}/single/${QT_SOURCE_FILE}
+  wget -nc https://download.qt.io/official_releases/qt/${QT_VERSION_MINOR}/${QT_VERSION}/single/${QT_SOURCE_FILE}
 
   if [[ -f ${QT_SOURCE_FILE} ]]; then
     mkdir ${QT_TARGET_DIR}

@@ -70,6 +70,7 @@ execute_process(
     # Compile & Cleanup: Depth Pass Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
     "STATIC_SHADERS_PATH=${DEPTH_SHADERS_PATH} . ${SPV_COMPILE_SCRIPT}"
+
     WORKING_DIRECTORY ${BIN_DIR}
     COMMAND_ERROR_IS_FATAL ANY
 )
@@ -77,6 +78,7 @@ execute_process(
     # Compile & Cleanup: Rasterization Pass Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
     "STATIC_SHADERS_PATH=${ACTOR_SHADERS_PATH} . ${SPV_COMPILE_SCRIPT}"
+
     WORKING_DIRECTORY ${BIN_DIR}
     COMMAND_ERROR_IS_FATAL ANY
 )
@@ -84,6 +86,7 @@ execute_process(
     # Compile & Cleanup: SDFR (Raymarch) Main Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
     "STATIC_SHADERS_PATH=${STATIC_SHADERS_PATH} . ${SPV_COMPILE_SCRIPT}"
+
     WORKING_DIRECTORY ${BIN_DIR}
     COMMAND_ERROR_IS_FATAL ANY
 )
@@ -91,6 +94,7 @@ execute_process(
     # Compile & Cleanup: SDFR (Raymarch) Partial Shaders
     COMMAND ${CMAKE_COMMAND} -E env ${SHELL} -c
     "PARTS_SHADERS_PATH=${PARTS_SHADERS_PATH} . ${SPV_PARTS_COMPILE_SCRIPT}"
+
     WORKING_DIRECTORY ${BIN_DIR}
     COMMAND_ERROR_IS_FATAL ANY
 )
