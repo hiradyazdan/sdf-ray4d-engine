@@ -114,7 +114,7 @@ target_link_libraries(${TARGET_NAME} PRIVATE nodes)
 #############################################################################
 
 if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    if(WIN32)
+    if(MSVC)
         add_compile_options(
             -EHa # should explicitly enable exceptions with clang-cl (https://github.com/catchorg/Catch2/issues/1113)
             -Wno-c++98-compat
@@ -143,6 +143,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
             /Zi
             -EHa # should explicitly enable exceptions with clang-cl (https://github.com/catchorg/Catch2/issues/1113)
             -fsanitize=address
+#            -fno-omit-frame-pointer
+#            -g -02 # TODO: figure out why not known even with RelWithDebInfo build
             -fsanitize-recover=address
             -fsanitize-address-use-after-scope
         )
@@ -176,17 +178,21 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
             COMMAND_ERROR_IS_FATAL ANY
         )
 
-        target_link_directories (${TARGET_NAME} PRIVATE "${ProgramFiles\(x86\)}/$ENV{CLANG_CL_LIB_DIR}")
+        target_link_directories (${TARGET_NAME} PRIVATE "$ENV{ProgramFiles\(x86\)}/$ENV{CLANG_CL_LIB_DIR}")
         target_link_libraries   (${TARGET_NAME} PRIVATE $ENV{CLANG_RT_ASAN_DYN} $ENV{CLANG_RT_ASAN_DYN_THUNK})
         target_link_options     (${TARGET_NAME} PRIVATE /wholearchive:$ENV{CLANG_RT_ASAN_DYN_THUNK}.lib)
-    elseif(UNIX)
+    else()
         # NOTE
         #
-        # There seems to be gcc version incompatibility issues with sanitizers in CLion
-        # and earlier than gcc 9 or 10 don't work correctly
+        # - There seems to be gcc version incompatibility issues with sanitizers in CLion
+        #   and earlier than gcc 9 or 10 don't work correctly
+        # - Sanitizers do not also work with gcc/clang via MinGW and Cygwin on any of their ports
+        # - Vulkan is not yet supported via WSL either for runtime, so WSL is also not available to use
         #
         # https://intellij-support.jetbrains.com/hc/en-us/community/posts/360003031060-Using-sanitizers-with-visual-representation
         # https://youtrack.jetbrains.com/issue/CPP-13813?_ga=2.196238828.1991408756.1633127548-1736470599.1604156095
+        # https://github.com/msys2/MINGW-packages/issues/3163
+        # https://github.com/microsoft/wslg/issues/40
         #
         target_compile_options(
             ${TARGET_NAME} PRIVATE
