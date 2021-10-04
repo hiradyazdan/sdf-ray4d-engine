@@ -32,26 +32,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO   ${CMAKE_CURRENT_BINARY_DIR})
 
 set(BUILD_ENV_FILE ${CMAKE_CURRENT_SOURCE_DIR}/.env.build)
 
-if(NOT EXISTS "${BUILD_ENV_FILE}")
-    message(FATAL_ERROR "Dot-env file not found: ${BUILD_ENV_FILE}")
-endif()
-
-file(STRINGS "${BUILD_ENV_FILE}" entries)
-foreach(entry IN LISTS entries)
-    if(NOT entry MATCHES "^$|[ ]$|^\#")
-        if(entry MATCHES "^([^=]+)=(.*)$")
-            set(ENV_KEY ${CMAKE_MATCH_1})
-            string(REGEX MATCHALL [^\"] ENV_VALUE "${CMAKE_MATCH_2}")
-            list(JOIN ENV_VALUE "" ENV_VALUE)
-
-            if(NOT ENV_VALUE MATCHES "^\#")
-                set(ENV{${ENV_KEY}} "${ENV_VALUE}")
-            endif()
-        else()
-            message(FATAL_ERROR "Malformed dotenv entry:\n${entry}")
-        endif()
-    endif()
-endforeach()
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/env_var_parser.cmake)
 
 # If UNITY BUILD causes compile or runtime issues (e.g. ODRs) turn this off.
 # setting this to ON may mess up the IDE syntax/error detections intermittently

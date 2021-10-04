@@ -11,26 +11,7 @@ endif()
 set(BUILD_ENV_FILE  "${CMAKE_ARGV3}")
 set(SOURCE_DIR      "${CMAKE_ARGV4}")
 
-if(NOT EXISTS "${BUILD_ENV_FILE}")
-    message(FATAL_ERROR "Dot-env file not found: ${BUILD_ENV_FILE}")
-endif()
-
-file(STRINGS "${BUILD_ENV_FILE}" entries)
-foreach(entry IN LISTS entries)
-    if(NOT entry MATCHES "^$|[ ]$|^\#")
-        if(entry MATCHES "^([^=]+)=(.*)$")
-            set(ENV_KEY ${CMAKE_MATCH_1})
-            string(REGEX MATCHALL [^\"] ENV_VALUE "${CMAKE_MATCH_2}")
-            list(JOIN ENV_VALUE "" ENV_VALUE)
-
-            if(NOT ENV_VALUE MATCHES "^\#")
-                set(ENV{${ENV_KEY}} "${ENV_VALUE}")
-            endif()
-        else()
-            message(FATAL_ERROR "Malformed dotenv entry:\n${entry}")
-        endif()
-    endif()
-endforeach()
+include(${SOURCE_DIR}/cmake/env_var_parser.cmake)
 
 set(QT_BUILD_SCRIPT ./qt_vulkan_source_build.sh)
 
