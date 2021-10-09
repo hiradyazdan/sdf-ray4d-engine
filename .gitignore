@@ -55,3 +55,4 @@ renderdoc/*
 # Env Vars & Configs
 .env*
 !.env*example
+*.pid

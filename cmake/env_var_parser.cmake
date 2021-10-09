@@ -2,6 +2,11 @@
 # ENV VARIABLE PARSER
 ###########################
 
+# NOTE:
+#
+# This script is not available as an independent cmake script
+#
+
 if(NOT EXISTS "${BUILD_ENV_FILE}")
     message(FATAL_ERROR "Dot-env file not found: ${BUILD_ENV_FILE}")
 endif()

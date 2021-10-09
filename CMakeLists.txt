@@ -46,13 +46,15 @@ if(UNIX AND NOT APPLE)
     # NOTE
     #
     # This builds qt from source to enable vulkan instance and functions at configure time.
-    # It may take up to an hour or less depending on the system memory.
+    # It may take up to an hour or more depending on the system memory.
     if(NOT QT_BUILD_COMPLETE)
         execute_process(
             COMMAND ${CMAKE_COMMAND} -P
             ${CMAKE_CURRENT_SOURCE_DIR}/cmake/qt_source_build.cmake
             ${BUILD_ENV_FILE}
             ${CMAKE_CURRENT_SOURCE_DIR}
+
+            COMMAND_ERROR_IS_FATAL ANY
         )
         set(QT_BUILD_COMPLETE TRUE CACHE BOOL "Qt Build completed?" FORCE)
     endif()
@@ -169,10 +171,13 @@ if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         # NOTE
         #
         # - Sanitizers do not work with gcc/clang via MinGW and Cygwin on any of their ports
-        # - Vulkan is not yet supported via WSL either for runtime, so WSL is also not available to use
+        # - Vulkan is not yet supported (officially) via WSL/WSL2 either for runtime, so WSL is also not available to use
         #
         # https://github.com/msys2/MINGW-packages/issues/3163
         # https://github.com/microsoft/wslg/issues/40
+        # https://docs.microsoft.com/en-us/windows/wsl/tutorials/gui-apps
+        # https://docs.nvidia.com/cuda/wsl-user-guide/index.html
+        # https://github.com/gnsmrky/wsl-vulkan-mesa
         #
         target_compile_options(
             ${TARGET_NAME} PRIVATE
