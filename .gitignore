@@ -56,3 +56,4 @@ renderdoc/*
 .env*
 !.env*example
 *.pid
+*.lock

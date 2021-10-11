@@ -15,20 +15,27 @@
 # per build in parallel (synchronously) as otherwise
 # it conflicts and fails. So, should wait for it to
 # finish before continuing with the other parallel build
-# configuration
+# configurations
 #
-QT_PARALLEL_BUILD_LOCK=./qt_parallel_build_lock.pid
+QT_PARALLEL_BUILD_LOCK="${PWD}/qt_parallel_build_lock.pid"
 if [[ -f ${QT_PARALLEL_BUILD_LOCK} ]]; then
   echo "** Qt source build is already running! Waiting for it to finish..."
   sleep 2073600 & # infinity
 
-  echo $! > ${QT_PARALLEL_BUILD_LOCK}
-  wait
+  echo $! >> ${QT_PARALLEL_BUILD_LOCK}
+  wait &>/dev/null
 else
   touch ${QT_PARALLEL_BUILD_LOCK}
 fi
 
-function removeLock() { rm ${QT_PARALLEL_BUILD_LOCK} >/dev/null 2>&1; }
+function unlock()
+{
+  if [[ ! -f ${QT_PARALLEL_BUILD_LOCK} ]]; then return; fi
+
+  PID_LIST=$(cat ${QT_PARALLEL_BUILD_LOCK} | tr '\n' ' ')
+  kill -9 ${PID_LIST} 2>/dev/null
+  rm ${QT_PARALLEL_BUILD_LOCK} >/dev/null 2>&1
+}
 
 QT_VERSION_PATTERN='^([0-9]+\.){2}(\*|[0-9]+)(-.*)?$' # semver format
 QT_SRC_DOWNLOAD_DIR=$(eval echo "${QT_SRC_DOWNLOAD_DIR}")
@@ -36,28 +43,28 @@ QT_SRC_DOWNLOAD_DIR=$(eval echo "${QT_SRC_DOWNLOAD_DIR}")
 if ! [[ ${QT_VERSION} =~ ${QT_VERSION_PATTERN} ]]; then
   echo "QT_VERSION should be in a valid format (i.e., major.minor.patch)!"
 
-  removeLock
+  unlock
   return 1
 fi
 
 if [[ ! -d "${QT_SRC_DOWNLOAD_DIR}" ]]; then
   echo "QT_SRC_DOWNLOAD_DIR should be an existing directory!"
 
-  removeLock
+  unlock
   return 1
 fi
 
 if ! echo ${SYSTEM_PASSWORD} | sudo -S >/dev/null 2>&1 true; then
   echo "SYSTEM_PASSWORD is incorrect!"
 
-  removeLock
+  unlock
   return 1
 fi
 
 QT_SOURCE_FILE_NAME="qt-everywhere-src-${QT_VERSION}.tar.xz"
 QT_SOURCE_FILE_PATH="${QT_SRC_DOWNLOAD_DIR}/${QT_SOURCE_FILE_NAME}"
 QT_TARGET_DIR_NAME=$(echo "qt${QT_VERSION}" | sed -e 's/\.//g')
-QT_TARGET_DIR_PATH="/opt/${QT_TARGET_DIR_NAME}-target" # untarring in same directory is very slow due to io priorities
+QT_TARGET_DIR_PATH="/opt/${QT_TARGET_DIR_NAME}-build-release" # untarring in same directory is very slow due to io priorities
 QT_TARGET_TAR_COMPLETE=${QT_TARGET_DIR_PATH}/.tar_complete
 QT_TARGET_ERROR_LOG_FILE="${PWD}/qt_build_error.log"
 QT_INSTALL_DIR_PATH=/opt/${QT_TARGET_DIR_NAME}
@@ -68,7 +75,7 @@ if [[ -d "${QT_INSTALL_DIR_PATH}" ]]; then
   echo "** If you need to reinstall, delete the following directory:"
   echo "** - ${QT_INSTALL_DIR_PATH}"
 
-  removeLock
+  unlock
   return 0
 fi
 
@@ -101,10 +108,12 @@ sudo apt-get -y install \
      libxcb-xf86dri0 libxcb-xf86dri0-dev libxcb-xfixes0 libxcb-xfixes0-dev libxcb-xinerama0 libxcb-xinerama0-dev \
      libxcb-xkb-dev libxcb-xkb1 libxcb-xtest0 libxcb-xtest0-dev libxcb-xv0 libxcb-xv0-dev libxcb-xvmc0 \
      libxcb-xvmc0-dev libxcb1 libxcb1-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxext-dev libxfixes-dev \
-     libxi-dev libxrandr-dev libxrender-dev libxslt1-dev libxss-dev libxtst-dev libvulkan-dev vulkan-utils \
-     perl python ruby axel pv ccache || { removeLock && return; }
+     libxi-dev libxrandr-dev libxrender-dev libxslt1-dev libxss-dev libxtst-dev perl python ruby \
+     axel pv ccache || { unlock && return; }
+# for WSL/WSL2 only (still experimental)
+#sudo apt-get -y install libvulkan-dev vulkan-tools vulkan-utils || { unlock && return; }
 
-cd ${QT_SRC_DOWNLOAD_DIR} || { removeLock && return; }
+cd ${QT_SRC_DOWNLOAD_DIR} || { unlock && return; }
 
 if [[ ! -d "${QT_TARGET_DIR_PATH}" || ! -f ${QT_TARGET_TAR_COMPLETE} ]]; then
   echo "Retrieving ${QT_SOURCE_FILE_NAME} ..."
@@ -117,11 +126,11 @@ if [[ ! -d "${QT_TARGET_DIR_PATH}" || ! -f ${QT_TARGET_TAR_COMPLETE} ]]; then
 
   if [[ -f ${QT_SOURCE_FILE_PATH} ]]; then
     echo "Extracting ${QT_SOURCE_FILE_NAME} ..."
-    sudo mkdir -p ${QT_TARGET_DIR_PATH}
+    echo ${SYSTEM_PASSWORD} | sudo -S mkdir -p ${QT_TARGET_DIR_PATH}
     pv -f ${QT_SOURCE_FILE_PATH} | sudo tar -xJf- \
                                             --skip-old-files \
                                             --strip-components=1 \
-                                            -C ${QT_TARGET_DIR_PATH} || { removeLock && return; }
+                                            -C ${QT_TARGET_DIR_PATH} || { unlock && return; }
     sudo touch ${QT_TARGET_TAR_COMPLETE}
   fi
 fi
@@ -129,7 +138,7 @@ fi
 if ! command -v vulkaninfo &> /dev/null; then
   echo "Error - Vulkan SDK not found!"
 
-  removeLock
+  unlock
   return 1
 fi
 
@@ -154,19 +163,13 @@ sudo ./configure -prefix ${QT_INSTALL_DIR_PATH} \
                  -skip qtwebview \
                  2> >(tee -a ${QT_TARGET_ERROR_LOG_FILE})
 
-echo "Building ${QT_TARGET_DIR_NAME} ..."
-sudo make -j8 2>> ${QT_TARGET_ERROR_LOG_FILE}
+echo "Compiling ${QT_TARGET_DIR_NAME} ..."
+echo ${SYSTEM_PASSWORD} | sudo -Sk make -j8 2>> ${QT_TARGET_ERROR_LOG_FILE}
 
 echo "Installing ${QT_TARGET_DIR_NAME} ..."
-sudo make install 2>> ${QT_TARGET_ERROR_LOG_FILE}
+echo ${SYSTEM_PASSWORD} | sudo -S make install 2>> ${QT_TARGET_ERROR_LOG_FILE}
 
 cd ../ && sudo rm -rf ${QT_TARGET_DIR_PATH} && rm ${QT_SOURCE_FILE_PATH}
 
-# NOTE: Parallel Builds Thread-safety (avoid data race)
-if [[ -f ${QT_PARALLEL_BUILD_LOCK} ]]; then
-  kill "$(< ${QT_PARALLEL_BUILD_LOCK})"
-
-  removeLock
-fi
-
+unlock
 return 0
