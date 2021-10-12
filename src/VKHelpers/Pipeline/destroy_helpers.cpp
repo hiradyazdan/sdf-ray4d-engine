@@ -3,9 +3,9 @@
  * Members: Destroy Helpers (Public)
  *****************************************************/
 
-#include "Helpers/Pipeline.hpp"
+#include "VKHelpers/Pipeline.hpp"
 
-using namespace sdfRay4d::helpers;
+using namespace sdfRay4d::vkHelpers;
 
 /**
  *

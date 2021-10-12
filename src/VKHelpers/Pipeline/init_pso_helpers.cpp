@@ -3,9 +3,9 @@
  * Members: Init PSO (Pipeline State Objects) Helpers (Private)
  *****************************************************/
 
-#include "Helpers/Pipeline.hpp"
+#include "VKHelpers/Pipeline.hpp"
 
-using namespace sdfRay4d::helpers;
+using namespace sdfRay4d::vkHelpers;
 
 /**
  *
@@ -26,8 +26,8 @@ void PipelineHelper::initPSOs(
 }
 
 /**
- * 
- * @param[in] _material 
+ *
+ * @param[in] _material
  */
 void PipelineHelper::setDynamicState(
   const MaterialPtr &_material
@@ -46,8 +46,8 @@ void PipelineHelper::setDynamicState(
 }
 
 /**
- * 
- * @param[in] _material 
+ *
+ * @param[in] _material
  */
 void PipelineHelper::setVertexInputState(
   const MaterialPtr &_material
@@ -93,8 +93,8 @@ void PipelineHelper::setVertexInputState(
 }
 
 /**
- * 
- * @param[in] _material 
+ *
+ * @param[in] _material
  */
 void PipelineHelper::setInputAssemblyState(
   const MaterialPtr &_material
@@ -109,8 +109,8 @@ void PipelineHelper::setInputAssemblyState(
 }
 
 /**
- * 
- * @param[in] _material 
+ *
+ * @param[in] _material
  */
 void PipelineHelper::setRasterizationState(
   const MaterialPtr &_material
@@ -133,8 +133,8 @@ void PipelineHelper::setRasterizationState(
 }
 
 /**
- * 
- * @param[in] _material 
+ *
+ * @param[in] _material
  */
 void PipelineHelper::setColorBlendState(
   const MaterialPtr &_material
@@ -167,8 +167,8 @@ void PipelineHelper::setColorBlendState(
 }
 
 /**
- * 
- * @param[in] _material 
+ *
+ * @param[in] _material
  */
 void PipelineHelper::setViewportState(
   const MaterialPtr &_material
@@ -185,8 +185,8 @@ void PipelineHelper::setViewportState(
 }
 
 /**
- * 
- * @param[in] _material 
+ *
+ * @param[in] _material
  */
 void PipelineHelper::setDepthStencilState(
   const MaterialPtr &_material
@@ -202,8 +202,8 @@ void PipelineHelper::setDepthStencilState(
 }
 
 /**
- * 
- * @param[in] _material 
+ *
+ * @param[in] _material
  */
 void PipelineHelper::setMultisampleState(
   const MaterialPtr &_material

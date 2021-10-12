@@ -1,6 +1,6 @@
 /*****************************************************
  * Partial Class: Renderer
- * Members: Frame - User Input Helpers/Handlers (Private)
+ * Members: Frame - User Input VKHelpers/Handlers (Private)
  *****************************************************/
 
 #include "Renderer.hpp"

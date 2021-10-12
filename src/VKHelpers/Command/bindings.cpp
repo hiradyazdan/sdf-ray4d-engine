@@ -3,9 +3,9 @@
  * Members: Command Buffer Bindings/Overloads (Private)
  *****************************************************/
 
-#include "Helpers/Command.hpp"
+#include "VKHelpers/Command.hpp"
 
-using namespace sdfRay4d::helpers;
+using namespace sdfRay4d::vkHelpers;
 
 /**
  *

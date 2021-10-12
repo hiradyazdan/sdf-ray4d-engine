@@ -3,9 +3,9 @@
  * Members: Create Pipeline Workers (Public)
  *****************************************************/
 
-#include "Helpers/Pipeline.hpp"
+#include "VKHelpers/Pipeline.hpp"
 
-using namespace sdfRay4d::helpers;
+using namespace sdfRay4d::vkHelpers;
 
 /**
  * @brief creates a single worker for each pipeline

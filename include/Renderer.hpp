@@ -2,7 +2,7 @@
 
 #include <QFutureWatcher>
 
-#include "Helpers/Pipeline.hpp"
+#include "VKHelpers/Pipeline.hpp"
 #include "Window/VulkanWindow.hpp"
 #include "Mesh.hpp"
 #include "Camera.hpp"
@@ -150,7 +150,7 @@ namespace sdfRay4d
      * - Pipeline
      */
     private:
-      helpers::PipelineHelper m_pipelineHelper;
+      vkHelpers::PipelineHelper m_pipelineHelper;
 
     /**
      * Vulkan Members

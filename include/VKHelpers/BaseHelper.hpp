@@ -3,7 +3,7 @@
 #include "Types.hpp"
 #include "Material.hpp"
 
-namespace sdfRay4d::helpers
+namespace sdfRay4d::vkHelpers
 {
   using namespace vk;
 

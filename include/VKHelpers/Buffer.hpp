@@ -2,7 +2,7 @@
 
 #include "BaseHelper.hpp"
 
-namespace sdfRay4d::helpers
+namespace sdfRay4d::vkHelpers
 {
   /**
    * @class BufferHelper

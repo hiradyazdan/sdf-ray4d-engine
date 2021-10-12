@@ -3,9 +3,9 @@
  * Members: Memory Helpers (Private)
  *****************************************************/
 
-#include "Helpers/Buffer.hpp"
+#include "VKHelpers/Buffer.hpp"
 
-using namespace sdfRay4d::helpers;
+using namespace sdfRay4d::vkHelpers;
 
 /**
  *

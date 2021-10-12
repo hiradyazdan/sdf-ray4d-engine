@@ -14,9 +14,9 @@
  * - memory_helpers.cpp
  *****************************************************/
 
-#include "Helpers/Buffer.hpp"
+#include "VKHelpers/Buffer.hpp"
 
-using namespace sdfRay4d::helpers;
+using namespace sdfRay4d::vkHelpers;
 
 BufferHelper::BufferHelper(
   const Device &_device,

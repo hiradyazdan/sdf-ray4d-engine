@@ -14,16 +14,15 @@ namespace sdfRay4d
    * to make it possible to be adopted by either
    * SDF Graph or another rendering mechanism
    *
-   * @note CTAD (Class Template Argument Deduction) is supported on C++17 with
-   * - gcc 8.0+
-   * - clang 7.0+
-   * - msvc 2017+ (only with std:c++17 and std:c++latest compiler options)
-   *
+   * @note CTAD (Class Template Argument Deduction) is supported on C++17 with \n
+   * - gcc 8.0+ \n
+   * - clang 7.0+ \n
+   * - msvc 2017+ (only with std:c++17 and std:c++latest compiler options) \n\n
    * https://devblogs.microsoft.com/cppblog/how-to-use-class-template-argument-deduction
    *
-   * TODO:
+   * TODO: update material struct \n
    * - make Material a pure POD by setting device and device functions for respective
-   *   components outside their ctors with generic/global initializer function
+   *   components outside their ctors with generic/global initializer function \n
    * - abstract Material components with similar functionality into reusable wrapper structs
    */
   template<typename TConst = float>
@@ -33,7 +32,7 @@ namespace sdfRay4d
     using DescPoolSizeList    = std::vector<descriptor::PoolSize>;
     using LayoutBindingList   = std::vector<descriptor::LayoutBinding>;
     using DescLayoutList      = std::vector<descriptor::Layout>;
-    using DescSettList        = std::vector<descriptor::Set>;
+    using DescSetList         = std::vector<descriptor::Set>;
 
     // Shader
     Shader                      vertexShader;
@@ -59,7 +58,7 @@ namespace sdfRay4d
     DescPoolSizeList            descPoolSizes;
     LayoutBindingList           layoutBindings;
     DescLayoutList              descSetLayouts;
-    DescSettList                descSets;
+    DescSetList                 descSets;
     uint32_t                    descSetLayoutCount = 0;
     uint32_t                    dynamicDescCount = 0;
 
