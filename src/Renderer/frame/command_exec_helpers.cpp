@@ -13,7 +13,9 @@ using namespace sdfRay4d;
  */
 void Renderer::executeCommands()
 {
-  m_pipelineHelper.command.init(
+  auto &command = m_pipelineHelper.getCommandHelper();
+
+  command.init(
     m_vkWindow->currentCommandBuffer(),
     m_vkWindow->currentFramebuffer(),
     m_vkWindow->currentFrame(),
@@ -22,7 +24,7 @@ void Renderer::executeCommands()
   );
 
   // Custom RenderPass with depth attachment only
-  m_pipelineHelper.command.executeRenderPass({
+  command.executeRenderPass({
     m_depthMaterial // bind material and draw
   });
 
@@ -31,12 +33,12 @@ void Renderer::executeCommands()
    * and command buffers are within the previous render pass, therefore
    * explicit device synchronization is required here.
    */
-  m_pipelineHelper.command.executePipelineBarrier(
+  command.executePipelineBarrier(
     m_depthMaterial
   );
 
   // default Qt Vulkan RenderPass
-  m_pipelineHelper.command.executeRenderPass({
+  command.executeRenderPass({
     m_actorMaterial, // bind material and draw
     m_sdfrMaterial // bind material and draw
   });

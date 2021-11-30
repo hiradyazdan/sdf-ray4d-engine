@@ -212,8 +212,8 @@ void PipelineHelper::destroyBuffers() noexcept
 {
   for(auto &material : m_materials)
   {
-    buffer.destroyBuffer(material->buffer);
-    buffer.destroyBuffer(material->dynamicUniformBuffer);
-    buffer.freeMemory();
+    m_bufferHelper.destroyBuffer(material->buffer);
+    m_bufferHelper.destroyBuffer(material->dynamicUniformBuffer);
+    m_bufferHelper.freeMemory();
   }
 }

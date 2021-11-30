@@ -83,7 +83,7 @@ void PipelineHelper::createPipeline(
     }
   }
 
-  descriptor.createDescriptorSets(_material);
+  m_descriptorHelper.createDescriptorSets(_material);
   createLayout(_material);
   createGraphicsPipeline(_material);
 

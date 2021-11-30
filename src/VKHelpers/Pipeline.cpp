@@ -52,9 +52,9 @@ void PipelineHelper::initHelpers(
     _defaultRenderPass
   );
 
-  descriptor          = DescriptorHelper(m_device, m_deviceFuncs);
-  buffer              = BufferHelper(m_device, m_deviceFuncs);
-  command             = CommandHelper(m_device, m_deviceFuncs);
+  m_descriptorHelper  = DescriptorHelper(m_device, m_deviceFuncs);
+  m_bufferHelper      = BufferHelper(m_device, m_deviceFuncs);
+  m_commandHelper     = CommandHelper(m_device, m_deviceFuncs);
 }
 
 /**
@@ -68,7 +68,7 @@ void PipelineHelper::setFramebufferAttachments(
   if(m_renderPassHelper.getFramebufferAttachments() == _fbAttachments) return;
 
   m_renderPassHelper.setFramebufferAttachments(_fbAttachments);
-  command.setRenderPassHelper(m_renderPassHelper);
+  m_commandHelper.setRenderPassHelper(m_renderPassHelper);
 }
 
 /**

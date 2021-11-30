@@ -13,6 +13,8 @@ void Renderer::createBuffers()
 
   markViewProjDirty();
 
+  auto &buffer = m_pipelineHelper.getBufferHelper();
+
   for (const auto &material : m_materials)
   {
     if(material == m_sdfrMaterial)
@@ -20,7 +22,7 @@ void Renderer::createBuffers()
       material->bufferSize *= m_concurrentFrameCount;
     }
 
-    m_pipelineHelper.buffer.createBuffer(
+    buffer.createBuffer(
       material->bufferSize,
       material->bufferUsage,
       material->buffer,
@@ -36,7 +38,7 @@ void Renderer::createBuffers()
    * Instead of using multiple descriptor sets, a single dynamic uniform buffer is used
    * and active frame offset is set at the time of binding the descriptor set.
    */
-  m_pipelineHelper.buffer.createBuffer(
+  buffer.createBuffer(
     (
       m_actorMaterial->vertUniSize +
       m_actorMaterial->fragUniSize
@@ -54,23 +56,25 @@ void Renderer::createBuffers()
     sdfUniformStartOffset + m_sdfrMaterial->memReq.size
   );
 
-  m_pipelineHelper.buffer.allocateMemory(
+  buffer.allocateMemory(
     m_actorMaterial->uniMemStartOffset + m_actorMaterial->dynamicUniformMemReq.size,
     m_vkWindow->hostVisibleMemoryIndex()
   );
 
-  m_pipelineHelper.buffer.bindBufferMemory(m_depthMaterial->buffer, 0);
-  m_pipelineHelper.buffer.bindBufferMemory(m_actorMaterial->buffer, m_depthMaterial->vertUniSize);
-  m_pipelineHelper.buffer.bindBufferMemory(m_sdfrMaterial->buffer, sdfUniformStartOffset);
+  buffer.bindBufferMemory(m_depthMaterial->buffer, 0);
+  buffer.bindBufferMemory(m_actorMaterial->buffer, m_depthMaterial->vertUniSize);
+  buffer.bindBufferMemory(m_sdfrMaterial->buffer, sdfUniformStartOffset);
 
-  m_pipelineHelper.buffer.bindBufferMemory(m_actorMaterial->dynamicUniformBuffer, m_actorMaterial->uniMemStartOffset);
+  buffer.bindBufferMemory(m_actorMaterial->dynamicUniformBuffer, m_actorMaterial->uniMemStartOffset);
 
   updateDescriptorSets();
 }
 
 void Renderer::updateDescriptorSets()
 {
-  m_pipelineHelper.descriptor.addWriteSet(
+  auto &descriptor = m_pipelineHelper.getDescriptorHelper();
+
+  descriptor.addWriteSet(
     m_depthMaterial->descSets[0],
     m_depthMaterial->layoutBindings[0],
     {
@@ -80,7 +84,7 @@ void Renderer::updateDescriptorSets()
     }
   );
   // Descriptors for the dynamic uniform buffer in the vertex and fragment shaders
-  m_pipelineHelper.descriptor.addWriteSet(
+  descriptor.addWriteSet(
     m_actorMaterial->descSets[0],
     m_actorMaterial->layoutBindings[0],
     {
@@ -89,7 +93,7 @@ void Renderer::updateDescriptorSets()
       m_actorMaterial->vertUniSize // range
     }
   );
-  m_pipelineHelper.descriptor.addWriteSet(
+  descriptor.addWriteSet(
     m_actorMaterial->descSets[0],
     m_actorMaterial->layoutBindings[1],
     {
@@ -98,7 +102,7 @@ void Renderer::updateDescriptorSets()
       m_actorMaterial->fragUniSize // range
     }
   );
-  m_pipelineHelper.descriptor.addWriteSet(
+  descriptor.addWriteSet(
     m_sdfrMaterial->descSets[0],
     m_sdfrMaterial->layoutBindings[0],
     {
@@ -108,5 +112,5 @@ void Renderer::updateDescriptorSets()
     }
   );
 
-  m_pipelineHelper.descriptor.updateDescriptorSets();
+  descriptor.updateDescriptorSets();
 }

@@ -31,11 +31,6 @@ namespace sdfRay4d::vkHelpers
     using ImageViewList       = std::vector<texture::ImageView>;
 
     public:
-      DescriptorHelper descriptor;
-      BufferHelper buffer;
-      CommandHelper command;
-
-    public:
       void initHelpers(
         const Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs,
@@ -94,6 +89,11 @@ namespace sdfRay4d::vkHelpers
       void setFramebufferAttachments    (const ImageViewList &_fbAttachments) noexcept;
       RenderPass &getRenderPass         (bool _useDefault = true) noexcept;
 
+    public:
+      DescriptorHelper &getDescriptorHelper() { return m_descriptorHelper; }
+      BufferHelper &getBufferHelper() { return m_bufferHelper; }
+      CommandHelper &getCommandHelper() { return m_commandHelper; }
+
     /**
      * Create Pipeline Helpers (on Worker Thread)
      * -------------------------------------------------
@@ -139,6 +139,9 @@ namespace sdfRay4d::vkHelpers
       QMutex m_pipeMutex;
 
       RenderPassHelper m_renderPassHelper;
+      DescriptorHelper m_descriptorHelper;
+      BufferHelper m_bufferHelper;
+      CommandHelper m_commandHelper;
 
       SampleCountFlags m_sampleCountFlags;
 
