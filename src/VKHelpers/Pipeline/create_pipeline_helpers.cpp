@@ -7,19 +7,16 @@
 
 using namespace sdfRay4d::vkHelpers;
 
+/**
+ * @brief This will reduce pipeline (re)creation cost
+ * @note Just in case to cache the layouts/descriptor sets & shader module
+ * though most modern drivers have a cache of their own
+ */
 void PipelineHelper::createCache() noexcept
 {
-  /**
-   * @note
-   *
-   * This will reduce pipeline (re)creation cost
-   *
-   * Just in case to cache the layouts/descriptor sets & shader module
-   * though most modern drivers have a cache of their own
-   */
   pipeline::CacheInfo pipelineCacheInfo = {}; // memset
 
-  pipelineCacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+  pipelineCacheInfo.sType = pipeline::StructureType::CACHE_INFO;
 
   auto result = m_deviceFuncs->vkCreatePipelineCache(
     m_device,
@@ -88,7 +85,7 @@ void PipelineHelper::createPipeline(
   createGraphicsPipeline(_material);
 
   /**
-   * TODO: Should I create buffers at this stage?
+   * @todo Should I create buffers at this stage?
    * if buffers don't need to update per frame (static)
    */
 //  createBuffers();
@@ -104,7 +101,7 @@ void PipelineHelper::swapSDFRPipelines(
   const MaterialPtr &_newMaterial
 ) noexcept
 {
-  // safe-guard in case if this is invoked elsewhere
+  // safeguard in case if this is invoked elsewhere
   if(!m_isHot) return;
 
   m_isHot = false;
@@ -126,7 +123,7 @@ void PipelineHelper::createLayout(
 ) noexcept
 {
   pipeline::LayoutInfo pipelineLayoutInfo = {}; // memset
-  pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+  pipelineLayoutInfo.sType = pipeline::StructureType::LAYOUT_INFO;
   pipelineLayoutInfo.pushConstantRangeCount = _material->pushConstantRangeCount;
   pipelineLayoutInfo.pPushConstantRanges = &_material->pushConstantRange;
   pipelineLayoutInfo.setLayoutCount = _material->descSetLayoutCount;
@@ -146,7 +143,7 @@ void PipelineHelper::createLayout(
 }
 
 /**
- * TODO: implement compute pipeline with compute shaders
+ * @todo implement compute pipeline with compute shaders
  *
  * per Material Pipeline
  */
@@ -161,7 +158,7 @@ void PipelineHelper::createComputePipeline(
 
   pipeline::ComputePipelineInfo pipelineInfo = {}; // memset
 
-  pipelineInfo.sType                = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+  pipelineInfo.sType                = pipeline::StructureType::COMPUTE_PIPELINE_INFO;
   //  pipelineInfo.stage                = m_actorMaterial->shaderStages.data();
   pipelineInfo.layout               = _material->pipelineLayout;
 
@@ -195,7 +192,7 @@ void PipelineHelper::createGraphicsPipeline(
   auto &&pso = _material->pso;
 
   pipeline::GraphicsPipelineInfo pipelineInfo = {}; // memset
-  pipelineInfo.sType                = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+  pipelineInfo.sType                = pipeline::StructureType::GRAPHICS_PIPELINE_INFO;
   pipelineInfo.stageCount           = shaderStages.size();
   pipelineInfo.pStages              = shaderStages.data();
 
@@ -246,7 +243,7 @@ void PipelineHelper::initShaderStages(
   const MaterialPtr &_material
 ) noexcept
 {
-  const auto &structureType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+  const auto &structureType = pipeline::StructureType::SHADER_STAGE_INFO;
 
   _material->shaderStages = {
     {

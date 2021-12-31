@@ -2,7 +2,7 @@
 
 #include "Shader.hpp"
 #include "Texture.hpp"
-#include "PSO.hpp"
+#include "VKHelpers/PSO.hpp"
 
 namespace sdfRay4d
 {
@@ -20,7 +20,7 @@ namespace sdfRay4d
    * - msvc 2017+ (only with std:c++17 and std:c++latest compiler options) \n\n
    * https://devblogs.microsoft.com/cppblog/how-to-use-class-template-argument-deduction
    *
-   * TODO: update material struct \n
+   * @todo update material struct: \n
    * - make Material a pure POD by setting device and device functions for respective
    *   components outside their ctors with generic/global initializer function \n
    * - abstract Material components with similar functionality into reusable wrapper structs
@@ -43,8 +43,8 @@ namespace sdfRay4d
     Texture                     texture;
 
     // Buffer
-    Buffer                      buffer = VK_NULL_HANDLE;
-    Buffer                      dynamicUniformBuffer = VK_NULL_HANDLE;
+    buffer::Buffer              buffer = VK_NULL_HANDLE;
+    buffer::Buffer              dynamicUniformBuffer = VK_NULL_HANDLE;
     buffer::UsageFlags          bufferUsage = {};
     device::Size                bufferSize = 0;
     device::Size                vertUniSize = 0;
@@ -75,11 +75,11 @@ namespace sdfRay4d
     pipeline::StageFlags        sourceStage = {};
     pipeline::StageFlags        destinationStage = {};
     pipeline::Layout            pipelineLayout = VK_NULL_HANDLE;
-    Pipeline                    pipeline = VK_NULL_HANDLE;
+    pipeline::Pipeline          pipeline = VK_NULL_HANDLE;
 
     // RenderPass
-    RenderPass                  renderPass = VK_NULL_HANDLE;
-    Framebuffer                 framebuffer = VK_NULL_HANDLE;
+    renderpass::RenderPass      renderPass = VK_NULL_HANDLE;
+    framebuffer::Framebuffer    framebuffer = VK_NULL_HANDLE;
 
     uint32_t                    vertexCount = 0;
 
@@ -98,7 +98,7 @@ namespace sdfRay4d
      * @param[in] _deviceFuncs
      */
     Material(
-      Device &_device,
+      device::Device &_device,
       QVulkanDeviceFunctions *_deviceFuncs
     ) :
       vertexShader(_device, _deviceFuncs)
@@ -117,7 +117,7 @@ namespace sdfRay4d
      *
      * @param[in] _offset push constants range offset
      * @param[in] _size push constants range size
-     * @param[in] _stageFlags one or more shader stage flag bits
+     * @param[in] _stages one or more shader stage flag bits
      */
     void setPushConstantRange(
       uint32_t _offset,

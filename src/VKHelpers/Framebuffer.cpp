@@ -13,7 +13,7 @@ using namespace sdfRay4d::vkHelpers;
  * @param[in] _deviceFuncs
  */
 FramebufferHelper::FramebufferHelper(
-  const Device &_device,
+  const device::Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs
 ) noexcept :
   m_device(_device)
@@ -36,7 +36,7 @@ void FramebufferHelper::setAttachments(
  * @param[in] _framebuffer
  */
 void FramebufferHelper::setDefaultFramebuffer(
-  const Framebuffer &_framebuffer
+  const framebuffer::Framebuffer &_framebuffer
 ) noexcept
 {
   m_defaultFrameBuffer = _framebuffer;
@@ -62,8 +62,8 @@ void FramebufferHelper::setSize(
  * @param[in] _useDefault
  * @return Framebuffer instance
  */
-Framebuffer &FramebufferHelper::getFramebuffer(
-  const RenderPass &_renderPass,
+framebuffer::Framebuffer &FramebufferHelper::getFramebuffer(
+  const renderpass::RenderPass &_renderPass,
   bool _useDefault
 ) noexcept
 {
@@ -92,7 +92,7 @@ Framebuffer &FramebufferHelper::getFramebuffer(
  * @param[in] _renderPass
  */
 void FramebufferHelper::createFramebuffer(
-  const RenderPass &_renderPass
+  const renderpass::RenderPass &_renderPass
 ) noexcept
 {
   if(m_extentWidth == 0 || m_extentHeight == 0)
@@ -102,9 +102,9 @@ void FramebufferHelper::createFramebuffer(
     return;
   }
 
-  FramebufferInfo framebufferInfo = {}; // memset
+  framebuffer::Info framebufferInfo = {}; // memset
 
-  framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+  framebufferInfo.sType = framebuffer::StructureType::FRAMEBUFFER_INFO;
   framebufferInfo.renderPass = _renderPass; // custom renderPass
   framebufferInfo.attachmentCount = m_attachments.size(); // depth pass attachment image view is only 1
   framebufferInfo.pAttachments = m_attachments.data();

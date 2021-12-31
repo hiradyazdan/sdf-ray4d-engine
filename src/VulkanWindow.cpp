@@ -47,7 +47,7 @@ QVulkanWindowRenderer *VulkanWindow::createRenderer()
 
   m_renderer = new Renderer(
     this,
-    false //true TODO: temporarily disable msaa for sampling depth texture
+    false //true @todo temporarily disable msaa for sampling depth texture
   );
 
   return m_renderer;

@@ -25,14 +25,14 @@ using namespace sdfRay4d;
  * @param[in] _deviceFuncs
  */
 Shader::Shader(
-  Device &_device,
+  device::Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs
 ) :
   m_device(_device)
 , m_deviceFuncs(_deviceFuncs)
-, m_version(Constants::shaderVersion)
-, m_shadersPath(Constants::shadersPath)
-, m_template(Constants::shaderTmpl)
+, m_version(constants::shaderVersion)
+, m_shadersPath(constants::shadersPath)
+, m_template(constants::shaderTmpl)
 {}
 
 /**

@@ -24,7 +24,7 @@ using namespace sdfRay4d;
  * @param[in] _filePath (QString) main shader file path
  * @param[in] _partialFilePaths (QStringList) shader's partial file paths (optional)
  *
- * TODO:
+ * @todo
  * Make this function a variadic template with parameter pack
  * for filePaths. The complexity would be to make a separate
  * header file to have decl/definition in one file and also
@@ -86,7 +86,7 @@ void Shader::load(
       }
 
       /**
-       * TODO: make SPIRVCompiler::compile thread-safe with lock/unlock?
+       * @todo make SPIRVCompiler::compile thread-safe with lock/unlock?
        *
        * @note
        *
@@ -163,7 +163,7 @@ void Shader::load(
 
   m_worker = QtConcurrent::run([_shaderData, this]()
   {
-    const auto &originalTemplate = Constants::shaderTmpl;
+    const auto &originalTemplate = constants::shaderTmpl;
     const auto &shaderData = !_shaderData.empty() ? _shaderData : originalTemplate;
     const auto &serializableData = shaderData.data();
 
@@ -232,7 +232,7 @@ Shader::Data Shader::load(
   Data data;
 
   shader::Info shaderInfo = {}; // memset
-  shaderInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+  shaderInfo.sType = shader::StructureType::SHADER_MODULE_INFO;
   shaderInfo.codeSize = !_isPrecompiled
     ? _spvBytes.size() * sizeof(uint32_t)
     : _rawSPVBytes.size();

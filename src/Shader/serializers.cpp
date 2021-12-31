@@ -3,8 +3,6 @@
  * Members: Serializers (Private)
  *****************************************************/
 
-#include <regex>
-
 #include "Shader.hpp"
 
 using namespace sdfRay4d;
@@ -41,7 +39,7 @@ void Shader::serializeVersionDirective(
 ) const
 {
   /**
-   * TODO: Optimize - rewrite with string::replace for less memory copying
+   * @todo Optimize - rewrite with string::replace for less memory copying
    * This could be quite expensive as it has string manipulation with
    * copying memory all over the place.
    */

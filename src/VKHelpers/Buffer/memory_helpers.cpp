@@ -18,7 +18,7 @@ void BufferHelper::allocateMemory(
 ) noexcept
 {
   memory::AllocInfo memAllocInfo = {
-    VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, // sType
+    memory::StructureType::MEMORY_ALLOC_INFO, // sType
     nullptr, // pNext
     _size, // allocationSize
     _typeIndex // memoryTypeIndex
@@ -42,7 +42,7 @@ void BufferHelper::allocateMemory(
  * @param[in] _memOffset
  */
 void BufferHelper::bindBufferMemory(
-  const Buffer &_buffer,
+  const buffer::Buffer &_buffer,
   const device::Size &_memOffset
 ) noexcept
 {
@@ -86,4 +86,16 @@ void BufferHelper::mapMemory(
 //  memcpy(p, , _byteSize);
 //  //  memcpy(p + m_sdfUniformStartOffset, m_sdfUniformBuffer, );
   m_deviceFuncs->vkUnmapMemory(m_device, m_bufferMemory);
+}
+
+void BufferHelper::freeMemory() noexcept
+{
+  if (!m_bufferMemory) return;
+
+  m_deviceFuncs->vkFreeMemory(
+    m_device,
+    m_bufferMemory,
+    nullptr
+  );
+  m_bufferMemory = VK_NULL_HANDLE;
 }

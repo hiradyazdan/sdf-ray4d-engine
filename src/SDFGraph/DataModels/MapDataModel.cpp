@@ -71,7 +71,7 @@ void MapDataModel::setInData(
      * milliseconds. The longer the delay, the less stalling, but not too
      * long as the automatic compilation will be delayed.
      */
-    QTimer::singleShot(Constants::autoCompileInterval, this, &MapDataModel::isValid);
+    QTimer::singleShot(constants::autoCompileInterval, this, &MapDataModel::isValid);
   }
   else
   {

@@ -27,7 +27,7 @@ void DescriptorHelper::addWriteSet(
 
   descriptor::Write descriptor  = {}; // memset
 
-  descriptor.sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  descriptor.sType              = descriptor::StructureType::WRITE_SET;
   descriptor.dstSet             = _descSet;
   descriptor.dstBinding         = _layoutBinding.binding;
   descriptor.descriptorCount    = _layoutBinding.descriptorCount;
@@ -57,7 +57,7 @@ void DescriptorHelper::addWriteSet(
 
   descriptor::Write descriptor  = {};
 
-  descriptor.sType              = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  descriptor.sType              = descriptor::StructureType::WRITE_SET;
   descriptor.dstSet             = _descSet;
   descriptor.dstBinding         = _layoutBinding.binding;
   descriptor.descriptorCount    = _layoutBinding.descriptorCount;

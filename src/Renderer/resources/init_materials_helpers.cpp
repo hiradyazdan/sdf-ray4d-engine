@@ -146,7 +146,7 @@ void Renderer::initSDFRMaterial(const MaterialPtr &_material)
     6 * 16 + 12 + 2 * 4
   ); // see rasterized_mesh_pass.frag
 
-  // TODO : might not need this for depth texture
+  // @todo : might not need this for depth texture
   const auto &maxSamplerAnisotropy = getDeviceLimits()->maxSamplerAnisotropy;
   _material->texture.createSampler(maxSamplerAnisotropy);
 

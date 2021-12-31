@@ -47,6 +47,8 @@ it may take up to an hour to finish depending on the system memory.
 
 ***Note:*** if on Windows, make sure vcpkg packages are 64-bit system compatible with `-DVCPKG_TARGET_TRIPLET=x64-windows`.
 
+Inside your preferred build directory, run:
+
 ```shell
 cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_CMAKE_PATH} ..
 cmake --build .
@@ -69,7 +71,7 @@ to alleviate this reducing number of compilation units and saving compilation ti
 - `Pre-compiled Headers`/`PCH` (cmake 3.16+)
 - `Module` Header Units (C++20 `Modules`)
 
-Currently, `UNITY_BUILD` is used here, as `PCH` need more configuration and also
+Currently, cmake's `UNITY_BUILD` and `PCH` are used as,
 there's no `Module Header units` support for C++17 which is used in this project.
 
 ## Design
@@ -242,7 +244,3 @@ This requires a specific algorithm to identify which shaders need to be picked u
 
 SPIRV shaders are essentially a set of shader instructions in bytecode, which means they won't have any comments or empty spaces
 included and therefore are already space-optimized. Using Vulkan SDK's SPIRV Disassembler (`spirv-dis`) prints out shader instructions.
-
-## Unity Native Plugin
-
-TBC

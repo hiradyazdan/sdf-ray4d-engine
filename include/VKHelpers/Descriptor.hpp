@@ -17,7 +17,7 @@ namespace sdfRay4d::vkHelpers
 
     public:
       DescriptorHelper(
-        const Device &_device,
+        const device::Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs
       ) noexcept;
 
@@ -60,7 +60,7 @@ namespace sdfRay4d::vkHelpers
       void allocateDescriptorSets     (const MaterialPtr &_material) noexcept;
 
     private:
-      Device m_device = VK_NULL_HANDLE;
+      device::Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
       descriptor::BufferInfo m_bufferInfo = {};

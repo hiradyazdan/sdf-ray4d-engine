@@ -1,29 +1,29 @@
 #pragma once
 
 /**
- * @namespace Constants
+ * @namespace constants
  * @brief This namespace serves as a static data
  * container for the entire lifecycle of the application
  *
- * TODO: Replace this with a json-based manifest file
+ * @todo Replace this with a json-based manifest file
  */
-namespace sdfRay4d::Constants
+namespace sdfRay4d::constants
 {
-  constexpr auto autoCompileInterval  = 350; // milliseconds
+  static constexpr const auto autoCompileInterval = 350; // milliseconds
 
-  constexpr auto shaderVersion        = 450;
-  constexpr auto shaderTmpl           = "/* ------ PLACEHOLDER (DO NOT CHANGE) ------ */";
+  static constexpr const auto shaderVersion       = 450;
+  static constexpr const auto shaderTmpl    = "/* ------ PLACEHOLDER (DO NOT CHANGE) ------ */";
 
-  constexpr auto shadersPath          = "assets/shaders/";
-  constexpr auto modelsPath           = "assets/models/";
-  constexpr auto texturesPath         = "assets/textures/";
+  static constexpr const auto shadersPath   = "assets/shaders/";
+  static constexpr const auto modelsPath    = "assets/models/";
+  static constexpr const auto texturesPath  = "assets/textures/";
 
   /**
    * @namespace Models
    */
   namespace modelsPaths
   {
-    constexpr auto actor = "block.buf";
+    static constexpr const auto actor = "block.buf";
   }
 
   /**
@@ -38,14 +38,14 @@ namespace sdfRay4d::Constants
     {
       namespace vert
       {
-        constexpr auto main = "Depth/depth_pass.vert";
-        constexpr auto mainSPV = "Depth/depth_pass.vert.spv";
+        static constexpr const auto main = "Depth/depth_pass.vert";
+        static constexpr const auto mainSPV = "Depth/depth_pass.vert.spv";
       }
 
       namespace frag
       {
-        constexpr auto main = "Depth/depth_pass.frag";
-        constexpr auto mainSPV = "Depth/depth_pass.frag.spv";
+        static constexpr const auto main = "Depth/depth_pass.frag";
+        static constexpr const auto mainSPV = "Depth/depth_pass.frag.spv";
       }
     }
 
@@ -56,14 +56,14 @@ namespace sdfRay4d::Constants
     {
       namespace vert
       {
-        constexpr auto main = "Actor/rasterized_mesh_pass.vert";
-        constexpr auto mainSPV = "Actor/rasterized_mesh_pass.vert.spv";
+        static constexpr const auto main = "Actor/rasterized_mesh_pass.vert";
+        static constexpr const auto mainSPV = "Actor/rasterized_mesh_pass.vert.spv";
       }
 
       namespace frag
       {
-        constexpr auto main = "Actor/rasterized_mesh_pass.frag";
-        constexpr auto mainSPV = "Actor/rasterized_mesh_pass.frag.spv";
+        static constexpr const auto main = "Actor/rasterized_mesh_pass.frag";
+        static constexpr const auto mainSPV = "Actor/rasterized_mesh_pass.frag.spv";
       }
     }
 
@@ -74,19 +74,19 @@ namespace sdfRay4d::Constants
     {
       namespace vert
       {
-        constexpr auto main = "Raymarch/static/sdfr_pass.vert";
-        constexpr auto mainSPV = "Raymarch/static/sdfr_pass.vert.spv";
+        static constexpr const auto main = "Raymarch/static/sdfr_pass.vert";
+        static constexpr const auto mainSPV = "Raymarch/static/sdfr_pass.vert.spv";
       }
 
       namespace frag
       {
-        constexpr auto main = "Raymarch/dynamic/sdfr_pass.frag";
-        constexpr auto mainSPV = "Raymarch/static/sdfr_pass.frag.spv";
+        static constexpr const auto main = "Raymarch/dynamic/sdfr_pass.frag";
+        static constexpr const auto mainSPV = "Raymarch/static/sdfr_pass.frag.spv";
 
         namespace partials
         {
-          constexpr auto distanceFuncs = "Raymarch/_partials/distance_functions.partial.glsl";
-          constexpr auto operations = "Raymarch/_partials/operations.partial.glsl";
+          static constexpr const auto distanceFuncs = "Raymarch/_partials/distance_functions.partial.glsl";
+          static constexpr const auto operations = "Raymarch/_partials/operations.partial.glsl";
         }
       }
     }

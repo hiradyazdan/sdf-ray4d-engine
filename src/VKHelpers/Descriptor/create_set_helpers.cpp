@@ -10,14 +10,14 @@ using namespace sdfRay4d::vkHelpers;
 /**
  *
  * @param[in] _material
- * @param[out] _material->descPool
+ * [out] _material->descPool
  */
 void DescriptorHelper::createDescriptorPool(
   const MaterialPtr &_material
 ) noexcept
 {
   descriptor::PoolInfo descPoolInfo = {}; // memset
-  descPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+  descPoolInfo.sType = descriptor::StructureType::POOL_INFO;
   /**
    * @note
    * a single set if dynamic uniform buffer is used
@@ -43,7 +43,7 @@ void DescriptorHelper::createDescriptorPool(
 /**
  *
  * @param[in] _material
- * @param[out] _material->descSetLayout
+ * [out] _material->descSetLayout
  */
 void DescriptorHelper::createDescriptorSetLayout(
   const MaterialPtr &_material
@@ -64,7 +64,7 @@ void DescriptorHelper::createDescriptorSetLayout(
   for(auto i = 0; i < layoutCount; i++)
   {
     descriptor::LayoutInfo descLayoutInfo = {}; // memset
-    descLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descLayoutInfo.sType = descriptor::StructureType::SET_LAYOUT_INFO;
     descLayoutInfo.pNext = nullptr;
     descLayoutInfo.flags = 0;
     descLayoutInfo.bindingCount = layoutBindings.size();
@@ -87,7 +87,7 @@ void DescriptorHelper::createDescriptorSetLayout(
 /**
  *
  * @param[in] _material
- * @param[out] _material->descSet
+ * [out] _material->descSet
  */
 void DescriptorHelper::allocateDescriptorSets(
   const MaterialPtr &_material
@@ -107,7 +107,7 @@ void DescriptorHelper::allocateDescriptorSets(
   for(auto i = 0; i < layoutCount; i++)
   {
     descriptor::AllocInfo descSetInfo = {}; // memset
-    descSetInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    descSetInfo.sType = descriptor::StructureType::SET_ALLOC_INFO;
     descSetInfo.pNext = nullptr;
     descSetInfo.descriptorPool = _material->descPool;
     descSetInfo.descriptorSetCount = 1;
@@ -132,9 +132,9 @@ void DescriptorHelper::allocateDescriptorSets(
  * @note per material pipeline
  *
  * @param[in] _material
- * @param[out] _material->descPool
- * @param[out] _material->descSetLayouts
- * @param[out] _material->descSets
+ * [out] _material->descPool
+ * [out] _material->descSetLayouts
+ * [out] _material->descSets
  */
 void DescriptorHelper::createDescriptorSets(
   const MaterialPtr &_material

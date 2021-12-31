@@ -14,7 +14,7 @@ namespace sdfRay4d
   {
     Q_OBJECT
 
-    using MaterialPtr = std::shared_ptr<Material<float>>;
+    using MaterialPtr = std::shared_ptr<Material<>>;
 
     public:
       explicit VulkanWindow(bool _isDebug = false);

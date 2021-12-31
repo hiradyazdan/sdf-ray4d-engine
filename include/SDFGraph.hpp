@@ -23,7 +23,7 @@ namespace sdfRay4d
     using NodePtr               = std::unique_ptr<QtNodes::Node>;
     using NodePtrMap            = std::unordered_map<QUuid, NodePtr>;
 
-    using MaterialPtr           = std::shared_ptr<Material<float>>;
+    using MaterialPtr           = std::shared_ptr<Material<>>;
     using MapDataModelPtrSet    = std::unordered_set<sdfGraph::MapDataModel*>;
 
     public:
@@ -50,7 +50,7 @@ namespace sdfRay4d
 
     private:
       /**
-       * @tparam[in] TDataModel
+       * @tparam TDataModel
        * @param[in] _node
        * @return pointer to TDataModel instance
        */

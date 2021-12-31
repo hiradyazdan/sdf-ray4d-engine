@@ -93,6 +93,9 @@ void Renderer::swapSDFRPipelines()
      *   quite repeatedly and fast.
      * - if multiple objects on auto-compile are loaded and changed quite
      *   repeatedly and fast.
+     * @todo
+     *    replace async threads with fibers to address above issues and help removing
+     *    stale pointers and optimize auto compile more efficiently
      */
     m_destroyWorker = QtConcurrent::run([this]()
     {

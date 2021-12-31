@@ -7,8 +7,6 @@
 #include "BaseDataModel.hpp"
 #include "SDFGraph/Interfaces/IOperationDataModel.hpp"
 
-#include <iostream>
-
 namespace sdfRay4d::sdfGraph
 {
   class OperationDataModel : public BaseDataModel, public IOperationDataModel

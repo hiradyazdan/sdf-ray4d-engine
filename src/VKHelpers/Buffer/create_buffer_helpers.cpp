@@ -17,12 +17,12 @@ using namespace sdfRay4d::vkHelpers;
 void BufferHelper::createBuffer(
   device::Size _size,
   const buffer::UsageFlags &_usage,
-  Buffer &_buffer,
+  buffer::Buffer &_buffer,
   memory::Reqs &_memReq
 ) noexcept
 {
   buffer::Info bufInfo = {}; // memset
-  bufInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+  bufInfo.sType = buffer::StructureType::BUFFER_INFO;
   bufInfo.size = _size;
   bufInfo.usage = _usage;
 

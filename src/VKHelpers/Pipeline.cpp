@@ -36,10 +36,10 @@ using namespace sdfRay4d::vkHelpers;
  *
  */
 void PipelineHelper::initHelpers(
-  const Device &_device,
+  const device::Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs,
   const SampleCountFlags &_sampleCountFlags,
-  const RenderPass &_defaultRenderPass
+  const renderpass::RenderPass &_defaultRenderPass
 ) noexcept
 {
   m_device            = _device;
@@ -76,7 +76,7 @@ void PipelineHelper::setFramebufferAttachments(
  * @param[in] _useDefault
  * @return RenderPass instance
  */
-RenderPass &PipelineHelper::getRenderPass(bool _useDefault) noexcept
+renderpass::RenderPass &PipelineHelper::getRenderPass(bool _useDefault) noexcept
 {
   return m_renderPassHelper.getRenderPass(_useDefault);
 }
@@ -90,12 +90,12 @@ void PipelineHelper::waitForWorkersToFinish() noexcept
 }
 
 /**
- * TODO: this can be modified to request for
- * specific worker than implicitly request for
- * a designated worker which was previously
- * assigned to exclusiveWorker member. But currently,
- * the use case is limited to SDF Graph pipeline
- * creation.
+ * @todo this can be modified to request for
+ *      specific worker than implicitly request for
+ *      a designated worker which was previously
+ *      assigned to exclusiveWorker member. But currently,
+ *      the use case is limited to SDF Graph pipeline
+ *      creation.
  */
 void PipelineHelper::waitForWorkerToFinish() noexcept
 {

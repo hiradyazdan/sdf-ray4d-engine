@@ -6,8 +6,6 @@
 #include "SDFGraph/MapData.hpp"
 #include "BaseDataModel.hpp"
 
-#include <iostream>
-
 namespace sdfRay4d::sdfGraph
 {
   class MapDataModel : public BaseDataModel

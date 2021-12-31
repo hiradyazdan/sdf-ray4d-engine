@@ -29,6 +29,7 @@
 *.log
 
 # CMake
+CMakeSettings.json
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
@@ -42,6 +43,7 @@ CTestTestfile.cmake
 _deps
 
 # Builds & Instrumentations
+out/
 build/
 **/*build*/*
 vcpkg_installed/

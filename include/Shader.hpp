@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include <QVulkanInstance>
 #include <QFuture>
 
@@ -16,7 +14,7 @@ namespace sdfRay4d
   {
     public:
       Shader(
-        Device &_device,
+        device::Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs
       );
 
@@ -101,7 +99,7 @@ namespace sdfRay4d
      * Qt Vulkan Members
      */
     private:
-      Device m_device = VK_NULL_HANDLE;
+      device::Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
       QFuture<Data> m_worker;

@@ -16,7 +16,7 @@ namespace sdfRay4d
 
   class Renderer : public QVulkanWindowRenderer, public QObject
   {
-    using Mat           = Material<float>;
+    using Mat           = Material<>;
     using MaterialPtr   = std::shared_ptr<Mat>;
     using ImageViewList = std::vector<texture::ImageView>;
 
@@ -156,7 +156,7 @@ namespace sdfRay4d
      * Vulkan Members
      */
     private:
-      Device m_device = VK_NULL_HANDLE;
+      device::Device m_device = VK_NULL_HANDLE;
 
     /**
      * Qt Vulkan Members
@@ -195,7 +195,7 @@ namespace sdfRay4d
 
       struct
       {
-        Pipeline pipeline;
+        pipeline::Pipeline pipeline;
         pipeline::Layout layout;
       } m_oldPipeline = {};
   };

@@ -42,7 +42,7 @@ SDFGraph::SDFGraph(
 {
   setStyle();
 
-  namespace sdfrShaders = Constants::shadersPaths::raymarch::frag;
+  namespace sdfrShaders = constants::shadersPaths::raymarch::frag;
 
   m_sdfrMaterial->fragmentShader.preload({
     sdfrShaders::partials::distanceFuncs,
@@ -58,7 +58,7 @@ SDFGraph::SDFGraph(
 
 /**
  * @note Qt SLOT
- * 
+ *
  * @param[in] _connection
  */
 void SDFGraph::removeMapNode(const Connection &_connection)
@@ -110,7 +110,7 @@ void SDFGraph::setMapNodes()
       m_mapNodes.insert(mapNode);
     }
 
-    if(!m_isAutoCompile) // TODO: Use debug compile def for this
+    if(!m_isAutoCompile) // @todo Use debug compile def for this
     {
       const auto &shapeNode = getDataModel<ShapeDataModel>(nodeValue.get());
       if(shapeNode)
@@ -173,6 +173,11 @@ void SDFGraph::setAutoCompile(bool _isAutoCompile)
    */
   compile();
 
+  /**
+   * @todo implement fibers instead of async threads
+   *    fibers perform significantly more performant in this case
+   *    and avoid leaving stale vulkan objects/pointers on termination
+   */
   m_worker = QtConcurrent::run([this]()
   {
     /**
@@ -194,7 +199,7 @@ void SDFGraph::setAutoCompile(bool _isAutoCompile)
        * when removing a connection or node and/or switch to manual
        * compile after, otherwise the app will crash.
        *
-       * TODO: Figure out why and replace with a better logic
+       * @todo Figure out why and replace with a better logic
        */
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }

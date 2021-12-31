@@ -31,6 +31,8 @@ NodeDataType OperationDataModel::dataType(
     case PortType::Out:
     case PortType::None:
       return MapData().type();
+    default:
+      throw std::runtime_error("PortType is invalid!");
   }
 }
 

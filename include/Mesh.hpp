@@ -8,7 +8,7 @@
 namespace sdfRay4d
 {
   /**
-   * TODO: Rewrite this
+   * @todo Rewrite this
    */
 
   class Mesh

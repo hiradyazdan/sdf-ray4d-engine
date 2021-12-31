@@ -21,15 +21,14 @@ using namespace sdfRay4d::vkHelpers;
  *
  * @param[in] _device
  * @param[in] _deviceFuncs device functions
- * @param[in] _fbAttachments framebuffer attachments
  * @param[in] _sampleCountFlags
  * @param[in] _renderPass
  */
 RenderPassHelper::RenderPassHelper(
-  const Device &_device,
+  const device::Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs,
   const SampleCountFlags &_sampleCountFlags,
-  const RenderPass &_renderPass
+  const renderpass::RenderPass &_renderPass
 ) noexcept :
   m_device(_device)
 , m_deviceFuncs(_deviceFuncs)
@@ -79,8 +78,8 @@ void RenderPassHelper::createCustomRenderPass(
   subPassDesc.pColorAttachments = nullptr;
   subPassDesc.pDepthStencilAttachment = &dsRef;
 
-  RenderPassInfo renderPassInfo = {}; // memset
-  renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+  renderpass::Info renderPassInfo = {}; // memset
+  renderPassInfo.sType = renderpass::StructureType::RENDER_PASS_INFO;
   renderPassInfo.attachmentCount = 1;
   renderPassInfo.pAttachments = attDesc;
   renderPassInfo.subpassCount = 1;
@@ -131,7 +130,7 @@ void RenderPassHelper::createRenderPassInfo(
   m_clearValues[0].color = m_clearValues[2].color = clearColor;
   m_clearValues[1].depthStencil = clearDepthStencil;
 
-  m_renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+  m_renderPassInfo.sType = renderpass::StructureType::RENDER_PASS_BEGIN_INFO;
   m_renderPassInfo.renderPass = rpMaterial->renderPass;
   m_renderPassInfo.framebuffer = rpMaterial->framebuffer;
   m_renderPassInfo.renderArea.extent.width = m_extentWidth;
@@ -146,7 +145,7 @@ void RenderPassHelper::createRenderPassInfo(
  * @param[in] _useDefault
  * @return RenderPass instance
  */
-RenderPass &RenderPassHelper::getRenderPass(bool _useDefault) noexcept
+renderpass::RenderPass &RenderPassHelper::getRenderPass(bool _useDefault) noexcept
 {
   if(!m_renderPass && !_useDefault)
   {

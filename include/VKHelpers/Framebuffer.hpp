@@ -27,27 +27,27 @@ namespace sdfRay4d::vkHelpers
 
     private:
       FramebufferHelper(
-        const Device &_device,
+        const device::Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs
       ) noexcept;
 
     private:
-      void createFramebuffer(const RenderPass &_renderPass) noexcept;
+      void createFramebuffer(const renderpass::RenderPass &_renderPass) noexcept;
       void setAttachments(const ImageViewList &_attachments) noexcept;
       void setSize(uint32_t _extentWidth, uint32_t _extentHeight) noexcept;
-      void setDefaultFramebuffer(const Framebuffer &_framebuffer) noexcept;
+      void setDefaultFramebuffer(const framebuffer::Framebuffer &_framebuffer) noexcept;
       ImageViewList &getAttachments() noexcept { return m_attachments; }
-      Framebuffer &getFramebuffer(
-        const RenderPass &_renderPass,
+      framebuffer::Framebuffer &getFramebuffer(
+        const renderpass::RenderPass &_renderPass,
         bool _useDefault
       ) noexcept;
 
     private:
-      Device m_device = VK_NULL_HANDLE;
+      device::Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
-      Framebuffer m_defaultFrameBuffer = VK_NULL_HANDLE;
-      Framebuffer m_frameBuffer = VK_NULL_HANDLE;
+      framebuffer::Framebuffer m_defaultFrameBuffer = VK_NULL_HANDLE;
+      framebuffer::Framebuffer m_frameBuffer = VK_NULL_HANDLE;
       ImageViewList m_attachments = {};
 
       uint32_t m_extentWidth = 0;

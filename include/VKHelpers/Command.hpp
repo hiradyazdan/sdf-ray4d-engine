@@ -18,7 +18,7 @@ namespace sdfRay4d::vkHelpers
 
     public:
       CommandHelper(
-        const Device &_device,
+        const device::Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs
       ) noexcept;
 
@@ -32,7 +32,7 @@ namespace sdfRay4d::vkHelpers
     public:
       void init(
         const CmdBuffer &_cmdBuffer,
-        const Framebuffer &_framebuffer,
+        const framebuffer::Framebuffer &_framebuffer,
         int _frameId,
         uint32_t _extentWidth,
         uint32_t _extentHeight
@@ -63,7 +63,7 @@ namespace sdfRay4d::vkHelpers
       void setRenderPassHelper(const RenderPassHelper &_renderPassHelper) noexcept;
 
     private:
-      Device m_device = VK_NULL_HANDLE;
+      device::Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
       CmdBuffer m_cmdBuffer = VK_NULL_HANDLE;

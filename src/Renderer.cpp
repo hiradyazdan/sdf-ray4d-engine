@@ -39,8 +39,8 @@ Renderer::Renderer(
 , m_isMSAA(_isMSAA)
 {
   m_actorMesh.load(
-    QString(Constants::modelsPath) +
-      QString(Constants::modelsPaths::actor)
+    QString(constants::modelsPath) +
+      QString(constants::modelsPaths::actor)
   );
 
   connect(

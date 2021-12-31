@@ -75,6 +75,8 @@ NodeDataType ShapeDataModel::dataType(
     case PortType::In:
     case PortType::None:
       return MapData().type();
+    default:
+      throw std::runtime_error("PortType is invalid!");
   }
 }
 

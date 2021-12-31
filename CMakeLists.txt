@@ -36,10 +36,10 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/env_var_parser.cmake)
 
 # If UNITY BUILD causes compile or runtime issues (e.g. ODRs) turn this off.
 # setting this to ON may mess up the IDE syntax/error detections intermittently
-if(NOT DEFINED ENV{CMAKE_UNITY_BUILD})
+if(NOT DEFINED ENV{UNITY_BUILD_ENABLED})
     set(CMAKE_UNITY_BUILD ON)
 else()
-    set(CMAKE_UNITY_BUILD $ENV{CMAKE_UNITY_BUILD})
+    set(CMAKE_UNITY_BUILD $ENV{UNITY_BUILD_ENABLED})
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -79,6 +79,11 @@ file(
 
 target_sources(${TARGET_NAME} PRIVATE ${${TARGET_NAME}_SOURCE})
 
+if($ENV{PCH_ENABLED})
+    target_precompile_headers(${TARGET_NAME} PRIVATE include/pch.hpp)
+    set(CMAKE_PCH_INSTANTIATE_TEMPLATES ON)
+endif()
+
 # NOTE:
 #
 # Currently vcpkg port of glslang does not link
@@ -95,6 +100,13 @@ target_link_libraries(${TARGET_NAME} PRIVATE Vulkan::Vulkan)
 #target_link_libraries(${TARGET_NAME} PRIVATE glm::glm)
 target_link_libraries(${TARGET_NAME} PRIVATE Qt5::Widgets Qt5::Concurrent)
 target_link_libraries(${TARGET_NAME} PRIVATE nodes)
+
+# Doxygen
+#############################################################################
+
+if($ENV{DOC_BUILD_ENABLED})
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/doxygen.cmake)
+endif()
 
 # Sanitizers
 #############################################################################

@@ -17,7 +17,7 @@ namespace sdfRay4d::vkHelpers
 
     public:
       BufferHelper(
-        const Device &_device,
+        const device::Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs
       ) noexcept;
 
@@ -32,7 +32,7 @@ namespace sdfRay4d::vkHelpers
       void createBuffer(
         device::Size _size,
         const buffer::UsageFlags &_usage,
-        Buffer &_buffer,
+        buffer::Buffer &_buffer,
         memory::Reqs &_memReq
       ) noexcept;
 
@@ -42,17 +42,17 @@ namespace sdfRay4d::vkHelpers
         uint32_t _typeIndex
       ) noexcept;
       void bindBufferMemory(
-        const Buffer &_buffer,
+        const buffer::Buffer &_buffer,
         const device::Size &_memOffset
       ) noexcept;
       void mapMemory(size_t _byteSize) noexcept;
 
     private:
-      void destroyBuffer(Buffer &_buffer) noexcept;
+      void destroyBuffer(buffer::Buffer &_buffer) noexcept;
       void freeMemory() noexcept;
 
     private:
-      Device m_device = VK_NULL_HANDLE;
+      device::Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
 //      std::vector<Buffer> m_buffers;

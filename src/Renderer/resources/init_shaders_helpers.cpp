@@ -9,7 +9,7 @@ using namespace sdfRay4d;
 
 void Renderer::initDepthShaders()
 {
-  namespace depthShaders = Constants::shadersPaths::depth;
+  namespace depthShaders = constants::shadersPaths::depth;
 
   if (!m_depthMaterial->vertexShader.isValid())
   {
@@ -28,7 +28,7 @@ void Renderer::initDepthShaders()
 
 void Renderer::initActorShaders()
 {
-  namespace actorShaders = Constants::shadersPaths::actor;
+  namespace actorShaders = constants::shadersPaths::actor;
 
   if (!m_actorMaterial->vertexShader.isValid())
   {
@@ -47,7 +47,7 @@ void Renderer::initActorShaders()
 
 void Renderer::initSDFRShaders()
 {
-  namespace sdfrShaders = Constants::shadersPaths::raymarch;
+  namespace sdfrShaders = constants::shadersPaths::raymarch;
 
   if (!m_sdfrMaterial->vertexShader.isValid())
   {

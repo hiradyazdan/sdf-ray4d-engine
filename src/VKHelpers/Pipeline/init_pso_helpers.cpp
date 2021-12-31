@@ -40,7 +40,7 @@ void PipelineHelper::setDynamicState(
     VK_DYNAMIC_STATE_SCISSOR
   };
 
-  dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+  dynamicState.sType = pipeline::StructureType::DYNAMIC_INFO;
   dynamicState.dynamicStateCount = states.size(); // 2
   dynamicState.pDynamicStates = states.data();
 }
@@ -83,7 +83,7 @@ void PipelineHelper::setVertexInputState(
     }
   };
 
-  vertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+  vertexInputState.sType = pipeline::StructureType::VERTEX_INPUT_INFO;
   vertexInputState.vertexBindingDescriptionCount = vertexBindingDesc.size();
   vertexInputState.pVertexBindingDescriptions = vertexBindingDesc.data();
   vertexInputState.vertexAttributeDescriptionCount = vertexAttrDesc.size();
@@ -103,7 +103,7 @@ void PipelineHelper::setInputAssemblyState(
   auto &pso = _material->pso;
   auto &inputAssemblyState = pso.inputAssemblyState = {}; // memset
 
-  inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+  inputAssemblyState.sType = pipeline::StructureType::INPUT_ASSEMBLY_INFO;
   inputAssemblyState.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
   inputAssemblyState.primitiveRestartEnable = VK_FALSE;
 }
@@ -119,7 +119,7 @@ void PipelineHelper::setRasterizationState(
   auto &pso = _material->pso;
   auto &rasterizationState = pso.rasterizationState = {}; // memset
 
-  rasterizationState.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+  rasterizationState.sType = pipeline::StructureType::RASTERIZATION_INFO;
   rasterizationState.depthClampEnable = VK_FALSE;
   rasterizationState.rasterizerDiscardEnable = VK_FALSE;
   rasterizationState.polygonMode = VK_POLYGON_MODE_FILL;
@@ -143,7 +143,7 @@ void PipelineHelper::setColorBlendState(
   auto &pso = _material->pso;
   auto &colorBlendState = pso.colorBlendState = {}; // memset
 
-  colorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+  colorBlendState.sType = pipeline::StructureType::COLOR_BLEND_INFO;
   colorBlendState.logicOpEnable = VK_FALSE;
   colorBlendState.attachmentCount = 1;
 
@@ -177,7 +177,7 @@ void PipelineHelper::setViewportState(
   auto &pso = _material->pso;
   auto &viewportState = pso.viewportState = {}; // memset
 
-  viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+  viewportState.sType = pipeline::StructureType::VIEWPORT_INFO;
   viewportState.viewportCount = 1;
   viewportState.pViewports = nullptr;
   viewportState.scissorCount = 1;
@@ -195,7 +195,7 @@ void PipelineHelper::setDepthStencilState(
   auto &pso = _material->pso;
   auto &depthStencilState = pso.depthStencilState = {}; // memset
 
-  depthStencilState.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+  depthStencilState.sType = pipeline::StructureType::DEPTH_STENCIL_INFO;
   depthStencilState.depthTestEnable = VK_TRUE;
   depthStencilState.depthWriteEnable = VK_TRUE;
   depthStencilState.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
@@ -212,7 +212,7 @@ void PipelineHelper::setMultisampleState(
   auto &pso = _material->pso;
   auto &multisampleState = pso.multisampleState = {}; // memset
 
-  multisampleState.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+  multisampleState.sType = pipeline::StructureType::MULTISAMPLE_INFO;
   multisampleState.rasterizationSamples = m_sampleCountFlags;
   multisampleState.sampleShadingEnable = VK_FALSE;
   multisampleState.minSampleShading = 1.0f;

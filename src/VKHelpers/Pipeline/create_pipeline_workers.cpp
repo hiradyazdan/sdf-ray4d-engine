@@ -1,6 +1,7 @@
 /*****************************************************
  * Partial Class: PipelineHelper
  * Members: Create Pipeline Workers (Public)
+ * @todo replace async threads with fibers
  *****************************************************/
 
 #include "VKHelpers/Pipeline.hpp"

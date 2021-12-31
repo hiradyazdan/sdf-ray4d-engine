@@ -10,6 +10,6 @@ namespace sdfRay4d::vkHelpers
   class BaseHelper
   {
     protected:
-      using MaterialPtr = std::shared_ptr<Material<float>>;
+      using MaterialPtr = std::shared_ptr<Material<>>;
   };
 }

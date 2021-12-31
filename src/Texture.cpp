@@ -15,13 +15,13 @@ using namespace texture;
  * @param[in] _deviceFuncs
  */
 Texture::Texture(
-  Device &_device,
+  device::Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs
 //  const QString &_texturesPath
   ) :
   m_device(_device)
 , m_deviceFuncs(_deviceFuncs)
-//, m_texturesPath(Constants::texturesPath)
+//, m_texturesPath(constants::texturesPath)
 {}
 
 /**
@@ -38,7 +38,7 @@ void Texture::createImage(
 {
   ImageInfo imageInfo = {}; // memset
 
-  imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+  imageInfo.sType = texture::StructureType::IMAGE_INFO;
   imageInfo.pNext = nullptr;
   imageInfo.imageType = VK_IMAGE_TYPE_2D;
   imageInfo.format = VK_FORMAT_D16_UNORM;
@@ -87,7 +87,7 @@ void Texture::createImageMemory(
   );
 
   memory::AllocInfo memAllocInfo = {}; // memset
-  memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+  memAllocInfo.sType = memory::StructureType::MEMORY_ALLOC_INFO;
   memAllocInfo.pNext = nullptr;
   memAllocInfo.allocationSize = memReqs.size;
   memAllocInfo.memoryTypeIndex = _deviceMemIndex;
@@ -123,7 +123,7 @@ void Texture::createImageMemoryBarrier(
   const AccessFlags &_destAccessMask
 )
 {
-  m_imageMemBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+  m_imageMemBarrier.sType = texture::StructureType::IMAGE_MEMORY_BARRIER;
   m_imageMemBarrier.oldLayout = _oldLayout;
   m_imageMemBarrier.newLayout = _newLayout;
   m_imageMemBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -162,7 +162,7 @@ void Texture::createImageView(
 {
   ImageViewInfo viewInfo = {}; // memset
 
-  viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+  viewInfo.sType = texture::StructureType::IMAGE_VIEW_INFO;
   viewInfo.pNext = nullptr;
   viewInfo.image = m_image;
   viewInfo.format = VK_FORMAT_D16_UNORM;//VK_FORMAT_R8G8B8A8_SRGB;
@@ -208,7 +208,7 @@ void Texture::createSampler(
 {
   SamplerInfo samplerInfo = {}; // memset
 
-  samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+  samplerInfo.sType = texture::StructureType::SAMPLER_INFO;
 
   samplerInfo.magFilter = VK_FILTER_LINEAR;
   samplerInfo.minFilter = VK_FILTER_LINEAR;

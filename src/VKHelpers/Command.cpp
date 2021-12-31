@@ -24,7 +24,7 @@ using namespace sdfRay4d::vkHelpers;
  * @param[in] _deviceFuncs
  */
 CommandHelper::CommandHelper(
-  const Device &_device,
+  const device::Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs
 ) noexcept :
   m_device(_device)
@@ -41,7 +41,7 @@ CommandHelper::CommandHelper(
  */
 void CommandHelper::init(
   const CmdBuffer &_cmdBuffer,
-  const Framebuffer &_framebuffer,
+  const framebuffer::Framebuffer &_framebuffer,
   int _frameId,
   uint32_t _extentWidth,
   uint32_t _extentHeight
@@ -124,7 +124,7 @@ void CommandHelper::executeCmdPushConstants(
    * than reference the original, to avoid
    * adding infinite number of per frame data
    *
-   * TODO: Fix dynamic data/mouse positions
+   * @todo Fix dynamic data/mouse positions
    */
   auto pushConstants = _material->pushConstants;
 

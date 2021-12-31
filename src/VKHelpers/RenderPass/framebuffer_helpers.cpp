@@ -28,7 +28,7 @@ void RenderPassHelper::setFramebufferAttachments(
  * @param[in] _framebuffer
  */
 void RenderPassHelper::setDefaultFramebuffer(
-  const Framebuffer &_framebuffer
+  const framebuffer::Framebuffer &_framebuffer
 ) noexcept
 {
   m_framebufferHelper.setDefaultFramebuffer(_framebuffer);

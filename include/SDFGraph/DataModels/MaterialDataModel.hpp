@@ -6,8 +6,6 @@
 
 #include "BaseDataModel.hpp"
 
-#include <iostream>
-
 namespace sdfRay4d::sdfGraph
 {
   class MaterialDataModel : public BaseDataModel

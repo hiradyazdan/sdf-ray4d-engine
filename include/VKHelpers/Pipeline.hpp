@@ -32,10 +32,10 @@ namespace sdfRay4d::vkHelpers
 
     public:
       void initHelpers(
-        const Device &_device,
+        const device::Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs,
         const SampleCountFlags &_sampleCountFlags,
-        const RenderPass &_defaultRenderPass
+        const renderpass::RenderPass &_defaultRenderPass
       ) noexcept;
 
     public:
@@ -73,7 +73,7 @@ namespace sdfRay4d::vkHelpers
       void destroyTextures() noexcept;
 
       void destroyPipelines() noexcept;
-      void destroyPipeline              (Pipeline &_pipeline) noexcept;
+      void destroyPipeline              (pipeline::Pipeline &_pipeline) noexcept;
       void destroyPipeline              (const MaterialPtr &_material) noexcept;
       void destroyPipelineLayout        (pipeline::Layout &_pipelineLayout) noexcept;
       void destroyPipelineLayout        (const MaterialPtr &_material) noexcept;
@@ -87,7 +87,7 @@ namespace sdfRay4d::vkHelpers
 
     public:
       void setFramebufferAttachments    (const ImageViewList &_fbAttachments) noexcept;
-      RenderPass &getRenderPass         (bool _useDefault = true) noexcept;
+      renderpass::RenderPass &getRenderPass         (bool _useDefault = true) noexcept;
 
     public:
       DescriptorHelper &getDescriptorHelper() { return m_descriptorHelper; }
@@ -130,7 +130,7 @@ namespace sdfRay4d::vkHelpers
       void setMultisampleState          (const MaterialPtr &_material) noexcept;
 
     private:
-      Device m_device = VK_NULL_HANDLE;
+      device::Device m_device = VK_NULL_HANDLE;
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
       pipeline::Cache m_pipelineCache = VK_NULL_HANDLE;

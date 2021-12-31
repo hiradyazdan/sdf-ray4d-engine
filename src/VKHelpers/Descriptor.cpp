@@ -24,7 +24,7 @@ using namespace sdfRay4d::vkHelpers;
  * @param[in] _deviceFuncs
  */
 DescriptorHelper::DescriptorHelper(
-  const Device &_device,
+  const device::Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs
 ) noexcept :
   m_device(_device)

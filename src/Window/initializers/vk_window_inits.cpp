@@ -13,11 +13,6 @@ void MainWindow::initVkLayers()
 {
   QLoggingCategory::setFilterRules(QStringLiteral("qt.vulkan=true"));
 
-  /**
-   * TODO:
-   * Validation layers in Qt seem to be skipped
-   * when using Debugger on CLion
-   */
   const QByteArrayList &layers = {
 #ifndef Q_OS_ANDROID
     "VK_LAYER_KHRONOS_validation"

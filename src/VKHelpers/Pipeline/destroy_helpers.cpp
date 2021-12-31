@@ -12,7 +12,7 @@ using namespace sdfRay4d::vkHelpers;
  * @param[in] _pipeline
  */
 void PipelineHelper::destroyPipeline(
-  Pipeline &_pipeline
+  pipeline::Pipeline &_pipeline
 ) noexcept
 {
   if (!_pipeline) return;
