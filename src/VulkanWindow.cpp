@@ -43,6 +43,9 @@ QVulkanWindowRenderer *VulkanWindow::createRenderer()
    * 2. it has a non-default ctor, so its member needs to be initialized
    *    in a ctor's initializer list, instead of ctor body or member functions
    *    that may be called when device/device functions are already available.
+   *
+   * Also in a larger scale, we need access to material between multiple threads,
+   * and therefore a reference counted pointer at minimum is needed to keep its track
    */
 
   m_renderer = new Renderer(

@@ -7,6 +7,19 @@
 
 namespace sdfRay4d
 {
+  /**
+   * @struct NOP
+   * @brief (no-op) to be used as a super struct for any struct that
+   * represent compile-time type containers/namespaces than instantiable
+   * structures by removing their default constructors
+   */
+  struct NOP
+  {
+    NOP() = delete;
+    NOP(const NOP&) = delete; // non-copyable
+    NOP& operator=(const NOP&) = delete; // non-copyable
+  };
+
   namespace qt
   {}
 
@@ -20,30 +33,28 @@ namespace sdfRay4d
     using VertexAttrDesc        = VkVertexInputAttributeDescription;
     using DynamicState          = VkDynamicState;
 
-    using CmdPool               = VkCommandPool;
-    using CmdBuffer             = VkCommandBuffer;
-
+    using Clear                 = VkClearValue;
     using ClearColor            = VkClearColorValue;
     using ClearDepthStencil     = VkClearDepthStencilValue;
-    using Clear                 = VkClearValue;
     using Viewport              = VkViewport;
     using Rect2D                = VkRect2D;
     using PushConstantRange     = VkPushConstantRange;
     using SampleCountFlags      = VkSampleCountFlagBits;
 
-    using AttachmentDesc        = VkAttachmentDescription;
-    using AttachmentRef         = VkAttachmentReference;
-    using SubpassDesc           = VkSubpassDescription;
-
     namespace renderpass
     {
-      using RenderPass  = VkRenderPass;
+      using RenderPass      = VkRenderPass;
 
-      using Info        = VkRenderPassCreateInfo;
-      using BeginInfo   = VkRenderPassBeginInfo;
+      using Info            = VkRenderPassCreateInfo;
+      using BeginInfo       = VkRenderPassBeginInfo;
+
+      using SubpassDesc     = VkSubpassDescription;
+
+      using AttachmentDesc  = VkAttachmentDescription;
+      using AttachmentRef   = VkAttachmentReference;
 
       // RenderPass StructureType
-      struct StructureType
+      struct StructureType : NOP
       {
         static constexpr const VkStructureType RENDER_PASS_INFO       = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
         static constexpr const VkStructureType RENDER_PASS_BEGIN_INFO = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -57,7 +68,7 @@ namespace sdfRay4d
       using Info        = VkFramebufferCreateInfo;
 
       // Framebuffer StructureType
-      struct StructureType
+      struct StructureType : NOP
       {
         static constexpr const VkStructureType FRAMEBUFFER_INFO = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
       };
@@ -80,7 +91,7 @@ namespace sdfRay4d
       using SamplerInfo         = VkSamplerCreateInfo;
 
       // Texture StructureType
-      struct StructureType
+      struct StructureType : NOP
       {
         static constexpr const VkStructureType IMAGE_INFO             = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         static constexpr const VkStructureType IMAGE_VIEW_INFO        = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -98,10 +109,16 @@ namespace sdfRay4d
       using UsageFlags  = VkBufferUsageFlags;
 
       // Buffer StructureType
-      struct StructureType
+      struct StructureType : NOP
       {
         static constexpr const VkStructureType BUFFER_INFO = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
       };
+    }
+
+    namespace command
+    {
+      using CmdPool   = VkCommandPool;
+      using CmdBuffer = VkCommandBuffer;
     }
 
     namespace memory
@@ -110,7 +127,7 @@ namespace sdfRay4d
       using AllocInfo = VkMemoryAllocateInfo;
 
       // Memory StructureType
-      struct StructureType
+      struct StructureType : NOP
       {
         static constexpr const VkStructureType MEMORY_ALLOC_INFO = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
       };
@@ -143,7 +160,7 @@ namespace sdfRay4d
       using Write         = VkWriteDescriptorSet;
 
       // Descriptor StructureType
-      struct StructureType
+      struct StructureType : NOP
       {
         static constexpr const VkStructureType POOL_INFO        = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 
@@ -162,7 +179,7 @@ namespace sdfRay4d
       using StageFlags  = VkShaderStageFlags;
 
       // Shader StructureType
-      struct StructureType
+      struct StructureType : NOP
       {
         static constexpr const VkStructureType SHADER_MODULE_INFO  = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
       };
@@ -199,7 +216,7 @@ namespace sdfRay4d
       using ComputePipelineInfo   = VkComputePipelineCreateInfo;
 
       // Pipeline StructureType
-      struct StructureType
+      struct StructureType : NOP
       {
         // Pipeline States Infos
         static constexpr const VkStructureType SHADER_STAGE_INFO      = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;

@@ -121,6 +121,6 @@ void FramebufferHelper::createFramebuffer(
 
   if (result != VK_SUCCESS)
   {
-    qWarning("Failed to create Framebuffer: %d", result);
+    qFatal("Failed to create Framebuffer: %d", result);
   }
 }

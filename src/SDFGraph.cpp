@@ -178,7 +178,7 @@ void SDFGraph::setAutoCompile(bool _isAutoCompile)
    *    fibers perform significantly more performant in this case
    *    and avoid leaving stale vulkan objects/pointers on termination
    */
-  m_worker = QtConcurrent::run([this]()
+  m_worker = QtConcurrent::run([&]()
   {
     /**
      * @note we only need to find the map nodes

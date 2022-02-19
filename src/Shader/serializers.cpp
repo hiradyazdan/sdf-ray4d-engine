@@ -24,7 +24,7 @@ void Shader::serialize(
 {
   for(const auto &partialPath : _partialFilePaths)
   {
-    _rawBytes.prepend(getFileBytes(m_shadersPath + partialPath));
+    _rawBytes.prepend(getFileBytes(constants::shadersPath + partialPath));
   }
 
   serializeVersionDirective(_rawBytes);
@@ -36,7 +36,7 @@ void Shader::serialize(
  */
 void Shader::serializeVersionDirective(
   QByteArray &_rawBytes
-) const
+)
 {
   /**
    * @todo Optimize - rewrite with string::replace for less memory copying
@@ -44,7 +44,7 @@ void Shader::serializeVersionDirective(
    * copying memory all over the place.
    */
   std::string modifiedShader;
-  auto versionDirective = "#version " + std::to_string(m_version);
+  auto versionDirective = "#version " + std::to_string(constants::shaderVersion);
   auto shaderCode = _rawBytes.toStdString();
   std::regex_replace(
     back_inserter(modifiedShader), // copies

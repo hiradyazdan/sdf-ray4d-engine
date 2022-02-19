@@ -33,6 +33,7 @@ namespace sdfRay4d
     using LayoutBindingList   = std::vector<descriptor::LayoutBinding>;
     using DescLayoutList      = std::vector<descriptor::Layout>;
     using DescSetList         = std::vector<descriptor::Set>;
+    using PushConstantList    = std::vector<TConst>;
 
     // Shader
     Shader                      vertexShader;
@@ -43,48 +44,48 @@ namespace sdfRay4d
     Texture                     texture;
 
     // Buffer
-    buffer::Buffer              buffer = VK_NULL_HANDLE;
-    buffer::Buffer              dynamicUniformBuffer = VK_NULL_HANDLE;
-    buffer::UsageFlags          bufferUsage = {};
-    device::Size                bufferSize = 0;
-    device::Size                vertUniSize = 0;
-    device::Size                fragUniSize = 0;
-    device::Size                uniMemStartOffset = 0;
-    memory::Reqs                memReq = {};
-    memory::Reqs                dynamicUniformMemReq = {};
+    buffer::Buffer              buffer                  = VK_NULL_HANDLE;
+    buffer::Buffer              dynamicUniformBuffer    = VK_NULL_HANDLE;
+    buffer::UsageFlags          bufferUsage             = {};
+    device::Size                bufferSize              = 0;
+    device::Size                vertUniSize             = 0;
+    device::Size                fragUniSize             = 0;
+    device::Size                uniMemStartOffset       = 0;
+    memory::Reqs                memReq                  = {};
+    memory::Reqs                dynamicUniformMemReq    = {};
 
     // Descriptor
-    descriptor::Pool            descPool = VK_NULL_HANDLE;
+    descriptor::Pool            descPool                = VK_NULL_HANDLE;
     DescPoolSizeList            descPoolSizes;
     LayoutBindingList           layoutBindings;
     DescLayoutList              descSetLayouts;
     DescSetList                 descSets;
-    uint32_t                    descSetLayoutCount = 0;
-    uint32_t                    dynamicDescCount = 0;
+    uint32_t                    descSetLayoutCount      = 0;
+    uint32_t                    dynamicDescCount        = 0;
 
     // PushConstant
-    uint32_t                    pushConstantRangeCount = 0;
-    PushConstantRange           pushConstantRange = {};
-    std::vector<TConst>         pushConstants = {};
+    uint32_t                    pushConstantRangeCount  = 0;
+    PushConstantRange           pushConstantRange       = {};
+    PushConstantList            pushConstants           = {};
 
     // PSO
     PSO                         pso;
 
     // Pipeline
     ShaderStageInfoList         shaderStages;
-    pipeline::StageFlags        sourceStage = {};
-    pipeline::StageFlags        destinationStage = {};
-    pipeline::Layout            pipelineLayout = VK_NULL_HANDLE;
-    pipeline::Pipeline          pipeline = VK_NULL_HANDLE;
+    pipeline::StageFlags        sourceStage             = {};
+    pipeline::StageFlags        destinationStage        = {};
+    pipeline::Layout            pipelineLayout          = VK_NULL_HANDLE;
+    pipeline::Pipeline          pipeline                = VK_NULL_HANDLE;
 
     // RenderPass
-    renderpass::RenderPass      renderPass = VK_NULL_HANDLE;
-    framebuffer::Framebuffer    framebuffer = VK_NULL_HANDLE;
+    renderpass::RenderPass      renderPass              = VK_NULL_HANDLE;
+    framebuffer::Framebuffer    framebuffer             = VK_NULL_HANDLE;
 
-    uint32_t                    vertexCount = 0;
+    uint32_t                    vertexCount             = 0;
 
-    bool                        isHotSwappable = false;
-    bool                        isDefault = true;
+    bool                        isHotSwappable          = false;
+    bool                        isDefault               = true;
 
     /**
      * @brief Material struct holds pipeline data throughout their
@@ -98,13 +99,13 @@ namespace sdfRay4d
      * @param[in] _deviceFuncs
      */
     Material(
-      device::Device &_device,
+      const device::Device &_device,
       QVulkanDeviceFunctions *_deviceFuncs
     ) :
-      vertexShader(_device, _deviceFuncs)
+      vertexShader  (_device, _deviceFuncs)
     , fragmentShader(_device, _deviceFuncs)
-    , computeShader(_device, _deviceFuncs)
-    , texture(_device, _deviceFuncs)
+    , computeShader (_device, _deviceFuncs)
+    , texture       (_device, _deviceFuncs)
     {};
 
     /**
@@ -125,11 +126,11 @@ namespace sdfRay4d
       shader::StageFlags _stages = VK_SHADER_STAGE_FRAGMENT_BIT
     )
     {
-      pushConstantRangeCount = 1;
+      pushConstantRangeCount        = 1;
 
-      pushConstantRange.stageFlags = _stages;
-      pushConstantRange.offset = _offset;
-      pushConstantRange.size = _size;
+      pushConstantRange.stageFlags  = _stages;
+      pushConstantRange.offset      = _offset;
+      pushConstantRange.size        = _size;
     }
   };
 }

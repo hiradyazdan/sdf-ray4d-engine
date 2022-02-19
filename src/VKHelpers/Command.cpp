@@ -40,7 +40,7 @@ CommandHelper::CommandHelper(
  * @param[in] _extentHeight
  */
 void CommandHelper::init(
-  const CmdBuffer &_cmdBuffer,
+  const command::CmdBuffer &_cmdBuffer,
   const framebuffer::Framebuffer &_framebuffer,
   int _frameId,
   uint32_t _extentWidth,
@@ -157,11 +157,11 @@ void CommandHelper::executeRenderPass(
   const std::vector<MaterialPtr> &_materials
 ) noexcept
 {
-  m_renderPassHelper.createRenderPassInfo(_materials);
+  m_renderPassHelper.createBeginInfo(_materials);
 
   m_deviceFuncs->vkCmdBeginRenderPass(
     m_cmdBuffer,
-    &m_renderPassHelper.getRenderPassInfo(),
+    &m_renderPassHelper.getBeginInfo(),
     VK_SUBPASS_CONTENTS_INLINE
   );
 

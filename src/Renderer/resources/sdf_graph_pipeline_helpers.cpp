@@ -70,8 +70,9 @@ void Renderer::swapSDFRPipelines()
    *
    * @note Although it may stall the pipeline, that is the only way
    * Qt Vulkan seems to expose in this case. Otherwise, I could use
-   * vkGetFenceStatus and pass the Fence to check every frame,
-   * which is not available through Qt Vulkan public API.
+   * vkGetFenceStatus and pass the inflight Fence to check every frame,
+   * which is not available through Qt Vulkan public API (resides in
+   * QVulkanWindowPrivate class -> FrameResources struct).
    *
    * @note Since the shader compilation is expected to be a one-off
    * design session for the user, than a game realtime/interactive
@@ -97,15 +98,19 @@ void Renderer::swapSDFRPipelines()
      *    replace async threads with fibers to address above issues and help removing
      *    stale pointers and optimize auto compile more efficiently
      */
-    m_destroyWorker = QtConcurrent::run([this]()
+    m_destroyWorker = QtConcurrent::run([&]()
     {
       m_pipelineHelper.destroyShaderModule(m_newSDFRMaterial->fragmentShader);
-      m_pipelineHelper.destroyDescriptorSetLayout(m_newSDFRMaterial->descSetLayouts);
+      m_pipelineHelper.destroyDescriptorSetLayouts(m_newSDFRMaterial->descSetLayouts);
       m_pipelineHelper.destroyDescriptorPool(m_newSDFRMaterial->descPool);
       m_pipelineHelper.destroyTexture(m_newSDFRMaterial->texture);
 
       m_pipelineHelper.destroyPipelineLayout(m_oldPipeline.layout);
       m_pipelineHelper.destroyPipeline(m_oldPipeline.pipeline);
     });
+  }
+  else
+  {
+    qFatal("Failed to wait for graphics queue to become idle: %d", result);
   }
 }

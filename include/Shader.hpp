@@ -14,7 +14,7 @@ namespace sdfRay4d
   {
     public:
       Shader(
-        device::Device &_device,
+        const device::Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs
       );
 
@@ -65,9 +65,9 @@ namespace sdfRay4d
       static QByteArray getFileBytes(const QString &_filePath);
       static shader::StageFlag getShaderStage(const std::string &_fileExtension);
 
-      void serializeVersionDirective(
+      static void serializeVersionDirective(
         QByteArray &_rawBytes
-      ) const;
+      ) ;
       void serialize(
         const QByteArray &_rawBytes
       );
@@ -91,7 +91,6 @@ namespace sdfRay4d
     private:
       SPIRVCompiler m_spirvCompiler;
 
-      int m_version;
       bool m_isLoading = false;
       Data m_data;
 
@@ -103,7 +102,6 @@ namespace sdfRay4d
       QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
 
       QFuture<Data> m_worker;
-      QString m_shadersPath;
 
       QByteArray m_rawBytes;
       std::string m_template;

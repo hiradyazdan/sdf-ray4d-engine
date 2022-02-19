@@ -54,4 +54,5 @@ void Renderer::releaseResources()
   m_pipelineHelper.destroyShaderModules();
   m_pipelineHelper.destroyTextures();
   m_pipelineHelper.destroyBuffers();
+  m_pipelineHelper.destroyMaterials();
 }

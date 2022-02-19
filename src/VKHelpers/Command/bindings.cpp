@@ -43,7 +43,7 @@ void CommandHelper::executeCmdBind(
       frameDynamicOffsets.push_back(frameDynamicOffset);
     }
 
-    const auto dynamicOffsetCount = frameDynamicOffsets.size();
+    const auto &dynamicOffsetCount = frameDynamicOffsets.size();
 
     m_deviceFuncs->vkCmdBindDescriptorSets(
       m_cmdBuffer,

@@ -1,4 +1,4 @@
-# SDF Ray4D Engine (masters-project)
+# SDF Ray4D Engine
 
 ## Requirements
 

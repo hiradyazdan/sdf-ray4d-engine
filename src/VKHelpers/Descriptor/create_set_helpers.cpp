@@ -10,7 +10,7 @@ using namespace sdfRay4d::vkHelpers;
 /**
  *
  * @param[in] _material
- * [out] _material->descPool
+ * @param[out] _material->descPool
  */
 void DescriptorHelper::createDescriptorPool(
   const MaterialPtr &_material
@@ -43,9 +43,9 @@ void DescriptorHelper::createDescriptorPool(
 /**
  *
  * @param[in] _material
- * [out] _material->descSetLayout
+ * @param[out] _material->descSetLayouts
  */
-void DescriptorHelper::createDescriptorSetLayout(
+void DescriptorHelper::createDescriptorSetLayouts(
   const MaterialPtr &_material
 ) noexcept
 {
@@ -56,10 +56,12 @@ void DescriptorHelper::createDescriptorSetLayout(
    * texture (combined image) sampler cannot be set using one single
    * dynamic uniform buffers along with other descriptors/UBOs.
    */
-  auto &layoutBindings = _material->layoutBindings;
-  auto &layoutCount = _material->descSetLayoutCount;
 
-  _material->descSetLayouts.resize(layoutCount);
+  const auto &layoutBindings = _material->layoutBindings;
+  const auto &layoutCount = _material->descSetLayoutCount;
+  auto &layouts = _material->descSetLayouts;
+
+  layouts.resize(layoutCount);
 
   for(auto i = 0; i < layoutCount; i++)
   {
@@ -74,7 +76,7 @@ void DescriptorHelper::createDescriptorSetLayout(
       m_device,
       &descLayoutInfo, // [in]
       nullptr,
-      &_material->descSetLayouts[i] // [out] e.g. Texture Sampler Set Layout
+      &layouts[i] // [out] e.g. Texture Sampler Set Layout
     );
 
     if (result != VK_SUCCESS)
@@ -87,7 +89,7 @@ void DescriptorHelper::createDescriptorSetLayout(
 /**
  *
  * @param[in] _material
- * [out] _material->descSet
+ * @param[out] _material->descSets
  */
 void DescriptorHelper::allocateDescriptorSets(
   const MaterialPtr &_material
@@ -100,29 +102,29 @@ void DescriptorHelper::allocateDescriptorSets(
    * texture (combined image) sampler cannot be set using one single
    * dynamic uniform buffers along with other descriptors/UBOs.
    */
-  auto &layoutCount = _material->descSetLayoutCount;
 
-  _material->descSets.resize(layoutCount);
+  const auto &layoutCount = _material->descSetLayoutCount;
+  const auto &layouts = _material->descSetLayouts;
+  auto &sets = _material->descSets;
 
-  for(auto i = 0; i < layoutCount; i++)
+  sets.resize(layoutCount);
+
+  descriptor::AllocInfo descSetInfo = {}; // memset
+  descSetInfo.sType                 = descriptor::StructureType::SET_ALLOC_INFO;
+  descSetInfo.pNext                 = nullptr;
+  descSetInfo.descriptorPool        = _material->descPool;
+  descSetInfo.descriptorSetCount    = layouts.size();
+  descSetInfo.pSetLayouts           = layouts.data();
+
+  auto result = m_deviceFuncs->vkAllocateDescriptorSets(
+    m_device,
+    &descSetInfo, // [in]
+    sets.data() // [out]
+  );
+
+  if (result != VK_SUCCESS)
   {
-    descriptor::AllocInfo descSetInfo = {}; // memset
-    descSetInfo.sType = descriptor::StructureType::SET_ALLOC_INFO;
-    descSetInfo.pNext = nullptr;
-    descSetInfo.descriptorPool = _material->descPool;
-    descSetInfo.descriptorSetCount = 1;
-    descSetInfo.pSetLayouts = _material->descSetLayouts.data();
-
-    auto result = m_deviceFuncs->vkAllocateDescriptorSets(
-      m_device,
-      &descSetInfo, // [in]
-      &_material->descSets[i] // [out]
-    );
-
-    if (result != VK_SUCCESS)
-    {
-      qFatal("Failed to allocate descriptor set: %d", result);
-    }
+    qFatal("Failed to allocate descriptor sets: %d", result);
   }
 }
 
@@ -132,15 +134,15 @@ void DescriptorHelper::allocateDescriptorSets(
  * @note per material pipeline
  *
  * @param[in] _material
- * [out] _material->descPool
- * [out] _material->descSetLayouts
- * [out] _material->descSets
+ * @param[out] _material->descPool
+ * @param[out] _material->descSetLayouts
+ * @param[out] _material->descSets
  */
 void DescriptorHelper::createDescriptorSets(
   const MaterialPtr &_material
 ) noexcept
 {
   createDescriptorPool(_material);
-  createDescriptorSetLayout(_material);
+  createDescriptorSetLayouts(_material);
   allocateDescriptorSets(_material);
 }

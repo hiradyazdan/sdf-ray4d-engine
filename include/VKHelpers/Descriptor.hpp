@@ -15,18 +15,18 @@ namespace sdfRay4d::vkHelpers
   {
     friend class PipelineHelper;
 
+    using BufferInfoPtr = std::unique_ptr<descriptor::BufferInfo>;
+    using ImageInfoPtr  = std::unique_ptr<descriptor::ImageInfo>;
+
+    /**
+     * TODO: implement custom move ctors and operator overloads while removing copy ctors
+     */
     public:
+      DescriptorHelper() = default;
       DescriptorHelper(
         const device::Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs
       ) noexcept;
-
-    /**
-     * @note DescriptorHelper is non-copyable
-     */
-    public:
-      DescriptorHelper() = default;
-      DescriptorHelper(const DescriptorHelper&) = delete;
 
     /**
      * Add WriteSet Overloads (buffer and image infos)
@@ -54,17 +54,18 @@ namespace sdfRay4d::vkHelpers
      *
      */
     private:
-      void createDescriptorSets       (const MaterialPtr &_material) noexcept;
       void createDescriptorPool       (const MaterialPtr &_material) noexcept;
-      void createDescriptorSetLayout  (const MaterialPtr &_material) noexcept;
+      void createDescriptorSetLayouts (const MaterialPtr &_material) noexcept;
       void allocateDescriptorSets     (const MaterialPtr &_material) noexcept;
+      void createDescriptorSets       (const MaterialPtr &_material) noexcept;
 
     private:
-      device::Device m_device = VK_NULL_HANDLE;
-      QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
+      device::Device                  m_device        = VK_NULL_HANDLE;
+      QVulkanDeviceFunctions          *m_deviceFuncs  = VK_NULL_HANDLE;
 
-      descriptor::BufferInfo m_bufferInfo = {};
-      descriptor::ImageInfo m_imageInfo = {};
-      std::vector<descriptor::Write> m_descWriteList = {};
+      std::vector<descriptor::Write>  m_descWriteList = {};
+
+      std::vector<BufferInfoPtr>      m_bufferInfoPtrSet;
+      std::vector<ImageInfoPtr>       m_imageInfoPtrSet;
   };
 }

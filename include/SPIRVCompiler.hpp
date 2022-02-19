@@ -17,7 +17,7 @@ namespace sdfRay4d
   class SPIRVCompiler
   {
     public:
-      bool compile(
+      static bool compile(
         shader::StageFlag _stage,
         const QByteArray &_glslSource,
         std::vector<std::uint32_t> &_spvBytes,

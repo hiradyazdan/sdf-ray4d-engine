@@ -67,7 +67,7 @@ void Shader::load(
   m_worker = QtConcurrent::run([fileExtension, _filePath, _partialFilePaths, this]()
   {
     auto isPrecompiled = fileExtension == "spv";
-    auto rawBytes = getFileBytes(m_shadersPath + _filePath);
+    auto rawBytes = getFileBytes(constants::shadersPath + _filePath);
 
     std::vector<uint32_t> spvBytes;
     std::string log;
@@ -143,7 +143,7 @@ void Shader::preload(
   {
     auto filePath = _partialFilePaths[i];
 
-    m_rawBytes.append(getFileBytes(m_shadersPath + filePath));
+    m_rawBytes.append(getFileBytes(constants::shadersPath + filePath));
   }
 }
 
@@ -249,7 +249,7 @@ Shader::Data Shader::load(
 
   if (result != VK_SUCCESS)
   {
-    qWarning("Failed to create shader module: %d", result);
+    qFatal("Failed to create shader module: %d", result);
   }
 
   return data;

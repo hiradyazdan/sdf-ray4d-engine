@@ -64,54 +64,56 @@ namespace sdfRay4d
 //      void mousePressEvent(QMouseEvent *_event) override;
 //      void mouseReleaseEvent(QMouseEvent *_event) override;
 //      void mouseMoveEvent(QMouseEvent *_event) override;
-      void keyPressEvent(QKeyEvent *_event) override;
-      void resizeEvent(QResizeEvent *_event) override;
-      void closeEvent(QCloseEvent *_event) override;
+      void keyPressEvent(QKeyEvent    *_event)  override;
+      void resizeEvent  (QResizeEvent *_event)  override;
+      void closeEvent   (QCloseEvent  *_event)  override;
+      void showEvent    (QShowEvent   *_event)  override;
+      void hideEvent    (QHideEvent   *_event)  override;
 
     /**
      * Vulkan
      */
     private:
-      QVulkanInstance *m_vkInstance = VK_NULL_HANDLE;
-      VulkanWindow *m_vkWindow = VK_NULL_HANDLE;
+      QVulkanInstance *m_vkInstance   = VK_NULL_HANDLE;
+      VulkanWindow *m_vkWindow        = VK_NULL_HANDLE;
 
     /**
      * SDF Graph
      */
     private:
-      SDFGraph *m_sdfGraph = nullptr;
+      SDFGraph *m_sdfGraph            = nullptr;
 
     /**
      * Qt Widgets
      */
     private:
-      QWidget *m_vpWidget = nullptr;
-      QWidget *m_wrapperWidget = nullptr;
-      QWidget *m_mainMenuBar = nullptr;
+      QWidget *m_vpWidget             = nullptr;
+      QWidget *m_wrapperWidget        = nullptr;
+      QWidget *m_mainMenuBar          = nullptr;
 
-      QToolBar *m_sdfGraphToolbar = nullptr;
-      QDockWidget *m_sdfGraphWidget = nullptr;
-      QVBoxLayout *m_mainLayout = nullptr;
+      QToolBar *m_sdfGraphToolbar     = nullptr;
+      QDockWidget *m_sdfGraphWidget   = nullptr;
+      QVBoxLayout *m_mainLayout       = nullptr;
 
     /**
      * Qt Widget Menus
      */
     private:
-      QMenu *m_windowMenu = nullptr;
-      QMenu *m_sdfGraphMenu = nullptr;
-      QMenu *m_helpMenu = nullptr;
+      QMenu *m_windowMenu             = nullptr;
+      QMenu *m_sdfGraphMenu           = nullptr;
+      QMenu *m_helpMenu               = nullptr;
 
     /**
      * Qt Widget Actions
      */
     private:
-      QAction *m_loadSDFGraphAction = nullptr;
+      QAction *m_loadSDFGraphAction   = nullptr;
       QAction *m_toggleSDFGraphAction = nullptr;
-      QAction *m_aboutAction = nullptr;
-      QAction *m_quitAction = nullptr;
-      QAction *m_autoCompileAction = nullptr;
-      QAction *m_compileAction = nullptr;
-      QAction *m_saveAction = nullptr;
+      QAction *m_aboutAction          = nullptr;
+      QAction *m_quitAction           = nullptr;
+      QAction *m_autoCompileAction    = nullptr;
+      QAction *m_compileAction        = nullptr;
+      QAction *m_saveAction           = nullptr;
 
       QSize m_windowSize;
   };

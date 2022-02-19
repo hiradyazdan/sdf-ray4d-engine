@@ -48,6 +48,9 @@ build/
 **/*build*/*
 vcpkg_installed/
 renderdoc/*
+*profile*/*
+.database/*
+.datasets/*
 
 # OS and ide files
 .DS_Store

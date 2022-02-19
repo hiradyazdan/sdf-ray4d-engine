@@ -40,7 +40,6 @@ void PipelineHelper::createWorker(
 ) noexcept
 {
   m_materials = _materials;
-
   m_inclusiveWorker = QtConcurrent::run(
     this,
     &PipelineHelper::createPipelines

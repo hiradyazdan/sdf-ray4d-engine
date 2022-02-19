@@ -15,7 +15,7 @@ using namespace texture;
  * @param[in] _deviceFuncs
  */
 Texture::Texture(
-  device::Device &_device,
+  const device::Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs
 //  const QString &_texturesPath
   ) :

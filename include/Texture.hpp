@@ -15,7 +15,7 @@ namespace sdfRay4d
   {
     public:
       Texture(
-        device::Device &_device,
+        const device::Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs
 //        const QString &_texturesPath = QStringLiteral("textures/"),
       );

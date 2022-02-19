@@ -60,21 +60,22 @@ namespace sdfRay4d
     using DynamicStateList      = std::vector<DynamicState>;
     using VertexBindingDescList = std::vector<VertexBindingDesc>;
     using VertexAttrDescList    = std::vector<VertexAttrDesc>;
+    using ColorBlendAttList     = std::vector<pipeline::ColorBlendAttachment>;
 
     // pipeline::DynamicInfo.pDynamicStates is a pointer
     // => needs to persist data in scope via struct
-    DynamicStateList                dynamicStates;
+    DynamicStateList            dynamicStates;
 
     // pipeline::VertexInputInfo.pVertexBindingDescriptions is pointer
     // => needs to persist data in scope via struct
-    VertexBindingDescList           vertexBindingDesc;
+    VertexBindingDescList       vertexBindingDescs;
 
     // pipeline::VertexInputInfo.pVertexAttributeDescriptions is pointer
     // => needs to persist data in scope via struct
-    VertexAttrDescList              vertexAttrDesc;
+    VertexAttrDescList          vertexAttrDescs;
 
     // pipeline::ColorBlendInfo.pAttachments is a pointer
     // => needs to persist data in scope via struct
-    pipeline::ColorBlendAttachment  colorBlendAttachment;
+    ColorBlendAttList           colorBlendAttachments;
   };
 }

@@ -55,14 +55,14 @@ void PipelineHelper::setVertexInputState(
 {
   auto &pso = _material->pso;
   auto &vertexInputState = pso.vertexInputState = {}; // memset
-  auto &vertexBindingDesc = pso.vertexBindingDesc = {
+  auto &vertexBindingDescs = pso.vertexBindingDescs = {
     {
       0, // binding
       3 * sizeof(float), // stride
       VK_VERTEX_INPUT_RATE_VERTEX // inputRate
     }
   };
-  auto &vertexAttrDesc = pso.vertexAttrDesc = {
+  auto &vertexAttrDescs = pso.vertexAttrDescs = {
     { // position
       0, // location
       0, // binding
@@ -84,10 +84,10 @@ void PipelineHelper::setVertexInputState(
   };
 
   vertexInputState.sType = pipeline::StructureType::VERTEX_INPUT_INFO;
-  vertexInputState.vertexBindingDescriptionCount = vertexBindingDesc.size();
-  vertexInputState.pVertexBindingDescriptions = vertexBindingDesc.data();
-  vertexInputState.vertexAttributeDescriptionCount = vertexAttrDesc.size();
-  vertexInputState.pVertexAttributeDescriptions = vertexAttrDesc.data();
+  vertexInputState.vertexBindingDescriptionCount = vertexBindingDescs.size();
+  vertexInputState.pVertexBindingDescriptions = vertexBindingDescs.data();
+  vertexInputState.vertexAttributeDescriptionCount = vertexAttrDescs.size();
+  vertexInputState.pVertexAttributeDescriptions = vertexAttrDescs.data();
   vertexInputState.pNext = nullptr;
   vertexInputState.flags = 0;
 }
@@ -148,22 +148,23 @@ void PipelineHelper::setColorBlendState(
   colorBlendState.attachmentCount = 1;
 
   // no blend, write out all of rgba
-  auto &att = pso.colorBlendAttachment = {}; // memset
+  auto &attachments = pso.colorBlendAttachments = {
+    {
+      VK_FALSE,
+      VK_BLEND_FACTOR_ONE,
+      VK_BLEND_FACTOR_ZERO,
+      VK_BLEND_OP_ADD,
+      VK_BLEND_FACTOR_ONE,
+      VK_BLEND_FACTOR_ZERO,
+      VK_BLEND_OP_ADD,
+      VK_COLOR_COMPONENT_R_BIT |
+      VK_COLOR_COMPONENT_G_BIT |
+      VK_COLOR_COMPONENT_B_BIT |
+      VK_COLOR_COMPONENT_A_BIT
+    }
+  };
 
-  att.blendEnable = VK_FALSE;
-  att.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-  att.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-  att.colorBlendOp = VK_BLEND_OP_ADD;
-  att.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-  att.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-  att.alphaBlendOp = VK_BLEND_OP_ADD;
-  att.colorWriteMask =
-    VK_COLOR_COMPONENT_R_BIT |
-    VK_COLOR_COMPONENT_G_BIT |
-    VK_COLOR_COMPONENT_B_BIT |
-    VK_COLOR_COMPONENT_A_BIT;
-
-  colorBlendState.pAttachments = &att;
+  colorBlendState.pAttachments = attachments.data();
 }
 
 /**

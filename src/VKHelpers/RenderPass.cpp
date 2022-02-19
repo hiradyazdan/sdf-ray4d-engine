@@ -51,12 +51,12 @@ RenderPassHelper::RenderPassHelper(
  * @param[in] _depthStencilFormat
  * @param[out] m_renderPass
  */
-void RenderPassHelper::createCustomRenderPass(
+void RenderPassHelper::createRenderPass(
   const Format &_colorFormat,
   const Format &_depthStencilFormat
 ) noexcept
 {
-  AttachmentDesc attDesc[1] = {}; // memset
+  renderpass::AttachmentDesc attDesc[1] = {}; // memset
 
   attDesc[0].format = _depthStencilFormat;
   attDesc[0].samples = m_sampleCountFlags;
@@ -67,12 +67,12 @@ void RenderPassHelper::createCustomRenderPass(
   attDesc[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
   attDesc[0].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
-  AttachmentRef dsRef = {
+  renderpass::AttachmentRef dsRef = {
     0,
     VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
   };
 
-  SubpassDesc subPassDesc = {}; // memset
+  renderpass::SubpassDesc subPassDesc = {}; // memset
   subPassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
   subPassDesc.colorAttachmentCount = 0;
   subPassDesc.pColorAttachments = nullptr;
@@ -94,15 +94,15 @@ void RenderPassHelper::createCustomRenderPass(
 
   if (result != VK_SUCCESS)
   {
-    qWarning("Failed to create RenderPass: %d", result);
+    qFatal("Failed to create RenderPass: %d", result);
   }
 }
 
 /**
- * @brief creates renderPassInfo for both default and custom renderPass
+ * @brief creates renderPassBeginInfo for both default and custom renderPass
  * @param[in] _materials
  */
-void RenderPassHelper::createRenderPassInfo(
+void RenderPassHelper::createBeginInfo(
   const std::vector<MaterialPtr> &_materials
 ) noexcept
 {
@@ -130,13 +130,13 @@ void RenderPassHelper::createRenderPassInfo(
   m_clearValues[0].color = m_clearValues[2].color = clearColor;
   m_clearValues[1].depthStencil = clearDepthStencil;
 
-  m_renderPassInfo.sType = renderpass::StructureType::RENDER_PASS_BEGIN_INFO;
-  m_renderPassInfo.renderPass = rpMaterial->renderPass;
-  m_renderPassInfo.framebuffer = rpMaterial->framebuffer;
-  m_renderPassInfo.renderArea.extent.width = m_extentWidth;
-  m_renderPassInfo.renderArea.extent.height = m_extentHeight;
-  m_renderPassInfo.clearValueCount = m_sampleCountFlags > VK_SAMPLE_COUNT_1_BIT ? 3 : 2;
-  m_renderPassInfo.pClearValues = m_clearValues;
+  m_beginInfo.sType = renderpass::StructureType::RENDER_PASS_BEGIN_INFO;
+  m_beginInfo.renderPass = rpMaterial->renderPass;
+  m_beginInfo.framebuffer = rpMaterial->framebuffer;
+  m_beginInfo.renderArea.extent.width = m_extentWidth;
+  m_beginInfo.renderArea.extent.height = m_extentHeight;
+  m_beginInfo.clearValueCount = m_sampleCountFlags > VK_SAMPLE_COUNT_1_BIT ? 3 : 2;
+  m_beginInfo.pClearValues = m_clearValues;
 }
 
 /**
@@ -149,7 +149,7 @@ renderpass::RenderPass &RenderPassHelper::getRenderPass(bool _useDefault) noexce
 {
   if(!m_renderPass && !_useDefault)
   {
-    createCustomRenderPass();
+    createRenderPass();
   }
 
   /**

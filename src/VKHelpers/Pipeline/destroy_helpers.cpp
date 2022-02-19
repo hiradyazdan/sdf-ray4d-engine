@@ -87,7 +87,7 @@ void PipelineHelper::destroyPipelines() noexcept
  *
  * @param[in] _setLayouts
  */
-void PipelineHelper::destroyDescriptorSetLayout(
+void PipelineHelper::destroyDescriptorSetLayouts(
   DescLayoutList &_setLayouts
 ) noexcept
 {
@@ -127,7 +127,7 @@ void PipelineHelper::destroyDescriptors() noexcept
 {
   for(const auto &material : m_materials)
   {
-    destroyDescriptorSetLayout(material->descSetLayouts);
+    destroyDescriptorSetLayouts(material->descSetLayouts);
     destroyDescriptorPool(material->descPool);
   }
 }
@@ -216,4 +216,14 @@ void PipelineHelper::destroyBuffers() noexcept
     m_bufferHelper.destroyBuffer(material->dynamicUniformBuffer);
     m_bufferHelper.freeMemory();
   }
+}
+
+void PipelineHelper::destroyMaterials() noexcept
+{
+  for(auto &material : m_materials)
+  {
+    material.reset();
+  }
+
+  m_materials.clear();
 }

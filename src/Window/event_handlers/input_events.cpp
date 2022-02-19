@@ -153,6 +153,14 @@ void MainWindow::resizeEvent(QResizeEvent *_event)
   resizeSDFGraph(dockWidgetArea(m_sdfGraphWidget));
 }
 
+void MainWindow::hideEvent(QHideEvent *event)
+{
+}
+
+void MainWindow::showEvent(QShowEvent *event)
+{
+}
+
 /**
  *
  * @param[in] _event

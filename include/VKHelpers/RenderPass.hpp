@@ -38,13 +38,13 @@ namespace sdfRay4d::vkHelpers
      * -------------------------------------------------
      */
     private:
-      void createCustomRenderPass(
+      void createRenderPass(
         const Format &_colorFormat = VK_FORMAT_B8G8R8A8_UNORM,
         const Format &_depthStencilFormat = VK_FORMAT_D16_UNORM//VK_FORMAT_D24_UNORM_S8_UINT
       ) noexcept;
-      void createRenderPassInfo(const std::vector<MaterialPtr> &_materials) noexcept;
+      void createBeginInfo(const std::vector<MaterialPtr> &_materials) noexcept;
       renderpass::RenderPass &getRenderPass(bool _useDefault = true) noexcept;
-      renderpass::BeginInfo &getRenderPassInfo() noexcept { return m_renderPassInfo; }
+      renderpass::BeginInfo &getBeginInfo() noexcept { return m_beginInfo; }
 
     /**
      * Framebuffer Helpers
@@ -67,7 +67,7 @@ namespace sdfRay4d::vkHelpers
 
       SampleCountFlags m_sampleCountFlags = {};
       Clear m_clearValues[3] = {};
-      renderpass::BeginInfo m_renderPassInfo = {};
+      renderpass::BeginInfo m_beginInfo = {};
 
       uint32_t m_extentWidth = 0;
       uint32_t m_extentHeight = 0;

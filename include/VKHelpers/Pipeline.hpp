@@ -47,9 +47,9 @@ namespace sdfRay4d::vkHelpers
      *
      */
     public:
-      void createWorkers                (const std::vector<MaterialPtr> &_materials) noexcept;
-      void createWorker                 (const std::vector<MaterialPtr> &_materials) noexcept;
-      void createWorker                 (const MaterialPtr &_material, bool _isHot = false) noexcept;
+      void createWorkers                    (const std::vector<MaterialPtr> &_materials) noexcept;
+      void createWorker                     (const std::vector<MaterialPtr> &_materials) noexcept;
+      void createWorker                     (const MaterialPtr &_material, bool _isHot = false) noexcept;
 
     public:
       void waitForWorkersToFinish() noexcept;
@@ -62,23 +62,24 @@ namespace sdfRay4d::vkHelpers
      *
      */
     public:
-      void destroyDescriptorPool        (descriptor::Pool &_pool) noexcept;
-      void destroyDescriptorSetLayout   (DescLayoutList &_setLayouts) noexcept;
+      void destroyDescriptorPool            (descriptor::Pool &_pool) noexcept;
+      void destroyDescriptorSetLayouts      (DescLayoutList &_setLayouts) noexcept;
       void destroyDescriptors() noexcept;
 
       void destroyShaderModules() noexcept;
-      void destroyShaderModule          (Shader &_shader) noexcept;
+      void destroyShaderModule              (Shader &_shader) noexcept;
 
-      void destroyTexture               (Texture &_texture) noexcept;
+      void destroyTexture                   (Texture &_texture) noexcept;
       void destroyTextures() noexcept;
 
       void destroyPipelines() noexcept;
-      void destroyPipeline              (pipeline::Pipeline &_pipeline) noexcept;
-      void destroyPipeline              (const MaterialPtr &_material) noexcept;
-      void destroyPipelineLayout        (pipeline::Layout &_pipelineLayout) noexcept;
-      void destroyPipelineLayout        (const MaterialPtr &_material) noexcept;
+      void destroyPipeline                  (pipeline::Pipeline &_pipeline) noexcept;
+      void destroyPipeline                  (const MaterialPtr &_material) noexcept;
+      void destroyPipelineLayout            (pipeline::Layout &_pipelineLayout) noexcept;
+      void destroyPipelineLayout            (const MaterialPtr &_material) noexcept;
       void destroyRenderPass() noexcept;
       void destroyBuffers() noexcept;
+      void destroyMaterials() noexcept;
 
       void swapSDFRPipelines(
         const MaterialPtr &_oldMaterial,
@@ -86,13 +87,13 @@ namespace sdfRay4d::vkHelpers
       ) noexcept;
 
     public:
-      void setFramebufferAttachments    (const ImageViewList &_fbAttachments) noexcept;
-      renderpass::RenderPass &getRenderPass         (bool _useDefault = true) noexcept;
+      void setFramebufferAttachments        (const ImageViewList &_fbAttachments) noexcept;
+      renderpass::RenderPass &getRenderPass (bool _useDefault = true) noexcept;
 
     public:
-      DescriptorHelper &getDescriptorHelper() { return m_descriptorHelper; }
-      BufferHelper &getBufferHelper() { return m_bufferHelper; }
-      CommandHelper &getCommandHelper() { return m_commandHelper; }
+      inline DescriptorHelper  &getDescriptorHelper()  noexcept { return m_descriptorHelper; }
+      inline BufferHelper      &getBufferHelper()      noexcept { return m_bufferHelper; }
+      inline CommandHelper     &getCommandHelper()     noexcept { return m_commandHelper; }
 
     /**
      * Create Pipeline Helpers (on Worker Thread)
@@ -104,12 +105,12 @@ namespace sdfRay4d::vkHelpers
      */
     private:
       void createPipelines() noexcept;
-      void createPipeline               (const MaterialPtr &_material) noexcept;
-      void createLayout                 (const MaterialPtr &_material) noexcept;
-      void createComputePipeline        (const MaterialPtr &_material) noexcept;
-      void createGraphicsPipeline       (const MaterialPtr &_material) noexcept;
+      void createPipeline                   (const MaterialPtr &_material) noexcept;
+      void createLayout                     (const MaterialPtr &_material) noexcept;
+      void createComputePipeline            (const MaterialPtr &_material) noexcept;
+      void createGraphicsPipeline           (const MaterialPtr &_material) noexcept;
 
-      static void initShaderStages      (const MaterialPtr &_material) noexcept;
+      static void initShaderStages          (const MaterialPtr &_material) noexcept;
 
     /**
      * PSO (Pipeline State Objects) Helpers (on Worker Thread)
@@ -118,37 +119,38 @@ namespace sdfRay4d::vkHelpers
      *
      */
     private:
-      void initPSOs                     (const MaterialPtr &_material) noexcept;
+      void initPSOs                         (const MaterialPtr &_material) noexcept;
 
-      static void setDynamicState       (const MaterialPtr &_material) noexcept;
-      static void setVertexInputState   (const MaterialPtr &_material) noexcept;
-      static void setInputAssemblyState (const MaterialPtr &_material) noexcept;
-      static void setRasterizationState (const MaterialPtr &_material) noexcept;
-      static void setColorBlendState    (const MaterialPtr &_material) noexcept;
-      static void setViewportState      (const MaterialPtr &_material) noexcept;
-      static void setDepthStencilState  (const MaterialPtr &_material) noexcept;
-      void setMultisampleState          (const MaterialPtr &_material) noexcept;
+      static void setDynamicState           (const MaterialPtr &_material) noexcept;
+      static void setVertexInputState       (const MaterialPtr &_material) noexcept;
+      static void setInputAssemblyState     (const MaterialPtr &_material) noexcept;
+      static void setRasterizationState     (const MaterialPtr &_material) noexcept;
+      static void setColorBlendState        (const MaterialPtr &_material) noexcept;
+      static void setViewportState          (const MaterialPtr &_material) noexcept;
+      static void setDepthStencilState      (const MaterialPtr &_material) noexcept;
+      void setMultisampleState              (const MaterialPtr &_material) noexcept;
 
     private:
-      device::Device m_device = VK_NULL_HANDLE;
-      QVulkanDeviceFunctions *m_deviceFuncs = VK_NULL_HANDLE;
+      device::Device              m_device              = VK_NULL_HANDLE;
+      QVulkanDeviceFunctions      *m_deviceFuncs        = VK_NULL_HANDLE;
 
-      pipeline::Cache m_pipelineCache = VK_NULL_HANDLE;
-      shader::Module m_currentShaderModule = VK_NULL_HANDLE;
+      pipeline::Cache             m_pipelineCache       = VK_NULL_HANDLE;
+      shader::Module              m_currentShaderModule = VK_NULL_HANDLE;
 
-      QMutex m_pipeMutex;
+      bool                        m_isHot               = false; // for swapping old and new pipelines at runtime
 
-      RenderPassHelper m_renderPassHelper;
-      DescriptorHelper m_descriptorHelper;
-      BufferHelper m_bufferHelper;
-      CommandHelper m_commandHelper;
+      QMutex                      m_pipeMutex;
+      std::vector<QFuture<void>>  m_workers;
+      QFuture<void>               m_inclusiveWorker;
+      QFuture<void>               m_exclusiveWorker;
 
-      SampleCountFlags m_sampleCountFlags;
+      RenderPassHelper            m_renderPassHelper;
+      DescriptorHelper            m_descriptorHelper;
+      BufferHelper                m_bufferHelper;
+      CommandHelper               m_commandHelper;
 
-      std::vector<MaterialPtr> m_materials;
-      std::vector<QFuture<void>> m_workers;
-      QFuture<void> m_inclusiveWorker;
-      QFuture<void> m_exclusiveWorker;
-      bool m_isHot = false; // for swapping old and new pipelines at runtime
+      SampleCountFlags            m_sampleCountFlags;
+
+      std::vector<MaterialPtr>    m_materials;
   };
 }
