@@ -38,7 +38,7 @@ using namespace sdfRay4d::vkHelpers;
 void PipelineHelper::initHelpers(
   const device::Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs,
-  const SampleCountFlags &_sampleCountFlags,
+  const image::SampleCountFlagBits &_sampleCountFlags,
   const renderpass::RenderPass &_defaultRenderPass
 ) noexcept
 {

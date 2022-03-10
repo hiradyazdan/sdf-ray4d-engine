@@ -39,7 +39,6 @@ namespace sdfRay4d
     using Viewport              = VkViewport;
     using Rect2D                = VkRect2D;
     using PushConstantRange     = VkPushConstantRange;
-    using SampleCountFlags      = VkSampleCountFlagBits;
 
     namespace renderpass
     {
@@ -74,28 +73,32 @@ namespace sdfRay4d
       };
     }
 
-    namespace texture
+    namespace image
     {
-      using Image               = VkImage;
-      using ImageInfo           = VkImageCreateInfo;
-      using ImageUsage          = VkImageUsageFlags;
-      using ImageView           = VkImageView;
-      using ImageViewInfo       = VkImageViewCreateInfo;
-      using ImageAspect         = VkImageAspectFlags;
-      using ImageLayout         = VkImageLayout;
-      using ImageMemoryBarrier  = VkImageMemoryBarrier;
+      using Image         = VkImage;
 
-      using AccessFlags         = VkAccessFlags;
+      using Info          = VkImageCreateInfo;
+      using Usage         = VkImageUsageFlags;
+
+      using View          = VkImageView;
+      using ViewInfo      = VkImageViewCreateInfo;
+
+      using Aspect        = VkImageAspectFlags;
+      using Layout        = VkImageLayout;
+      using MemBarrier    = VkImageMemoryBarrier;
 
       using Sampler             = VkSampler;
       using SamplerInfo         = VkSamplerCreateInfo;
 
-      // Texture StructureType
+      using SampleCountFlagBits = VkSampleCountFlagBits;
+      using SampleCountFlags    = VkSampleCountFlags;
+
+      // Image StructureType
       struct StructureType : NOP
       {
-        static constexpr const VkStructureType IMAGE_INFO             = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-        static constexpr const VkStructureType IMAGE_VIEW_INFO        = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        static constexpr const VkStructureType IMAGE_MEMORY_BARRIER   = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        static constexpr const VkStructureType IMAGE_INFO = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        static constexpr const VkStructureType IMAGE_VIEW_INFO = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        static constexpr const VkStructureType IMAGE_MEMORY_BARRIER = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 
         static constexpr const VkStructureType SAMPLER_INFO           = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
       };
@@ -123,8 +126,10 @@ namespace sdfRay4d
 
     namespace memory
     {
-      using Reqs      = VkMemoryRequirements;
-      using AllocInfo = VkMemoryAllocateInfo;
+      using Reqs        = VkMemoryRequirements;
+      using AllocInfo   = VkMemoryAllocateInfo;
+
+      using AccessFlags = VkAccessFlags;
 
       // Memory StructureType
       struct StructureType : NOP
@@ -173,15 +178,31 @@ namespace sdfRay4d
 
     namespace shader
     {
-      using Module      = VkShaderModule;
-      using Info        = VkShaderModuleCreateInfo;
-      using StageFlag   = VkShaderStageFlagBits;
-      using StageFlags  = VkShaderStageFlags;
+      using Module        = VkShaderModule;
+      using Info          = VkShaderModuleCreateInfo;
+      using StageFlagBits = VkShaderStageFlagBits;
+      using StageFlags    = VkShaderStageFlags;
 
       // Shader StructureType
       struct StructureType : NOP
       {
         static constexpr const VkStructureType SHADER_MODULE_INFO  = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+      };
+
+      struct StageFlag : NOP
+      {
+        static constexpr const StageFlagBits VERTEX                   = VK_SHADER_STAGE_VERTEX_BIT;
+        static constexpr const StageFlagBits FRAGMENT                 = VK_SHADER_STAGE_FRAGMENT_BIT;
+        static constexpr const StageFlagBits COMPUTE                  = VK_SHADER_STAGE_COMPUTE_BIT;
+        static constexpr const StageFlagBits GEOMETRY                 = VK_SHADER_STAGE_GEOMETRY_BIT;
+        static constexpr const StageFlagBits TESSELLATION_CONTROL     = VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+        static constexpr const StageFlagBits TESSELLATION_EVALUATION  = VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+        static constexpr const StageFlagBits RAYGEN_KHR               = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
+        static constexpr const StageFlagBits ANY_HIT_KHR              = VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+        static constexpr const StageFlagBits CLOSEST_HIT_KHR          = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+        static constexpr const StageFlagBits MISS_KHR                 = VK_SHADER_STAGE_MISS_BIT_KHR;
+        static constexpr const StageFlagBits INTERSECTION_KHR         = VK_SHADER_STAGE_INTERSECTION_BIT_KHR;
+        static constexpr const StageFlagBits CALLABLE_KHR             = VK_SHADER_STAGE_CALLABLE_BIT_KHR;
       };
     }
 

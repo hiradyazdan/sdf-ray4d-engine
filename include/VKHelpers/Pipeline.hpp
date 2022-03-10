@@ -28,13 +28,13 @@ namespace sdfRay4d::vkHelpers
   {
     using ShaderStageInfoList = std::vector<pipeline::ShaderStageInfo>;
     using DescLayoutList      = std::vector<descriptor::Layout>;
-    using ImageViewList       = std::vector<texture::ImageView>;
+    using ImageViewList       = std::vector<image::View>;
 
     public:
       void initHelpers(
         const device::Device &_device,
         QVulkanDeviceFunctions *_deviceFuncs,
-        const SampleCountFlags &_sampleCountFlags,
+        const image::SampleCountFlagBits &_sampleCountFlags,
         const renderpass::RenderPass &_defaultRenderPass
       ) noexcept;
 
@@ -131,26 +131,26 @@ namespace sdfRay4d::vkHelpers
       void setMultisampleState              (const MaterialPtr &_material) noexcept;
 
     private:
-      device::Device              m_device              = VK_NULL_HANDLE;
-      QVulkanDeviceFunctions      *m_deviceFuncs        = VK_NULL_HANDLE;
+      device::Device                m_device              = VK_NULL_HANDLE;
+      QVulkanDeviceFunctions        *m_deviceFuncs        = VK_NULL_HANDLE;
 
-      pipeline::Cache             m_pipelineCache       = VK_NULL_HANDLE;
-      shader::Module              m_currentShaderModule = VK_NULL_HANDLE;
+      pipeline::Cache               m_pipelineCache       = VK_NULL_HANDLE;
+      shader::Module                m_currentShaderModule = VK_NULL_HANDLE;
 
-      bool                        m_isHot               = false; // for swapping old and new pipelines at runtime
+      bool                          m_isHot               = false; // for swapping old and new pipelines at runtime
 
-      QMutex                      m_pipeMutex;
-      std::vector<QFuture<void>>  m_workers;
-      QFuture<void>               m_inclusiveWorker;
-      QFuture<void>               m_exclusiveWorker;
+      QMutex                        m_pipeMutex;
+      std::vector<QFuture<void>>    m_workers;
+      QFuture<void>                 m_inclusiveWorker;
+      QFuture<void>                 m_exclusiveWorker;
 
-      RenderPassHelper            m_renderPassHelper;
-      DescriptorHelper            m_descriptorHelper;
-      BufferHelper                m_bufferHelper;
-      CommandHelper               m_commandHelper;
+      RenderPassHelper              m_renderPassHelper;
+      DescriptorHelper              m_descriptorHelper;
+      BufferHelper                  m_bufferHelper;
+      CommandHelper                 m_commandHelper;
 
-      SampleCountFlags            m_sampleCountFlags;
+      image::SampleCountFlagBits  m_sampleCountFlags;
 
-      std::vector<MaterialPtr>    m_materials;
+      std::vector<MaterialPtr>      m_materials;
   };
 }

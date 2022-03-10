@@ -102,9 +102,9 @@ namespace sdfRay4d
       const device::Device &_device,
       QVulkanDeviceFunctions *_deviceFuncs
     ) :
-      vertexShader  (_device, _deviceFuncs)
-    , fragmentShader(_device, _deviceFuncs)
-    , computeShader (_device, _deviceFuncs)
+      vertexShader  (_device, _deviceFuncs, shader::StageFlag::VERTEX)
+    , fragmentShader(_device, _deviceFuncs, shader::StageFlag::FRAGMENT)
+    , computeShader (_device, _deviceFuncs, shader::StageFlag::COMPUTE)
     , texture       (_device, _deviceFuncs)
     {};
 
@@ -123,7 +123,7 @@ namespace sdfRay4d
     void setPushConstantRange(
       uint32_t _offset,
       uint32_t _size,
-      shader::StageFlags _stages = VK_SHADER_STAGE_FRAGMENT_BIT
+      shader::StageFlags _stages = shader::StageFlag::FRAGMENT
     )
     {
       pushConstantRangeCount        = 1;

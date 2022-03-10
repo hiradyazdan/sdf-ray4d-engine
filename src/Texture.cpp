@@ -6,8 +6,7 @@
 
 #include "Texture.hpp"
 
-using namespace sdfRay4d;
-using namespace texture;
+using namespace sdfRay4d::image;
 
 /**
  *
@@ -33,12 +32,12 @@ Texture::Texture(
 void Texture::createImage(
   uint32_t _width,
   uint32_t _height,
-  ImageUsage _usage
+  image::Usage _usage
 )
 {
-  ImageInfo imageInfo = {}; // memset
+  image::Info imageInfo = {}; // memset
 
-  imageInfo.sType = texture::StructureType::IMAGE_INFO;
+  imageInfo.sType = image::StructureType::IMAGE_INFO;
   imageInfo.pNext = nullptr;
   imageInfo.imageType = VK_IMAGE_TYPE_2D;
   imageInfo.format = VK_FORMAT_D16_UNORM;
@@ -116,14 +115,14 @@ void Texture::createImageMemory(
  * @param[in] _destAccessMask
  */
 void Texture::createImageMemoryBarrier(
-  const ImageLayout &_oldLayout,
-  const ImageLayout &_newLayout,
-  const ImageAspect &_aspectMask,
-  const AccessFlags &_srcAccessMask,
-  const AccessFlags &_destAccessMask
+  const image::Layout &_oldLayout,
+  const image::Layout &_newLayout,
+  const image::Aspect &_aspectMask,
+  const memory::AccessFlags &_srcAccessMask,
+  const memory::AccessFlags &_destAccessMask
 )
 {
-  m_imageMemBarrier.sType = texture::StructureType::IMAGE_MEMORY_BARRIER;
+  m_imageMemBarrier.sType = image::StructureType::IMAGE_MEMORY_BARRIER;
   m_imageMemBarrier.oldLayout = _oldLayout;
   m_imageMemBarrier.newLayout = _newLayout;
   m_imageMemBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -145,7 +144,7 @@ void Texture::createImageMemoryBarrier(
  * @param[in] _aspectMask
  */
 void Texture::createImageView(
-  ImageAspect _aspectMask
+  image::Aspect _aspectMask
 )
 {
   createImageView(_aspectMask, m_imageView);
@@ -156,13 +155,13 @@ void Texture::createImageView(
  * @param[in,out] _imageView (m_imageView)
  */
 void Texture::createImageView(
-  ImageAspect _aspectMask,
-  texture::ImageView &_imageView
+  image::Aspect _aspectMask,
+  image::View &_imageView
 )
 {
-  ImageViewInfo viewInfo = {}; // memset
+  image::ViewInfo viewInfo = {}; // memset
 
-  viewInfo.sType = texture::StructureType::IMAGE_VIEW_INFO;
+  viewInfo.sType = image::StructureType::IMAGE_VIEW_INFO;
   viewInfo.pNext = nullptr;
   viewInfo.image = m_image;
   viewInfo.format = VK_FORMAT_D16_UNORM;//VK_FORMAT_R8G8B8A8_SRGB;
@@ -208,7 +207,7 @@ void Texture::createSampler(
 {
   SamplerInfo samplerInfo = {}; // memset
 
-  samplerInfo.sType = texture::StructureType::SAMPLER_INFO;
+  samplerInfo.sType = image::StructureType::SAMPLER_INFO;
 
   samplerInfo.magFilter = VK_FILTER_LINEAR;
   samplerInfo.minFilter = VK_FILTER_LINEAR;

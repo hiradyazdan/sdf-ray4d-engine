@@ -27,7 +27,7 @@ using namespace sdfRay4d::vkHelpers;
 RenderPassHelper::RenderPassHelper(
   const device::Device &_device,
   QVulkanDeviceFunctions *_deviceFuncs,
-  const SampleCountFlags &_sampleCountFlags,
+  const image::SampleCountFlagBits &_sampleCountFlags,
   const renderpass::RenderPass &_renderPass
 ) noexcept :
   m_device(_device)

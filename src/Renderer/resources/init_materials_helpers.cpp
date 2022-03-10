@@ -49,7 +49,7 @@ void Renderer::initDepthMaterial()
     0, // binding
     VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, // descriptorType
     1, // descriptorCount
-    VK_SHADER_STAGE_VERTEX_BIT, // stageFlags
+    shader::StageFlag::VERTEX, // stageFlags
     nullptr // pImmutableSamplers
   };
   material->descSetLayoutCount = 1;
@@ -98,14 +98,14 @@ void Renderer::initActorMaterial()
     0, // binding
     VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, // descriptorType
     1, // descriptorCount
-    VK_SHADER_STAGE_VERTEX_BIT, // stageFlags
+    shader::StageFlag::VERTEX, // stageFlags
     nullptr // pImmutableSamplers
   };
   material->layoutBindings[1] = {
     1, // binding
     VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, // descriptorType
     1, // descriptorCount
-    VK_SHADER_STAGE_FRAGMENT_BIT, // stageFlags
+    shader::StageFlag::FRAGMENT, // stageFlags
     nullptr // pImmutableSamplers
   };
   material->descSetLayoutCount = 1;
@@ -163,7 +163,7 @@ void Renderer::initSDFRMaterial(const MaterialPtr &_material)
     0, // binding
     VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, // descriptorType
     1, // descriptorCount
-    VK_SHADER_STAGE_FRAGMENT_BIT, // stageFlags
+    shader::StageFlag::FRAGMENT, // stageFlags
     nullptr // pImmutableSamplers
   };
   _material->descSetLayoutCount = 1;

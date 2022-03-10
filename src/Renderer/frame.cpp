@@ -68,8 +68,8 @@ void Renderer::updateFrame()
    * vulkan objects for auto-compile
    *
    */
-  m_swapWorker = QtConcurrent::run([&]()
-  {
-    swapSDFRPipelines();
-  });
+  m_swapWorker = QtConcurrent::run(
+    this,
+    &Renderer::swapSDFRPipelines
+  );
 }

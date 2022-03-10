@@ -52,6 +52,8 @@ void Renderer::swapSDFRPipelines()
 
   m_isNewWorker = false;
 
+  QMutexLocker locker(&m_guiMutex);
+
   m_oldPipeline.pipeline  = m_sdfrMaterial->pipeline;
   m_oldPipeline.layout    = m_sdfrMaterial->pipelineLayout;
 
@@ -69,7 +71,7 @@ void Renderer::swapSDFRPipelines()
    * their execution.
    *
    * @note Although it may stall the pipeline, that is the only way
-   * Qt Vulkan seems to expose in this case. Otherwise, I could use
+   * Qt Vulkan seems to expose in this case. Otherwise, I could've used
    * vkGetFenceStatus and pass the inflight Fence to check every frame,
    * which is not available through Qt Vulkan public API (resides in
    * QVulkanWindowPrivate class -> FrameResources struct).
@@ -95,11 +97,14 @@ void Renderer::swapSDFRPipelines()
      * - if multiple objects on auto-compile are loaded and changed quite
      *   repeatedly and fast.
      * @todo
-     *    replace async threads with fibers to address above issues and help removing
-     *    stale pointers and optimize auto compile more efficiently
+     *    replace async threads with fibers to address above issues
+     *    and help removing stale pointers and optimize auto compile
+     *    more efficiently
      */
     m_destroyWorker = QtConcurrent::run([&]()
     {
+      QMutexLocker locker(&m_guiMutex);
+
       m_pipelineHelper.destroyShaderModule(m_newSDFRMaterial->fragmentShader);
       m_pipelineHelper.destroyDescriptorSetLayouts(m_newSDFRMaterial->descSetLayouts);
       m_pipelineHelper.destroyDescriptorPool(m_newSDFRMaterial->descPool);

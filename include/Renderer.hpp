@@ -18,7 +18,7 @@ namespace sdfRay4d
   {
     using Mat           = Material<>;
     using MaterialPtr   = std::shared_ptr<Mat>;
-    using ImageViewList = std::vector<texture::ImageView>;
+    using ImageViewList = std::vector<image::View>;
 
     public:
       explicit Renderer(

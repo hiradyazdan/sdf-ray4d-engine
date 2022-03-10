@@ -16,7 +16,7 @@ namespace sdfRay4d::vkHelpers
     friend class RenderPassHelper;
     friend class CommandHelper;
 
-    using ImageViewList = std::vector<texture::ImageView>;
+    using ImageViewList = std::vector<image::View>;
 
     /**
      * @note FramebufferHelper is non-copyable

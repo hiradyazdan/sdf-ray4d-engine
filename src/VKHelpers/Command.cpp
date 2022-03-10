@@ -142,7 +142,7 @@ void CommandHelper::executeCmdPushConstants(
   m_deviceFuncs->vkCmdPushConstants(
     m_cmdBuffer,
     _material->pipelineLayout,
-    VK_SHADER_STAGE_FRAGMENT_BIT,
+    shader::StageFlag::FRAGMENT,
     0/*sizeof(mvp) - 4*/,
     sizeof(pushConstants.data()),
     pushConstants.data()

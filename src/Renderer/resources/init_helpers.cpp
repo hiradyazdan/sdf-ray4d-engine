@@ -81,6 +81,6 @@ void Renderer::createDepthView()
   );
 
   m_pipelineHelper.setFramebufferAttachments({
-    m_depthMaterial->texture.getImageView() // framebuffer depth attachment for custom renderPass
+    depthTexture.getImageView() // framebuffer depth attachment for custom renderPass
   });
 }

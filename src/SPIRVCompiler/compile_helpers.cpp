@@ -13,23 +13,25 @@ using namespace sdfRay4d;
  * @returns EShLanguage
  */
 EShLanguage SPIRVCompiler::getShaderLang(
-  const shader::StageFlag &_stage
+  const shader::StageFlagBits &_stage
 ) noexcept
 {
   switch (_stage)
   {
-    case VK_SHADER_STAGE_VERTEX_BIT:                  return EShLangVertex;
-    case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:    return EShLangTessControl;
-    case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT: return EShLangTessEvaluation;
-    case VK_SHADER_STAGE_GEOMETRY_BIT:                return EShLangGeometry;
-    case VK_SHADER_STAGE_FRAGMENT_BIT:                return EShLangFragment;
-    case VK_SHADER_STAGE_COMPUTE_BIT:                 return EShLangCompute;
-    case VK_SHADER_STAGE_RAYGEN_BIT_KHR:              return EShLangRayGen;
-    case VK_SHADER_STAGE_ANY_HIT_BIT_KHR:             return EShLangAnyHit;
-    case VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR:         return EShLangClosestHit;
-    case VK_SHADER_STAGE_MISS_BIT_KHR:                return EShLangMiss;
-    case VK_SHADER_STAGE_INTERSECTION_BIT_KHR:        return EShLangIntersect;
-    case VK_SHADER_STAGE_CALLABLE_BIT_KHR:            return EShLangCallable;
+    case shader::StageFlag::VERTEX:                   return EShLangVertex;
+    case shader::StageFlag::TESSELLATION_CONTROL:     return EShLangTessControl;
+    case shader::StageFlag::TESSELLATION_EVALUATION:  return EShLangTessEvaluation;
+    case shader::StageFlag::GEOMETRY:                 return EShLangGeometry;
+    case shader::StageFlag::FRAGMENT:                 return EShLangFragment;
+    case shader::StageFlag::COMPUTE:                  return EShLangCompute;
+
+    case shader::StageFlag::RAYGEN_KHR:               return EShLangRayGen;
+    case shader::StageFlag::ANY_HIT_KHR:              return EShLangAnyHit;
+    case shader::StageFlag::CLOSEST_HIT_KHR:          return EShLangClosestHit;
+    case shader::StageFlag::MISS_KHR:                 return EShLangMiss;
+    case shader::StageFlag::INTERSECTION_KHR:         return EShLangIntersect;
+    case shader::StageFlag::CALLABLE_KHR:             return EShLangCallable;
+
     default:                                          return EShLangVertex;
   }
 }

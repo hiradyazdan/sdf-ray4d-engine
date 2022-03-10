@@ -64,7 +64,7 @@ void Shader::load(
    * So, for the sake of code readability/maintainability, it may be cleaner to put everything inside the async
    * callback function.
    */
-  m_worker = QtConcurrent::run([fileExtension, _filePath, _partialFilePaths, this]()
+  m_worker = QtConcurrent::run([=]()
   {
     auto isPrecompiled = fileExtension == "spv";
     auto rawBytes = getFileBytes(constants::shadersPath + _filePath);
@@ -94,8 +94,8 @@ void Shader::load(
        * multiple shaders. It should only be called once per process, not per thread.
        */
       if(
-        !m_spirvCompiler.compile(
-          getShaderStage(fileExtension),
+        !SPIRVCompiler::compile(
+          m_stage,
           rawBytes,
           spvBytes, log
         )
@@ -161,7 +161,7 @@ void Shader::load(
 
   m_isLoading = true;
 
-  m_worker = QtConcurrent::run([_shaderData, this]()
+  m_worker = QtConcurrent::run([=]()
   {
     const auto &originalTemplate = constants::shaderTmpl;
     const auto &shaderData = !_shaderData.empty() ? _shaderData : originalTemplate;
@@ -186,8 +186,8 @@ void Shader::load(
      * multiple shaders. It should only be called once per process, not per thread.
      */
     if(
-      !m_spirvCompiler.compile(
-        getShaderStage("frag"),
+      !SPIRVCompiler::compile(
+        m_stage,
         m_rawBytes,
         spvBytes, log
         )

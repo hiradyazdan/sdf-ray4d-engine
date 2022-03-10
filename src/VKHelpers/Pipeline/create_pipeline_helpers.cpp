@@ -169,7 +169,7 @@ void PipelineHelper::createComputePipeline(
     &pipelineInfo,
     nullptr,
     &_material->pipeline
-    );
+  );
 
   if (result != VK_SUCCESS)
   {
@@ -250,7 +250,7 @@ void PipelineHelper::initShaderStages(
       structureType, // sType
       nullptr, // pNext
       0, // flags
-      VK_SHADER_STAGE_VERTEX_BIT, // stage
+      shader::StageFlag::VERTEX, // stage
       _material->vertexShader.getData()->shaderModule, // module
       "main", // pName
       nullptr // pSpecializationInfo
@@ -259,7 +259,7 @@ void PipelineHelper::initShaderStages(
       structureType, // sType
       nullptr, // pNext
       0, // flags
-      VK_SHADER_STAGE_FRAGMENT_BIT, // stage
+      shader::StageFlag::FRAGMENT, // stage
       _material->fragmentShader.getData()->shaderModule, // module
       "main", // pName
       nullptr // pSpecializationInfo

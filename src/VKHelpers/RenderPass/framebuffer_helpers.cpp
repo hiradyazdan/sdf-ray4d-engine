@@ -7,11 +7,6 @@
 
 using namespace sdfRay4d::vkHelpers;
 
-RenderPassHelper::ImageViewList &RenderPassHelper::getFramebufferAttachments() noexcept
-{
-  return m_framebufferHelper.getAttachments();
-}
-
 /**
  *
  * @param[in] _fbAttachments

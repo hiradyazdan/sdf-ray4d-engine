@@ -24,9 +24,7 @@ git clone --recurse-submodules -j8 https://github.com/hiradyazdan/sdf-ray4d-engi
 
 ***Note:***
 
-- `glslang` (The latest pull 18 Sept.) has a typo in its cmake config.
-  Please modify its `CMakeLists.txt` at line `144` to `endif(MSVC AND OVERRIDE_MSVCCRT)`.
-- `nodeeditor` also has a conflict with vcpkg that have to manually remove a snippet of code from
+- `nodeeditor` has a conflict with vcpkg that have to manually remove a snippet of code from
   the CMakeLists.txt in `nodeeditor/external/CMakeLists.txt` as below:
 
 ```cmake
@@ -133,20 +131,8 @@ The same applies to all other `vk` prefixed functions which are invoked
 by `QVulkanDeviceFunctions`instance.
 
 `QVulkanWindowPrivate` acts as an internal class and, its instance is injected into `QVulkanWindow` which
-manages all complex device related functionality including GPU-CPU Synchronization/Multithreading
+manages all complex device related functionality including CPU-GPU Synchronization/Multithreading
 and is hidden from the user.
-
-#### Design Restrictions
-
-- **VulkanWindow Inheritance**
-
-  Currently, couldn't find a way to use one single class consuming and inheriting both `QVulkanWindow` and `QMainWindow` even with `protected` specifiers as they have same public methods signature and therefore cause ambiguous method name lookup.
-
-  Also, instantiating the `QMainWindow` in `VulkanWindow` constructor to, instead, use the `resize` and `show`/`showMaximized` methods of `QVulkanWindow`, does not load an actual window and therefore cannot be used as a workaround.
-
-  Note that, we could inherit `QWindow` to our `VulkanWindow` class and use `QVulkanFunctions` and `QVulkanInstance`, but the limitation would be that `QWidget` functionality is limited and can't have predefined places for Qt widgets.
-
-  So, the only way is to inject (***Dependency Injection - DI***) or instantiate `VulkanWindow` in the `MainWindow` constructor, which may be better in terms of design and testability but with extra distinguished classes.
 
 #### Performance (Speed & Memory Usage)
 

@@ -1,6 +1,6 @@
 /*****************************************************
  * Partial Class: Shader (General)
- * Members: General Functions (Public)
+ * Members: General Functions (Public/Private)
  *
  * This Class is split into partials to categorize
  * and classify the functionality
@@ -15,6 +15,7 @@
  * - serializers.cpp
  *****************************************************/
 
+#include <QFile>
 #include "Shader.hpp"
 
 using namespace sdfRay4d;
@@ -23,13 +24,16 @@ using namespace sdfRay4d;
  *
  * @param[in] _device
  * @param[in] _deviceFuncs
+ * @param[in] _stage
  */
 Shader::Shader(
   const device::Device &_device,
-  QVulkanDeviceFunctions *_deviceFuncs
+  QVulkanDeviceFunctions *_deviceFuncs,
+  const shader::StageFlagBits &_stage
 ) :
   m_device(_device)
 , m_deviceFuncs(_deviceFuncs)
+, m_stage(_stage)
 , m_template(constants::shaderTmpl)
 {}
 
@@ -56,4 +60,17 @@ void Shader::reset()
 {
   m_data = Data();
   m_isLoading = false;
+}
+
+QByteArray Shader::getFileBytes(const QString &_filePath)
+{
+  QFile file(_filePath);
+
+  if (!file.open(QIODevice::ReadOnly))
+  {
+    qWarning("Failed to read shader %s", qPrintable(_filePath));
+    return {};
+  }
+
+  return file.readAll();
 }

@@ -25,8 +25,7 @@
 #include "SDFGraph/DataModels/Shapes/SphereDataModel.hpp"
 #include "SDFGraph/DataModels/Shapes/TorusDataModel.hpp"
 
-using namespace sdfRay4d;
-using namespace sdfGraph;
+using namespace sdfRay4d::sdfGraph;
 
 /**
  *
